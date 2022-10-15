@@ -1,21 +1,21 @@
 package br.com.pine.gerenciador.modelo.dominio.pagamento;
 
-import br.com.pine.gerenciador.aplicacao.transacao.AdicionaItemPago;
+import br.com.pine.gerenciador.aplicacao.transacao.RemoveItemPago;
 import br.com.pine.gerenciador.modelo.dominio.EventoDominio;
 
-public class ItemPagoAdicionado extends EventoDominio {
+public class ItemPagoRemovido extends EventoDominio {
     public String descricao;
     public int quantidade;
-    public UnidadeMedida unidadeMedida;
+    public String unidadeMedida;
     public float valorUnidade;
 
-    public ItemPagoAdicionado(){
+    public ItemPagoRemovido() {
     }
 
-    public ItemPagoAdicionado(AdicionaItemPago umComando) {
+    public ItemPagoRemovido(RemoveItemPago umComando) {
         super(umComando.idEntidade);
         this.descricao = umComando.descricao;
-        this.unidadeMedida = UnidadeMedida.valueOf(umComando.unidadeMedida);
+        this.unidadeMedida = umComando.unidadeMedida;
         this.valorUnidade = umComando.valorUnidade;
         this.quantidade = umComando.quantidade;
     }

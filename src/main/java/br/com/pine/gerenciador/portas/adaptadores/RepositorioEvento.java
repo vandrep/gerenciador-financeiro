@@ -1,7 +1,6 @@
 package br.com.pine.gerenciador.portas.adaptadores;
 
 import br.com.pine.gerenciador.modelo.dominio.EventoDominio;
-import br.com.pine.gerenciador.modelo.dominio.pagamento.Pagamento;
 import io.quarkus.hibernate.reactive.panache.PanacheRepository;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;

@@ -1,6 +1,9 @@
 package br.com.pine;
 
-import br.com.pine.gerenciador.aplicacao.pagamento.CriaPagamentoEmReal;
+import br.com.pine.gerenciador.aplicacao.transacao.AdicionaItemPago;
+import br.com.pine.gerenciador.aplicacao.transacao.CriaTransacao;
+import br.com.pine.gerenciador.aplicacao.transacao.RemoveItemPago;
+import br.com.pine.gerenciador.modelo.dominio.pagamento.UnidadeMedida;
 import br.com.pine.gerenciador.modelo.dominio.pagamento.ValorMonetario;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -54,17 +57,41 @@ public class Fixtures {
         return random.nextInt(umMinimo, umMaximo);
     }
 
+    public int umInteiroAleatorio() {
+        return random.nextInt(1, 10);
+    }
+
     public Date umaDataAleatoria() {
         return new Date(random.nextInt() * 1000L);
     }
 
-    public CriaPagamentoEmReal criaComandoCriaPagamentoEmReal() {
-        var umComando = new CriaPagamentoEmReal();
+    public CriaTransacao criaComandoCriaTransacao() {
+        var umComando = new CriaTransacao();
         umComando.idEntidade = umaStringAleatoria();
         umComando.data = umaDataAleatoria();
         umComando.valor = valorPositivo();
         umComando.nomeFornecedor = umaStringAleatoria();
         umComando.nomeBeneficiario = umaStringAleatoria();
         return umComando;
+    }
+
+    public AdicionaItemPago criaComandoAdicionaItemPago(String umIdEntidade) {
+        var umComando = new AdicionaItemPago();
+        umComando.idEntidade = umIdEntidade;
+        umComando.descricao = umaStringAleatoria();
+        umComando.quantidade = umInteiroAleatorio();
+        umComando.unidadeMedida = UnidadeMedida.UNIDADE.name();
+        umComando.valorUnidade = valorPositivo();
+        return umComando;
+    }
+
+    public RemoveItemPago criaComandoRemoveItemPagoIdentico(AdicionaItemPago umComandoAdiciona) {
+        var umComandoRemove = new RemoveItemPago();
+        umComandoRemove.idEntidade = umComandoAdiciona.idEntidade;
+        umComandoRemove.descricao = umComandoAdiciona.descricao;
+        umComandoRemove.quantidade = umComandoAdiciona.quantidade;
+        umComandoRemove.unidadeMedida = umComandoAdiciona.unidadeMedida;
+        umComandoRemove.valorUnidade = umComandoAdiciona.valorUnidade;
+        return umComandoRemove;
     }
 }

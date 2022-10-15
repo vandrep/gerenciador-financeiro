@@ -1,11 +1,10 @@
-package br.com.pine.gerenciador.aplicacao.pagamento;
+package br.com.pine.gerenciador.aplicacao.transacao;
 
 import br.com.pine.gerenciador.modelo.dominio.Comando;
 
 public class AdicionaItemPago extends Comando {
-    public String idPagamento;
-    public String nome;
+    public String descricao;
     public int quantidade;
     public String unidadeMedida;
-    public float valor;
+    public float valorUnidade;
 }

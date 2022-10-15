@@ -5,6 +5,10 @@ import java.util.List;
 
 public class Agregado extends Entidade{
 
+    public Agregado(String umIdEntidade){
+        super(umIdEntidade);
+    }
+
     public List<EventoDominio> processaComando(Comando umComando) {
         try {
             try {

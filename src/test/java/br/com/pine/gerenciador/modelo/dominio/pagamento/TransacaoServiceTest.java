@@ -1,5 +1,6 @@
 package br.com.pine.gerenciador.modelo.dominio.pagamento;
 
+import br.com.pine.Fixtures;
 import br.com.pine.gerenciador.modelo.dominio.EventoDominio;
 import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,30 +14,40 @@ import java.util.Date;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @QuarkusTest
-class PagamentoServiceTest {
+class TransacaoServiceTest {
     @Inject
-    PagamentoService pagamentoService;
+    TransacaoService transacaoService;
+    @Inject
+    Fixtures fixtures;
+
+    String umIdEntidade;
 
     @BeforeEach
     void setUp() {
+        umIdEntidade = fixtures.umaStringAleatoria();
     }
 
     @Test
-    void criaPagamentoComEventos() {
+    void criaTransacaoComEventos() {
         var pagamentoEmRealCriado = new PagamentoEmRealCriado();
+        pagamentoEmRealCriado.setIdEntidade(umIdEntidade);
         pagamentoEmRealCriado.data = Date.from(Instant.now());
         pagamentoEmRealCriado.valor = 50.0f;
         pagamentoEmRealCriado.nomeFornecedor = "Joselito";
         pagamentoEmRealCriado.nomeBeneficiario = "Augusto";
 
         var itemPagoAdicionado1 = new ItemPagoAdicionado();
-        itemPagoAdicionado1.nome = "Remédio";
+        itemPagoAdicionado1.setIdEntidade(umIdEntidade);
+        itemPagoAdicionado1.descricao = "Remédio";
         itemPagoAdicionado1.quantidade = 50;
+        itemPagoAdicionado1.unidadeMedida = UnidadeMedida.UNIDADE;
         itemPagoAdicionado1.valorUnidade = 200.0f;
 
         var itemPagoAdicionado2 = new ItemPagoAdicionado();
-        itemPagoAdicionado2.nome = "Remédio";
+        itemPagoAdicionado2.setIdEntidade(umIdEntidade);
+        itemPagoAdicionado2.descricao = "Remédio";
         itemPagoAdicionado2.quantidade = 50;
+        itemPagoAdicionado2.unidadeMedida = UnidadeMedida.UNIDADE;
         itemPagoAdicionado2.valorUnidade = 150.0f;
 
         var listaEventos = new ArrayList<EventoDominio>();
@@ -44,15 +55,15 @@ class PagamentoServiceTest {
         listaEventos.add(itemPagoAdicionado1);
         listaEventos.add(itemPagoAdicionado2);
 
-        var pagamento = pagamentoService.instanciaPagamento(listaEventos);
+        var pagamento = transacaoService.instanciaTransacao(listaEventos);
 
         var valor = itemPagoAdicionado1.valorUnidade + itemPagoAdicionado2.valorUnidade;
 
-        assertEquals(pagamentoEmRealCriado.data, pagamento.getData());
-        assertEquals(valor, pagamento.getValorMonetario().getValor());
-        assertEquals(pagamentoEmRealCriado.nomeFornecedor, pagamento.getNomeFornecedor());
-        assertEquals(pagamentoEmRealCriado.nomeBeneficiario, pagamento.getNomeBeneficiario());
+        assertEquals(pagamentoEmRealCriado.data, pagamento.getDataDeInclusao());
+        assertEquals(valor, pagamento.getValor());
+        assertEquals(pagamentoEmRealCriado.nomeFornecedor, pagamento.getNomeDoPagador());
+        assertEquals(pagamentoEmRealCriado.nomeBeneficiario, pagamento.getNomeDoRecebedor());
         assertEquals(2, pagamento.getListaItemPago().size());
-        assertEquals(itemPagoAdicionado2.nome, pagamento.getListaItemPago().get(0).getNome());
+        assertEquals(itemPagoAdicionado2.descricao, pagamento.getListaItemPago().get(0).getDescricao());
     }
 }

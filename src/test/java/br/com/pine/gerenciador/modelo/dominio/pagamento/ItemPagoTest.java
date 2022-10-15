@@ -15,51 +15,71 @@ class ItemPagoTest {
     @Inject
     Fixtures fixtures;
 
-    String umNome;
-    ValorMonetario umValorMonetario;
+    String umaDescricao;
     int umaQuantidade;
+    UnidadeMedida umaUnidadeMedida;
+    float umValor;
 
     @BeforeEach
     void setUp() {
-        umNome = fixtures.umaStringAleatoria(10);
-        umValorMonetario = fixtures.umValorMonetarioRealPositivo();
+        umaDescricao = fixtures.umaStringAleatoria(10);
         umaQuantidade = fixtures.umInteiroAleatorio(1, 10);
+        umaUnidadeMedida = UnidadeMedida.UNIDADE;
+        umValor = fixtures.valorPositivo();
     }
 
     @Test
     void criaItemPagoComSucesso() {
-        assertDoesNotThrow(() -> new ItemPago(umNome, umValorMonetario, umaQuantidade));
+        assertDoesNotThrow(() -> new ItemPago(umaDescricao, umaQuantidade, umaUnidadeMedida, umValor));
     }
 
     @Test
     void criaItemPagoNomeNuloComErro() {
-        umNome = null;
+        umaDescricao = null;
+
         var erro = assertThrows(IllegalArgumentException.class,
-                () -> new ItemPago(umNome, umValorMonetario, umaQuantidade));
+                () -> new ItemPago(umaDescricao, umaQuantidade, umaUnidadeMedida, umValor));
+
         assertEquals(ITEM_PAGO_NOME_NULO.mensagem, erro.getMessage());
     }
 
     @Test
     void criaItemPagoNomeVazioComErro() {
-        umNome = "";
+        umaDescricao = "";
+
         var erro = assertThrows(IllegalArgumentException.class,
-                () -> new ItemPago(umNome, umValorMonetario, umaQuantidade));
+                () -> new ItemPago(umaDescricao, umaQuantidade, umaUnidadeMedida, umValor));
+
         assertEquals(ITEM_PAGO_NOME_VAZIO.mensagem, erro.getMessage());
     }
 
     @Test
-    void criaItemPagoValorMonetarioVazioComErro() {
-        umValorMonetario = null;
+    void criaItemPagoValorNegativoComErro() {
+        umValor = fixtures.valorNegativo();
+
         var erro = assertThrows(IllegalArgumentException.class,
-                () -> new ItemPago(umNome, umValorMonetario, umaQuantidade));
-        assertEquals(ITEM_PAGO_VALOR_MONETARIO_VAZIO.mensagem, erro.getMessage());
+                () -> new ItemPago(umaDescricao, umaQuantidade, umaUnidadeMedida, umValor));
+
+        assertEquals(ITEM_PAGO_VALOR_NEGATIVO.mensagem, erro.getMessage());
     }
 
     @Test
     void criaItemPagoQuantidadeMenorQueUmComErro() {
         umaQuantidade = 0;
+
         var erro = assertThrows(IllegalArgumentException.class,
-                () -> new ItemPago(umNome, umValorMonetario, umaQuantidade));
+                () -> new ItemPago(umaDescricao, umaQuantidade, umaUnidadeMedida, umValor));
+
         assertEquals(ITEM_PAGO_QUANTIDADE_MENOR_QUE_UM.mensagem, erro.getMessage());
+    }
+
+    @Test
+    void criaItemPagoUnidadeMedidaNulaComErro() {
+        umaUnidadeMedida = null;
+
+        var erro = assertThrows(IllegalArgumentException.class,
+                () -> new ItemPago(umaDescricao, umaQuantidade, umaUnidadeMedida, umValor));
+
+        assertEquals(ITEM_PAGO_UNIDADE_MEDIDA_NULA.mensagem, erro.getMessage());
     }
 }
