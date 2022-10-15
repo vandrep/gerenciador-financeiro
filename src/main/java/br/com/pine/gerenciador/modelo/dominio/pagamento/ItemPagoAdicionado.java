@@ -5,15 +5,18 @@ import br.com.pine.gerenciador.modelo.dominio.EventoDominio;
 
 public class ItemPagoAdicionado extends EventoDominio {
     public String nome;
-    public float valor;
     public int quantidade;
+    public String unidadeMedida;
+    public float valorUnidade;
 
-    public ItemPagoAdicionado(){}
+    public ItemPagoAdicionado(){
+    }
 
     public ItemPagoAdicionado(AdicionaItemPago umComando) {
-        super();
+        super(umComando.idEntidade);
         this.nome = umComando.nome;
-        this.valor = umComando.valor;
+        this.unidadeMedida = umComando.unidadeMedida;
+        this.valorUnidade = umComando.valor;
         this.quantidade = umComando.quantidade;
     }
 }

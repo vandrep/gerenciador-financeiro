@@ -1,8 +1,6 @@
-package br.com.pine.gerenciador.modelo.dominio;
+package br.com.pine.gerenciador.modelo.dominio.pagamento;
 
-import br.com.pine.gerenciador.Fixtures;
-import br.com.pine.gerenciador.modelo.dominio.pagamento.ItemPago;
-import br.com.pine.gerenciador.modelo.dominio.pagamento.ValorMonetario;
+import br.com.pine.Fixtures;
 import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,12 +27,12 @@ class ItemPagoTest {
     }
 
     @Test
-    void criaItemPagoComSucesso(){
+    void criaItemPagoComSucesso() {
         assertDoesNotThrow(() -> new ItemPago(umNome, umValorMonetario, umaQuantidade));
     }
 
     @Test
-    void criaItemPagoNomeNuloComErro(){
+    void criaItemPagoNomeNuloComErro() {
         umNome = null;
         var erro = assertThrows(IllegalArgumentException.class,
                 () -> new ItemPago(umNome, umValorMonetario, umaQuantidade));
@@ -42,7 +40,7 @@ class ItemPagoTest {
     }
 
     @Test
-    void criaItemPagoNomeVazioComErro(){
+    void criaItemPagoNomeVazioComErro() {
         umNome = "";
         var erro = assertThrows(IllegalArgumentException.class,
                 () -> new ItemPago(umNome, umValorMonetario, umaQuantidade));
@@ -50,7 +48,7 @@ class ItemPagoTest {
     }
 
     @Test
-    void criaItemPagoValorMonetarioVazioComErro(){
+    void criaItemPagoValorMonetarioVazioComErro() {
         umValorMonetario = null;
         var erro = assertThrows(IllegalArgumentException.class,
                 () -> new ItemPago(umNome, umValorMonetario, umaQuantidade));
@@ -58,7 +56,7 @@ class ItemPagoTest {
     }
 
     @Test
-    void criaItemPagoQuantidadeMenorQueUmComErro(){
+    void criaItemPagoQuantidadeMenorQueUmComErro() {
         umaQuantidade = 0;
         var erro = assertThrows(IllegalArgumentException.class,
                 () -> new ItemPago(umNome, umValorMonetario, umaQuantidade));

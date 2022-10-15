@@ -1,15 +1,16 @@
 package br.com.pine.gerenciador.modelo.dominio;
 
-import java.util.UUID;
-
 public abstract class Entidade extends Validador {
-    private final String idEntidade;
+    private String idEntidade;
 
-    public Entidade(){
-        this.idEntidade = UUID.randomUUID().toString();
+    public Entidade() {
     }
 
-    public String getIdEntidade(){
+    public String getIdEntidade() {
         return this.idEntidade;
+    }
+
+    public void setIdEntidade(String umIdEntidade) {
+        this.idEntidade = umIdEntidade;
     }
 }

@@ -1,7 +1,6 @@
-package br.com.pine.gerenciador.modelo.dominio;
+package br.com.pine.gerenciador.modelo.dominio.pagamento;
 
-import br.com.pine.gerenciador.Fixtures;
-import br.com.pine.gerenciador.modelo.dominio.pagamento.ValorMonetario;
+import br.com.pine.Fixtures;
 import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

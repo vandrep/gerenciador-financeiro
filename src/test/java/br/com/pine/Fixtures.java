@@ -1,5 +1,6 @@
-package br.com.pine.gerenciador;
+package br.com.pine;
 
+import br.com.pine.gerenciador.aplicacao.pagamento.CriaPagamentoEmReal;
 import br.com.pine.gerenciador.modelo.dominio.pagamento.ValorMonetario;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -55,5 +56,15 @@ public class Fixtures {
 
     public Date umaDataAleatoria() {
         return new Date(random.nextInt() * 1000L);
+    }
+
+    public CriaPagamentoEmReal criaComandoCriaPagamentoEmReal() {
+        var umComando = new CriaPagamentoEmReal();
+        umComando.idEntidade = umaStringAleatoria();
+        umComando.data = umaDataAleatoria();
+        umComando.valor = valorPositivo();
+        umComando.nomeFornecedor = umaStringAleatoria();
+        umComando.nomeBeneficiario = umaStringAleatoria();
+        return umComando;
     }
 }

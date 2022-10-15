@@ -2,35 +2,25 @@ package br.com.pine.gerenciador.modelo.dominio.pagamento;
 
 import br.com.pine.gerenciador.aplicacao.pagamento.AdicionaItemPago;
 import br.com.pine.gerenciador.aplicacao.pagamento.CriaPagamentoEmReal;
-import br.com.pine.gerenciador.modelo.dominio.Entidade;
-import br.com.pine.gerenciador.modelo.dominio.EventoDominio;
+import br.com.pine.gerenciador.modelo.dominio.Agregado;
 
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
 import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.*;
 
-public class Pagamento extends Entidade {
+public class Pagamento extends Agregado {
     private Date data;
     private ValorMonetario valorMonetario;
     private String nomeFornecedor;
     private String nomeBeneficiario;
-    private Set<ItemPago> conjuntoItemPago;
+    private List<ItemPago> listaItemPago;
 
-    public Pagamento() {
-        this.setConjuntoItemPago();
-    }
 
-    public Pagamento(Date umaData,
-                     ValorMonetario umValorMonetario,
-                     String umNomeFornecedor,
-                     String umNomeBeneficiario) {
+    protected Pagamento() {
         super();
-        this.setData(umaData);
-        this.setValorMonetario(umValorMonetario);
-        this.setNomeFornecedor(umNomeFornecedor);
-        this.setNomeBeneficiario(umNomeBeneficiario);
+        this.setConjuntoItemPago();
     }
 
     public PagamentoEmRealCriado processa(CriaPagamentoEmReal umComando) {
@@ -42,13 +32,6 @@ public class Pagamento extends Entidade {
         return new PagamentoEmRealCriado(umComando);
     }
 
-    public void aplica(PagamentoEmRealCriado umEvento) {
-        this.setData(umEvento.data);
-        this.setValorMonetario(ValorMonetario.emReal(umEvento.valor));
-        this.setNomeFornecedor(umEvento.nomeFornecedor);
-        this.setNomeBeneficiario(umEvento.nomeBeneficiario);
-    }
-
     public ItemPagoAdicionado processa(AdicionaItemPago umComando) {
         new ItemPago(umComando.nome,
                 ValorMonetario.emReal(umComando.valor),
@@ -57,24 +40,23 @@ public class Pagamento extends Entidade {
         return new ItemPagoAdicionado(umComando);
     }
 
+    public void aplica(PagamentoEmRealCriado umEvento) {
+        this.setData(umEvento.data);
+        this.setValorMonetario(ValorMonetario.emReal(umEvento.valor));
+        this.setNomeFornecedor(umEvento.nomeFornecedor);
+        this.setNomeBeneficiario(umEvento.nomeBeneficiario);
+        this.setConjuntoItemPago();
+    }
+
     public void aplica(ItemPagoAdicionado umEvento) {
         this.adicionaItemPago(new ItemPago(
                 umEvento.nome,
-                ValorMonetario.emReal(umEvento.valor),
+                ValorMonetario.emReal(umEvento.valorUnidade),
                 umEvento.quantidade));
     }
 
-    public <T extends EventoDominio> void aplicaGenerico(T umEvento) {
-        if (umEvento instanceof PagamentoEmRealCriado) {
-            aplica((PagamentoEmRealCriado) umEvento);
-        }
-        if (umEvento instanceof ItemPagoAdicionado) {
-            aplica((ItemPagoAdicionado) umEvento);
-        }
-    }
-
     private void adicionaItemPago(ItemPago umItemPago) {
-        this.conjuntoItemPago.add(umItemPago);
+        this.listaItemPago.add(umItemPago);
     }
 
     public Date getData() {
@@ -82,7 +64,13 @@ public class Pagamento extends Entidade {
     }
 
     public ValorMonetario getValorMonetario() {
-        return valorMonetario;
+        if(this.listaItemPago.isEmpty()){
+            return valorMonetario;
+        }
+        return ValorMonetario.emReal(
+                listaItemPago.stream()
+                        .map(itemPago -> itemPago.getValorMonetarioUnitario().getValor())
+                        .reduce(0.0f, Float::sum));
     }
 
     public String getNomeFornecedor() {
@@ -93,8 +81,8 @@ public class Pagamento extends Entidade {
         return nomeBeneficiario;
     }
 
-    public Set<ItemPago> getConjuntoItemPago() {
-        return conjuntoItemPago;
+    public List<ItemPago> getListaItemPago() {
+        return listaItemPago;
     }
 
     private void validaData(Date umaData) {
@@ -137,6 +125,6 @@ public class Pagamento extends Entidade {
     }
 
     private void setConjuntoItemPago() {
-        this.conjuntoItemPago = new HashSet<>(0);
+        this.listaItemPago = new ArrayList<>(0);
     }
 }

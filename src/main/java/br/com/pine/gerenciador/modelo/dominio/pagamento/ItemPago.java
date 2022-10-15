@@ -6,21 +6,30 @@ import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.*;
 
 public class ItemPago extends ObjetoDeValor {
     private String nome;
-    private ValorMonetario valorMonetario;
     private int quantidade;
+    private UnidadeMedida unidadeMedida;
+    private ValorMonetario valorMonetarioUnitario;
 
-    public ItemPago(String umNome, ValorMonetario umValorMonetario, int umaQuantidade) {
+    protected ItemPago(String umNome, ValorMonetario umValorMonetario, int umaQuantidade) {
         this.setNome(umNome);
-        this.setValorMonetario(umValorMonetario);
+        this.setValorMonetarioUnitario(umValorMonetario);
         this.setQuantidade(umaQuantidade);
+    }
+
+    public float valorDoItem(){
+        return quantidade * valorMonetarioUnitario.getValor();
+    }
+
+    public UnidadeMedida getUnidadeMedida() {
+        return unidadeMedida;
     }
 
     public String getNome() {
         return nome;
     }
 
-    public ValorMonetario getValorMonetario() {
-        return valorMonetario;
+    public ValorMonetario getValorMonetarioUnitario() {
+        return valorMonetarioUnitario;
     }
 
     public int getQuantidade() {
@@ -33,9 +42,9 @@ public class ItemPago extends ObjetoDeValor {
         this.nome = umNome;
     }
 
-    private void setValorMonetario(ValorMonetario umValorMonetario) {
+    private void setValorMonetarioUnitario(ValorMonetario umValorMonetario) {
         validaArgumentoNaoNulo(umValorMonetario, ITEM_PAGO_VALOR_MONETARIO_VAZIO.mensagem);
-        this.valorMonetario = umValorMonetario;
+        this.valorMonetarioUnitario = umValorMonetario;
     }
 
     private void setQuantidade(int umaQuantidade) {

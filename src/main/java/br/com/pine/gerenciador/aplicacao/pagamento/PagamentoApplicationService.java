@@ -2,53 +2,41 @@ package br.com.pine.gerenciador.aplicacao.pagamento;
 
 import br.com.pine.gerenciador.modelo.dominio.EventoDominio;
 import br.com.pine.gerenciador.modelo.dominio.pagamento.Pagamento;
+import br.com.pine.gerenciador.modelo.dominio.pagamento.PagamentoService;
 import br.com.pine.gerenciador.portas.adaptadores.EventoArmazenado;
+import br.com.pine.gerenciador.portas.adaptadores.RepositorioEvento;
+import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.ws.rs.NotFoundException;
+import javax.inject.Inject;
 
 @ApplicationScoped
 public class PagamentoApplicationService {
+    @Inject
+    RepositorioEvento repositorioEvento;
+    @Inject
+    PagamentoService pagamentoService;
     private final String PAGAMENTO = "Pagamento";
 
     public Uni<Void> criaPagamento(CriaPagamentoEmReal umComando) {
-        var pagamento = new Pagamento();
-        var evento = pagamento.processa(umComando);
-        pagamento.aplica(evento);
-        return armazena(evento, pagamento.getIdEntidade());
+        return repositorioEvento.armazena(pagamentoService.criaPagamentoNovo(umComando), PAGAMENTO);
     }
 
     public Uni<Void> adicionaItemPago(AdicionaItemPago umComando) {
-        return instanciaPagamento(umComando.idPagamento)
-                .map(pagamento -> aplicaAlteracao(pagamento, umComando))
-                .chain(evento -> armazena(evento, umComando.idPagamento));
+        return repositorioEvento.eventosDominioDoId(umComando.idPagamento)
+                .onItem().transform(listaEventos -> pagamentoService.instanciaPagamento(listaEventos))
+                .onItem().transform(pagamento -> pagamento.processa(umComando))
+                .onItem().transformToUni(itemPagoAdicionado -> repositorioEvento.armazena(itemPagoAdicionado, PAGAMENTO));
     }
 
-    private Uni<Pagamento> instanciaPagamento(String umIdPagamento) {
-        return Uni.createFrom().item(new Pagamento())
-                .onItem().call(pagamento -> EventoArmazenado.eventosDoId(umIdPagamento)
-                        .onCompletion().ifEmpty().failWith(new NotFoundException("Sem eventos"))
-                        .map(this::converteEvento)
-                        .invoke(pagamento::aplicaGenerico)
-                        .collect().asList());
+    public Multi<EventoDominio> listaTodos() {
+        return repositorioEvento.streamAll()
+                .map(EventoArmazenado::getEventoDominio);
     }
 
-    private EventoDominio converteEvento(EventoArmazenado eventoArmazenado) {
-        return eventoArmazenado.getEventoDominio();
-    }
-
-    private EventoDominio aplicaAlteracao(Pagamento pagamento, AdicionaItemPago umComando) {
-        var eventoDominio = pagamento.processa(umComando);
-        pagamento.aplica(eventoDominio);
-        return eventoDominio;
-    }
-
-    private Uni<Void> armazena(EventoDominio umEvento, String umIdEntidade) {
-        return EventoArmazenado.armazenaEvento(
-                PAGAMENTO,
-                umEvento.getClass().getSimpleName(),
-                umIdEntidade,
-                umEvento);
+    public Multi<Pagamento> listaPagamentos() {
+        return repositorioEvento.listaPagamentos()
+                .map(lista -> pagamentoService.instanciaPagamento(lista));
     }
 }

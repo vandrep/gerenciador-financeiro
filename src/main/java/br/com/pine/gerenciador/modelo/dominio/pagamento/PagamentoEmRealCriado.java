@@ -15,7 +15,7 @@ public class PagamentoEmRealCriado extends EventoDominio {
     }
 
     public PagamentoEmRealCriado(CriaPagamentoEmReal umComando) {
-        super();
+        super(umComando.idEntidade);
         this.data = umComando.data;
         this.valor = umComando.valor;
         this.nomeFornecedor = umComando.nomeFornecedor;
