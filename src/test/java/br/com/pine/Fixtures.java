@@ -1,21 +1,28 @@
 package br.com.pine;
 
-import br.com.pine.gerenciador.aplicacao.transacao.comandos.transacao.*;
-import br.com.pine.gerenciador.modelo.dominio.pagamento.AtualizaCategoria;
-import br.com.pine.gerenciador.modelo.dominio.pagamento.Categoria;
-import br.com.pine.gerenciador.modelo.dominio.pagamento.UnidadeMedida;
-import br.com.pine.gerenciador.modelo.dominio.pagamento.ValorMonetario;
+import br.com.pine.gerenciador.aplicacao.transacao.comandos.AdicionaItemPago;
+import br.com.pine.gerenciador.aplicacao.transacao.comandos.AdicionaPagamento;
+import br.com.pine.gerenciador.aplicacao.transacao.comandos.AlteraItemPago;
+import br.com.pine.gerenciador.aplicacao.transacao.comandos.AtualizaCategoria;
+import br.com.pine.gerenciador.aplicacao.transacao.comandos.CriaTransacao;
+import br.com.pine.gerenciador.aplicacao.transacao.comandos.RemoveItemPago;
+import br.com.pine.gerenciador.modelo.dominio.transacao.UnidadeMedida;
+import br.com.pine.gerenciador.modelo.dominio.transacao.ValorMonetario;
 
 import javax.enterprise.context.ApplicationScoped;
-import java.util.*;
+import java.util.Currency;
+import java.util.Date;
+import java.util.Random;
+import java.util.Set;
 import java.util.stream.IntStream;
 
-import static br.com.pine.gerenciador.modelo.dominio.pagamento.Categoria.ALUGUEL;
-import static br.com.pine.gerenciador.modelo.dominio.pagamento.Categoria.SALARIO;
+import static br.com.pine.gerenciador.modelo.dominio.transacao.Categoria.ALUGUEL;
+import static br.com.pine.gerenciador.modelo.dominio.transacao.Categoria.SALARIO;
 
 @ApplicationScoped
 public class Fixtures {
     Random random = new Random();
+
     public float valorNegativo() {
         return -0.01f;
     }
@@ -37,14 +44,15 @@ public class Fixtures {
         return Currency.getInstance("BRL");
     }
 
-    public ValorMonetario umValorMonetarioRealPositivo(){
+    public ValorMonetario umValorMonetarioRealPositivo() {
         return new ValorMonetario(moedaReal(), valorPositivo());
     }
 
-    public String umaStringAleatoria(){
+    public String umaStringAleatoria() {
         return umaStringAleatoria(random.nextInt(1, 30));
     }
-    public String umaStringAleatoria(int tamanhoString){
+
+    public String umaStringAleatoria(int tamanhoString) {
         int limiteEsquerda = 'a';
         int limiteDireira = 'z';
 

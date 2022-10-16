@@ -1,17 +1,31 @@
-package br.com.pine.gerenciador.modelo.dominio.pagamento;
+package br.com.pine.gerenciador.modelo.dominio.transacao;
 
 import br.com.pine.Fixtures;
-import br.com.pine.gerenciador.aplicacao.transacao.comandos.transacao.*;
+import br.com.pine.gerenciador.aplicacao.transacao.comandos.AdicionaItemPago;
+import br.com.pine.gerenciador.aplicacao.transacao.comandos.AdicionaPagamento;
+import br.com.pine.gerenciador.aplicacao.transacao.comandos.AlteraItemPago;
+import br.com.pine.gerenciador.aplicacao.transacao.comandos.AtualizaCategoria;
+import br.com.pine.gerenciador.aplicacao.transacao.comandos.CriaTransacao;
+import br.com.pine.gerenciador.aplicacao.transacao.comandos.RemoveItemPago;
 import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import javax.inject.Inject;
 
-import java.util.Set;
-
-import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.ID_ENTIDADE_INVALIDA;
+import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.ITEM_PAGO_NAO_EXISTE_NA_TRANSACAO;
+import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.ITEM_PAGO_NOME_NULO;
+import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.TRANSACAO_DATA_NULA;
+import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.TRANSACAO_NOME_BENEFICIARIO_NULO;
+import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.TRANSACAO_NOME_BENEFICIARIO_VAZIO;
+import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.TRANSACAO_NOME_FORNECEDOR_NULO;
+import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.TRANSACAO_NOME_FORNECEDOR_VAZIO;
+import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.TRANSACAO_VALOR_NEGATIVO;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @QuarkusTest
 class TransacaoTest {

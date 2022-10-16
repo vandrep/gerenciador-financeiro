@@ -1,11 +1,11 @@
-package br.com.pine.gerenciador.modelo.dominio.pagamento;
+package br.com.pine.gerenciador.modelo.dominio.transacao;
 
 import br.com.pine.gerenciador.modelo.dominio.IdEntidade;
 
 public class IdPagamento extends IdEntidade {
     private String id;
 
-    public IdPagamento(String umIdPagamento){
+    public IdPagamento(String umIdPagamento) {
         this.id = umIdPagamento;
     }
 

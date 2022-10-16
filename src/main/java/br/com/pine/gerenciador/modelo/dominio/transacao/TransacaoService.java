@@ -1,6 +1,6 @@
-package br.com.pine.gerenciador.modelo.dominio.pagamento;
+package br.com.pine.gerenciador.modelo.dominio.transacao;
 
-import br.com.pine.gerenciador.aplicacao.transacao.comandos.transacao.CriaTransacao;
+import br.com.pine.gerenciador.aplicacao.transacao.comandos.CriaTransacao;
 import br.com.pine.gerenciador.modelo.dominio.EventoDeDominio;
 
 import javax.enterprise.context.ApplicationScoped;

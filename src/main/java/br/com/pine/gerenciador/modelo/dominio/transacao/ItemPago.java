@@ -1,8 +1,12 @@
-package br.com.pine.gerenciador.modelo.dominio.pagamento;
+package br.com.pine.gerenciador.modelo.dominio.transacao;
 
 import br.com.pine.gerenciador.modelo.dominio.ObjetoDeValor;
 
-import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.*;
+import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.ITEM_PAGO_NOME_NULO;
+import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.ITEM_PAGO_NOME_VAZIO;
+import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.ITEM_PAGO_QUANTIDADE_MENOR_QUE_UM;
+import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.ITEM_PAGO_UNIDADE_MEDIDA_NULA;
+import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.ITEM_PAGO_VALOR_NEGATIVO;
 
 public class ItemPago extends ObjetoDeValor {
     private String descricao;
@@ -25,7 +29,7 @@ public class ItemPago extends ObjetoDeValor {
         this.unidadeMedida = umaUnidadeMedida;
     }
 
-    public float valorDoItem(){
+    public float valorDoItem() {
         return quantidade * valorUnidade;
     }
 

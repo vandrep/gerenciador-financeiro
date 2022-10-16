@@ -1,9 +1,12 @@
-package br.com.pine.gerenciador.modelo.dominio.pagamento;
+package br.com.pine.gerenciador.modelo.dominio.transacao;
 
 import br.com.pine.Fixtures;
 import br.com.pine.gerenciador.modelo.dominio.EventoDeDominio;
-import br.com.pine.gerenciador.modelo.dominio.pagamento.eventos.ItemPagoAdicionado;
-import br.com.pine.gerenciador.modelo.dominio.pagamento.eventos.TransacaoCriada;
+import br.com.pine.gerenciador.modelo.dominio.transacao.IdTransacao;
+import br.com.pine.gerenciador.modelo.dominio.transacao.TransacaoService;
+import br.com.pine.gerenciador.modelo.dominio.transacao.UnidadeMedida;
+import br.com.pine.gerenciador.modelo.dominio.transacao.eventos.ItemPagoAdicionado;
+import br.com.pine.gerenciador.modelo.dominio.transacao.eventos.TransacaoCriada;
 import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

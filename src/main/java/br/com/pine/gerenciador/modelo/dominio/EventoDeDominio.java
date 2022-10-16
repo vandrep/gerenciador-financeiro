@@ -1,7 +1,7 @@
 package br.com.pine.gerenciador.modelo.dominio;
 
-import br.com.pine.gerenciador.modelo.dominio.pagamento.eventos.ItemPagoAdicionado;
-import br.com.pine.gerenciador.modelo.dominio.pagamento.eventos.TransacaoCriada;
+import br.com.pine.gerenciador.modelo.dominio.transacao.eventos.ItemPagoAdicionado;
+import br.com.pine.gerenciador.modelo.dominio.transacao.eventos.TransacaoCriada;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 

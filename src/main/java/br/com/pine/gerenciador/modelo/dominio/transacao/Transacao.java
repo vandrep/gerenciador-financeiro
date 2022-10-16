@@ -1,13 +1,34 @@
-package br.com.pine.gerenciador.modelo.dominio.pagamento;
+package br.com.pine.gerenciador.modelo.dominio.transacao;
 
-import br.com.pine.gerenciador.aplicacao.transacao.comandos.transacao.*;
+import br.com.pine.gerenciador.aplicacao.transacao.comandos.AdicionaItemPago;
+import br.com.pine.gerenciador.aplicacao.transacao.comandos.AdicionaPagamento;
+import br.com.pine.gerenciador.aplicacao.transacao.comandos.AlteraItemPago;
+import br.com.pine.gerenciador.aplicacao.transacao.comandos.AtualizaCategoria;
+import br.com.pine.gerenciador.aplicacao.transacao.comandos.CriaTransacao;
+import br.com.pine.gerenciador.aplicacao.transacao.comandos.RemoveItemPago;
 import br.com.pine.gerenciador.modelo.dominio.EventoDeDominio;
 import br.com.pine.gerenciador.modelo.dominio.RaizAgregado;
-import br.com.pine.gerenciador.modelo.dominio.pagamento.eventos.*;
+import br.com.pine.gerenciador.modelo.dominio.transacao.eventos.CategoriaAtualizada;
+import br.com.pine.gerenciador.modelo.dominio.transacao.eventos.ItemPagoAdicionado;
+import br.com.pine.gerenciador.modelo.dominio.transacao.eventos.ItemPagoRemovido;
+import br.com.pine.gerenciador.modelo.dominio.transacao.eventos.PagamentoAdicionado;
+import br.com.pine.gerenciador.modelo.dominio.transacao.eventos.TransacaoCriada;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
 
-import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.*;
+import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.ID_ENTIDADE_INVALIDA;
+import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.ITEM_PAGO_NAO_EXISTE_NA_TRANSACAO;
+import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.TRANSACAO_DATA_NULA;
+import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.TRANSACAO_ID_NULO;
+import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.TRANSACAO_ID_VAZIO;
+import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.TRANSACAO_NOME_BENEFICIARIO_NULO;
+import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.TRANSACAO_NOME_BENEFICIARIO_VAZIO;
+import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.TRANSACAO_NOME_FORNECEDOR_NULO;
+import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.TRANSACAO_NOME_FORNECEDOR_VAZIO;
+import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.TRANSACAO_VALOR_NEGATIVO;
 
 public class Transacao extends RaizAgregado {
     private IdTransacao idTransacao;
@@ -48,11 +69,11 @@ public class Transacao extends RaizAgregado {
         return listaItemPago;
     }
 
-    public IdPagamento getIdPagamento(){
+    public IdPagamento getIdPagamento() {
         return idPagamento;
     }
 
-    public Set<Categoria> getConjuntoCategoria(){
+    public Set<Categoria> getConjuntoCategoria() {
         return conjuntoCategoria;
     }
 
@@ -221,12 +242,12 @@ public class Transacao extends RaizAgregado {
         this.listaItemPago = new ArrayList<>(0);
     }
 
-//    TODO voltar aqui depois que o modelo estiver mais maduro
-    private void setIdPagamento(IdPagamento umIdPagamento){
+    //    TODO voltar aqui depois que o modelo estiver mais maduro
+    private void setIdPagamento(IdPagamento umIdPagamento) {
         this.idPagamento = umIdPagamento;
     }
 
-    private void setConjuntoCategoria(Set<Categoria> umConjuntoCategoria){
+    private void setConjuntoCategoria(Set<Categoria> umConjuntoCategoria) {
         this.conjuntoCategoria = umConjuntoCategoria;
     }
 }

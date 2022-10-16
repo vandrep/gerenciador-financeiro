@@ -1,9 +1,9 @@
-package br.com.pine.gerenciador.modelo.dominio.pagamento.eventos;
+package br.com.pine.gerenciador.modelo.dominio.transacao.eventos;
 
-import br.com.pine.gerenciador.aplicacao.transacao.comandos.transacao.RemoveItemPago;
+import br.com.pine.gerenciador.aplicacao.transacao.comandos.RemoveItemPago;
 import br.com.pine.gerenciador.modelo.dominio.EventoDeDominio;
-import br.com.pine.gerenciador.modelo.dominio.pagamento.IdTransacao;
-import br.com.pine.gerenciador.modelo.dominio.pagamento.UnidadeMedida;
+import br.com.pine.gerenciador.modelo.dominio.transacao.IdTransacao;
+import br.com.pine.gerenciador.modelo.dominio.transacao.UnidadeMedida;
 
 import java.time.LocalDateTime;
 

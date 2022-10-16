@@ -13,7 +13,7 @@ import java.util.List;
 @ApplicationScoped
 public class RepositorioEvento implements PanacheRepository<EventoArmazenado> {
 
-    public Multi<List<EventoDeDominio>> listaPagamentos(){
+    public Multi<List<EventoDeDominio>> listaPagamentos() {
         return streamAll()
                 .map(EventoArmazenado::getEventoDominio)
                 .group().by(EventoDeDominio::getIdEntidade)

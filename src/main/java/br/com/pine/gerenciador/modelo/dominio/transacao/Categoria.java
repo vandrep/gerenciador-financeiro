@@ -1,4 +1,4 @@
-package br.com.pine.gerenciador.modelo.dominio.pagamento;
+package br.com.pine.gerenciador.modelo.dominio.transacao;
 
 // TODO Criar tabela para gerenciar categorias
 public enum Categoria {

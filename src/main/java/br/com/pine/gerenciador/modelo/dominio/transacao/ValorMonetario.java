@@ -1,11 +1,13 @@
-package br.com.pine.gerenciador.modelo.dominio.pagamento;
+package br.com.pine.gerenciador.modelo.dominio.transacao;
 
 import br.com.pine.gerenciador.modelo.dominio.ObjetoDeValor;
 
 import java.util.Currency;
 import java.util.List;
 
-import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.*;
+import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.MOEDA_MENOR_QUE_ZERO;
+import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.MOEDA_NULA;
+import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.MOEDA_QUANTIDADE_CASAS_DECIMAIS_INVALIDA;
 
 public class ValorMonetario extends ObjetoDeValor {
     private Currency moeda;
@@ -20,11 +22,11 @@ public class ValorMonetario extends ObjetoDeValor {
         return new ValorMonetario(Currency.getInstance("BRL"), umValor);
     }
 
-    public Currency getMoeda(){
+    public Currency getMoeda() {
         return this.moeda;
     }
 
-    public float getValor(){
+    public float getValor() {
         return this.valor;
     }
 
@@ -39,11 +41,11 @@ public class ValorMonetario extends ObjetoDeValor {
         this.valor = umValor;
     }
 
-    private boolean validaQuantidadeCasasDecimais(float umValor){
+    private boolean validaQuantidadeCasasDecimais(float umValor) {
         return quantidadeCasasDecimais(umValor) <= moeda.getDefaultFractionDigits();
     }
 
-    private int quantidadeCasasDecimais(float umValor){
+    private int quantidadeCasasDecimais(float umValor) {
         return List.of(String.valueOf(umValor).split("\\.")).get(1).length();
     }
 }
