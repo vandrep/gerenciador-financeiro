@@ -3,11 +3,11 @@ package br.com.pine.gerenciador.portas.adaptadores;
 import br.com.pine.gerenciador.aplicacao.transacao.TransacaoApplicationService;
 import br.com.pine.gerenciador.aplicacao.transacao.comandos.AdicionaItemPago;
 import br.com.pine.gerenciador.aplicacao.transacao.comandos.CriaTransacao;
-import br.com.pine.gerenciador.modelo.dominio.EventoDeDominio;
 import br.com.pine.gerenciador.modelo.dominio.transacao.Transacao;
 import io.quarkus.hibernate.reactive.panache.common.runtime.ReactiveTransactional;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
+import org.jboss.resteasy.reactive.RestPath;
 
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
@@ -17,7 +17,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-@Path("/pagamento")
+@Path("/transacao")
 public class TransacaoWeb {
     @Inject
     TransacaoApplicationService transacaoApplicationService;
@@ -26,8 +26,8 @@ public class TransacaoWeb {
     @Path("/cria")
     @ReactiveTransactional
     @Consumes(MediaType.APPLICATION_JSON)
-    public Uni<Void> criaPagamento(CriaTransacao umComando) {
-        return transacaoApplicationService.criaTransacao(umComando);
+    public Uni<Void> cria(CriaTransacao umComando) {
+        return transacaoApplicationService.cria(umComando);
     }
 
     @POST
@@ -39,16 +39,16 @@ public class TransacaoWeb {
     }
 
     @GET
-    @Path("/listaTodos")
+    @Path("/lista")
     @Produces(MediaType.APPLICATION_JSON)
-    public Multi<EventoDeDominio> listaTodos() {
-        return transacaoApplicationService.listaTodos();
+    public Multi<Transacao> lista() {
+        return transacaoApplicationService.lista();
     }
 
     @GET
-    @Path("/listaPagamentos")
+    @Path("/consulta/{idTransacao}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Multi<Transacao> listaPagamentos() {
-        return transacaoApplicationService.listaPagamentos();
+    public Uni<Transacao> consulta(@RestPath String idTransacao) {
+        return transacaoApplicationService.consultaTransacao(idTransacao);
     }
 }

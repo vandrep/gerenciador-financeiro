@@ -21,7 +21,7 @@ public class TransacaoApplicationService {
     TransacaoService transacaoService;
     private final String NOME_ENTIDADE = Transacao.class.getSimpleName();
 
-    public Uni<Void> criaTransacao(CriaTransacao umComando) {
+    public Uni<Void> cria(CriaTransacao umComando) {
         return repositorioEvento.armazena(transacaoService.criaTransacao(umComando), NOME_ENTIDADE);
     }
 
@@ -37,8 +37,12 @@ public class TransacaoApplicationService {
                 .map(EventoArmazenado::getEventoDominio);
     }
 
-    public Multi<Transacao> listaPagamentos() {
+    public Multi<Transacao> lista() {
         return repositorioEvento.listaPagamentos()
                 .map(lista -> transacaoService.instanciaTransacao(lista));
+    }
+
+    public Uni<Transacao> consultaTransacao(String idTransacao) {
+        return null;
     }
 }
