@@ -12,7 +12,6 @@ public enum MensagensErro {
     ITEM_PAGO_NAO_EXISTE_NA_TRANSACAO("Item Pago não existe na Transação informada."),
     TRANSACAO_ID_NULO("Id da Transação deve ser informado."),
     TRANSACAO_ID_VAZIO("Id da Transação deve ser preenchido."),
-    TRANSACAO_DATA_NULA("Data da Transação deve ser informada."),
     TRANSACAO_VALOR_NEGATIVO("Valor da Transação deve ser maior ou igual a 0."),
     TRANSACAO_NOME_FORNECEDOR_NULO("Nome do Fornecedor da Transação deve ser informado."),
     TRANSACAO_NOME_FORNECEDOR_VAZIO("Nome do Fornecedor da Transação deve estar preenchido."),

@@ -3,13 +3,12 @@ package br.com.pine.gerenciador.modelo.dominio.transacao.eventos;
 import br.com.pine.gerenciador.aplicacao.transacao.comandos.AtualizaCategoria;
 import br.com.pine.gerenciador.modelo.dominio.EventoDeDominio;
 import br.com.pine.gerenciador.modelo.dominio.transacao.Categoria;
-import br.com.pine.gerenciador.modelo.dominio.transacao.IdTransacao;
 
 import java.time.LocalDateTime;
 import java.util.Set;
 
 public class CategoriaAtualizada extends EventoDeDominio {
-    public IdTransacao idTransacao;
+    public String idEntidade;
     public LocalDateTime ocorridoEm;
     public Set<Categoria> conjuntoCategoria;
 
@@ -17,14 +16,14 @@ public class CategoriaAtualizada extends EventoDeDominio {
     }
 
     public CategoriaAtualizada(AtualizaCategoria umComando) {
-        this.idTransacao = new IdTransacao(umComando.idTransacao);
+        this.idEntidade = umComando.idTransacao;
         this.ocorridoEm = LocalDateTime.now();
         this.conjuntoCategoria = umComando.conjuntoCategoria;
     }
 
     @Override
     public String getIdEntidade() {
-        return idTransacao.id();
+        return idEntidade;
     }
 
     @Override

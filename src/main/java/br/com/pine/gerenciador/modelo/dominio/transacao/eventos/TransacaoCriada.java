@@ -2,15 +2,12 @@ package br.com.pine.gerenciador.modelo.dominio.transacao.eventos;
 
 import br.com.pine.gerenciador.aplicacao.transacao.comandos.CriaTransacao;
 import br.com.pine.gerenciador.modelo.dominio.EventoDeDominio;
-import br.com.pine.gerenciador.modelo.dominio.transacao.IdTransacao;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 public class TransacaoCriada extends EventoDeDominio {
-    public IdTransacao idTransacao;
+    public String idEntidade;
     public LocalDateTime ocorridoEm;
-    public Date data;
     public float valor;
     public String nomeFornecedor;
     public String nomeBeneficiario;
@@ -18,10 +15,9 @@ public class TransacaoCriada extends EventoDeDominio {
     public TransacaoCriada() {
     }
 
-    public TransacaoCriada(CriaTransacao umComando, String umIdEntidade) {
-        this.idTransacao = new IdTransacao(umIdEntidade);
+    public TransacaoCriada(CriaTransacao umComando, String umIdTransacao) {
+        this.idEntidade = umIdTransacao;
         this.ocorridoEm = LocalDateTime.now();
-        this.data = umComando.data;
         this.valor = umComando.valor;
         this.nomeFornecedor = umComando.nomeDoPagador;
         this.nomeBeneficiario = umComando.nomeDoRecebedor;
@@ -29,7 +25,7 @@ public class TransacaoCriada extends EventoDeDominio {
 
     @Override
     public String getIdEntidade() {
-        return idTransacao.id();
+        return idEntidade;
     }
 
     @Override

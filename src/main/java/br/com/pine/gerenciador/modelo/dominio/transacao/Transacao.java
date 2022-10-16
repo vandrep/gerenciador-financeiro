@@ -15,13 +15,11 @@ import br.com.pine.gerenciador.modelo.dominio.transacao.eventos.PagamentoAdicion
 import br.com.pine.gerenciador.modelo.dominio.transacao.eventos.TransacaoCriada;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
 import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.ID_ENTIDADE_INVALIDA;
 import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.ITEM_PAGO_NAO_EXISTE_NA_TRANSACAO;
-import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.TRANSACAO_DATA_NULA;
 import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.TRANSACAO_ID_NULO;
 import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.TRANSACAO_ID_VAZIO;
 import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.TRANSACAO_NOME_BENEFICIARIO_NULO;
@@ -32,7 +30,6 @@ import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.TRANSACAO_VAL
 
 public class Transacao extends RaizAgregado {
     private IdTransacao idTransacao;
-    private Date dataDeInclusao;
     private float valor;
     private String nomeDoPagador;
     private String nomeDoRecebedor;
@@ -44,9 +41,6 @@ public class Transacao extends RaizAgregado {
         return this.idTransacao.id();
     }
 
-    public Date getDataDeInclusao() {
-        return dataDeInclusao;
-    }
 
     public float getValor() {
         if (this.listaItemPago.isEmpty()) {
@@ -84,7 +78,6 @@ public class Transacao extends RaizAgregado {
     }
 
     private List<EventoDeDominio> processa(CriaTransacao umComando) {
-        validaData(umComando.data);
         validaValor(umComando.valor);
         validaNomeFornecedor(umComando.nomeDoPagador);
         validaNomeBeneficiario(umComando.nomeDoRecebedor);
@@ -154,7 +147,6 @@ public class Transacao extends RaizAgregado {
     }
 
     private void aplica(TransacaoCriada umEvento) {
-        this.setDataDeInclusao(umEvento.data);
         this.setValor(umEvento.valor);
         this.setNomeDoPagador(umEvento.nomeFornecedor);
         this.setNomeDoRecebedor(umEvento.nomeBeneficiario);
@@ -178,7 +170,7 @@ public class Transacao extends RaizAgregado {
     }
 
     private void aplica(PagamentoAdicionado umEvento) {
-        this.setIdPagamento(umEvento.idPagamento);
+        this.setIdPagamento(new IdPagamento(umEvento.idPagamento));
     }
 
     private void aplica(CategoriaAtualizada umEvento) {
@@ -191,10 +183,6 @@ public class Transacao extends RaizAgregado {
 
     private void removeItemPago(ItemPago umItemPago) {
         this.listaItemPago.remove(umItemPago);
-    }
-
-    private void validaData(Date umaData) {
-        validaArgumentoNaoNulo(umaData, TRANSACAO_DATA_NULA.mensagem);
     }
 
     private void validaValor(float umValor) {
@@ -216,11 +204,6 @@ public class Transacao extends RaizAgregado {
         validaArgumentoNaoNulo(umIdTransacao, TRANSACAO_ID_NULO.mensagem);
         validaArgumentoNaoVazio(umIdTransacao, TRANSACAO_ID_VAZIO.mensagem);
         this.idTransacao = new IdTransacao(umIdTransacao);
-    }
-
-    private void setDataDeInclusao(Date umaData) {
-        validaData(umaData);
-        this.dataDeInclusao = umaData;
     }
 
     private void setValor(float umValor) {

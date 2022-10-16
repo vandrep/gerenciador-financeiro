@@ -16,7 +16,6 @@ import javax.inject.Inject;
 import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.ID_ENTIDADE_INVALIDA;
 import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.ITEM_PAGO_NAO_EXISTE_NA_TRANSACAO;
 import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.ITEM_PAGO_NOME_NULO;
-import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.TRANSACAO_DATA_NULA;
 import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.TRANSACAO_NOME_BENEFICIARIO_NULO;
 import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.TRANSACAO_NOME_BENEFICIARIO_VAZIO;
 import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.TRANSACAO_NOME_FORNECEDOR_NULO;
@@ -57,21 +56,9 @@ class TransacaoTest {
 
     @Test
     void criaTransacaoComSucesso() {
-        assertEquals(comandoCriaTransacao.data, transacao.getDataDeInclusao());
         assertEquals(comandoCriaTransacao.valor, transacao.getValor());
         assertEquals(comandoCriaTransacao.nomeDoPagador, transacao.getNomeDoPagador());
         assertEquals(comandoCriaTransacao.nomeDoRecebedor, transacao.getNomeDoRecebedor());
-    }
-
-    @Test
-    void criaTransacaoDataNulaComErro() {
-        comandoCriaTransacao.data = null;
-
-        var transacaoComErro = new Transacao(umIdEntidade);
-        var erro = assertThrows(IllegalArgumentException.class,
-                () -> transacaoComErro.processaComando(comandoCriaTransacao));
-
-        assertEquals(TRANSACAO_DATA_NULA.mensagem, erro.getMessage());
     }
 
     @Test

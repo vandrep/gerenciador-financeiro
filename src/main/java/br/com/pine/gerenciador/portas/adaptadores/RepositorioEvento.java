@@ -13,7 +13,7 @@ import java.util.List;
 @ApplicationScoped
 public class RepositorioEvento implements PanacheRepository<EventoArmazenado> {
 
-    public Multi<List<EventoDeDominio>> listaPagamentos() {
+    public Multi<List<EventoDeDominio>> listaEventoDeDominioAgrupadoPorIdEntidade() {
         return streamAll()
                 .map(EventoArmazenado::getEventoDominio)
                 .group().by(EventoDeDominio::getIdEntidade)
@@ -22,24 +22,23 @@ public class RepositorioEvento implements PanacheRepository<EventoArmazenado> {
                 .concatenate();
     }
 
-    public Uni<List<EventoDeDominio>> eventosDominioDoId(String umIdEntidade) {
+    public Uni<List<EventoDeDominio>> ListaEventoDeDominioDoIdEntidade(String umIdEntidade) {
         return find("identidade", umIdEntidade).stream()
                 .map(EventoArmazenado::getEventoDominio)
                 .onCompletion().ifEmpty().failWith(new NotFoundException("Sem eventos"))
                 .collect().asList();
     }
 
-    public Uni<Void> armazena(List<EventoDeDominio> listaEventos, String tipoEntidade) {
-        listaEventos.forEach(eventoDominio -> armazena(eventoDominio, tipoEntidade));
-        return Uni.createFrom().voidItem();
+    public Uni<Void> armazena(List<EventoDeDominio> listaEventoDeDominio, String tipoEntidade) {
+        return this.persist(listaEventoDeDominio.stream().map(eventoDeDominio -> converte(eventoDeDominio, tipoEntidade)));
     }
 
-    public Uni<Void> armazena(EventoDeDominio umEvento, String tipoEntidade) {
+    private EventoArmazenado converte(EventoDeDominio umEventoDeDominio, String tipoEntidade){
         var eventoArmazenado = new EventoArmazenado();
         eventoArmazenado.tipoEntidade = tipoEntidade;
-        eventoArmazenado.tipoEvento = umEvento.getClass().getSimpleName();
-        eventoArmazenado.idEntidade = umEvento.getIdEntidade();
-        eventoArmazenado.setDadosEvento(umEvento);
-        return persist(eventoArmazenado).replaceWithVoid();
+        eventoArmazenado.tipoEvento = umEventoDeDominio.getClass().getSimpleName();
+        eventoArmazenado.idEntidade = umEventoDeDominio.getIdEntidade();
+        eventoArmazenado.setDadosEvento(umEventoDeDominio);
+        return eventoArmazenado;
     }
 }
