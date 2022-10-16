@@ -1,7 +1,7 @@
 package br.com.pine.gerenciador.modelo.dominio.pagamento;
 
 import br.com.pine.Fixtures;
-import br.com.pine.gerenciador.modelo.dominio.EventoDominio;
+import br.com.pine.gerenciador.modelo.dominio.EventoDeDominio;
 import br.com.pine.gerenciador.modelo.dominio.pagamento.eventos.ItemPagoAdicionado;
 import br.com.pine.gerenciador.modelo.dominio.pagamento.eventos.TransacaoCriada;
 import io.quarkus.test.junit.QuarkusTest;
@@ -22,37 +22,37 @@ class TransacaoServiceTest {
     @Inject
     Fixtures fixtures;
 
-    String umIdEntidade;
+    String umIdTransacao;
 
     @BeforeEach
     void setUp() {
-        umIdEntidade = fixtures.umaStringAleatoria();
+        umIdTransacao = fixtures.umaStringAleatoria();
     }
 
     @Test
     void criaTransacaoComEventos() {
         var pagamentoEmRealCriado = new TransacaoCriada();
-        pagamentoEmRealCriado.setIdEntidade(umIdEntidade);
+        pagamentoEmRealCriado.idTransacao = new IdTransacao(umIdTransacao);
         pagamentoEmRealCriado.data = Date.from(Instant.now());
         pagamentoEmRealCriado.valor = 50.0f;
         pagamentoEmRealCriado.nomeFornecedor = "Joselito";
         pagamentoEmRealCriado.nomeBeneficiario = "Augusto";
 
         var itemPagoAdicionado1 = new ItemPagoAdicionado();
-        itemPagoAdicionado1.setIdEntidade(umIdEntidade);
+        itemPagoAdicionado1.idTransacao = new IdTransacao(umIdTransacao);
         itemPagoAdicionado1.descricao = "Remédio";
         itemPagoAdicionado1.quantidade = 50;
         itemPagoAdicionado1.unidadeMedida = UnidadeMedida.UNIDADE;
         itemPagoAdicionado1.valorUnidade = 200.0f;
 
         var itemPagoAdicionado2 = new ItemPagoAdicionado();
-        itemPagoAdicionado2.setIdEntidade(umIdEntidade);
+        itemPagoAdicionado2.idTransacao = new IdTransacao(umIdTransacao);
         itemPagoAdicionado2.descricao = "Remédio";
         itemPagoAdicionado2.quantidade = 50;
         itemPagoAdicionado2.unidadeMedida = UnidadeMedida.UNIDADE;
         itemPagoAdicionado2.valorUnidade = 150.0f;
 
-        var listaEventos = new ArrayList<EventoDominio>();
+        var listaEventos = new ArrayList<EventoDeDominio>();
         listaEventos.add(pagamentoEmRealCriado);
         listaEventos.add(itemPagoAdicionado1);
         listaEventos.add(itemPagoAdicionado2);

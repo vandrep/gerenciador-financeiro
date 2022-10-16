@@ -1,7 +1,7 @@
 package br.com.pine.gerenciador.modelo.dominio.pagamento;
 
 import br.com.pine.gerenciador.aplicacao.transacao.comandos.transacao.CriaTransacao;
-import br.com.pine.gerenciador.modelo.dominio.EventoDominio;
+import br.com.pine.gerenciador.modelo.dominio.EventoDeDominio;
 
 import javax.enterprise.context.ApplicationScoped;
 import java.util.List;
@@ -10,16 +10,15 @@ import java.util.UUID;
 @ApplicationScoped
 public class TransacaoService {
 
-    public EventoDominio criaTransacao(CriaTransacao umComando) {
-        var pagamento = new Transacao(UUID.randomUUID().toString());
-        return pagamento.processa(umComando);
+    public List<EventoDeDominio> criaTransacao(CriaTransacao umComando) {
+        var transacao = new Transacao(UUID.randomUUID().toString());
+        return transacao.processaComando(umComando);
     }
 
-    public Transacao instanciaTransacao(List<EventoDominio> listaEvento) {
-        var pagamento = new Transacao(listaEvento.get(0).getIdEntidade());
-        for (EventoDominio eventoDominio : listaEvento) {
-            pagamento.aplicaEvento(eventoDominio);
-        }
-        return pagamento;
+    public Transacao instanciaTransacao(List<EventoDeDominio> listaEvento) {
+        var transacao = new Transacao(listaEvento.get(0).getIdEntidade());
+        listaEvento.forEach(transacao::aplicaEvento);
+        return transacao;
     }
+
 }

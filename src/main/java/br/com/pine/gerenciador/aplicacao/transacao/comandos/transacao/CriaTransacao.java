@@ -7,6 +7,6 @@ import java.util.Date;
 public class CriaTransacao extends Comando {
     public Date data;
     public float valor;
-    public String nomeFornecedor;
-    public String nomeBeneficiario;
+    public String nomeDoPagador;
+    public String nomeDoRecebedor;
 }

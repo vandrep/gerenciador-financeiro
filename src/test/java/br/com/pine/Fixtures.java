@@ -65,11 +65,10 @@ public class Fixtures {
 
     public CriaTransacao criaComandoCriaTransacao() {
         var umComando = new CriaTransacao();
-        umComando.idEntidade = umaStringAleatoria();
         umComando.data = umaDataAleatoria();
         umComando.valor = valorPositivo();
-        umComando.nomeFornecedor = umaStringAleatoria();
-        umComando.nomeBeneficiario = umaStringAleatoria();
+        umComando.nomeDoPagador = umaStringAleatoria();
+        umComando.nomeDoRecebedor = umaStringAleatoria();
         return umComando;
     }
 

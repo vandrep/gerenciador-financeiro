@@ -3,7 +3,7 @@ package br.com.pine.gerenciador.portas.adaptadores;
 import br.com.pine.gerenciador.aplicacao.transacao.comandos.transacao.AdicionaItemPago;
 import br.com.pine.gerenciador.aplicacao.transacao.comandos.transacao.CriaTransacao;
 import br.com.pine.gerenciador.aplicacao.transacao.TransacaoApplicationService;
-import br.com.pine.gerenciador.modelo.dominio.EventoDominio;
+import br.com.pine.gerenciador.modelo.dominio.EventoDeDominio;
 import br.com.pine.gerenciador.modelo.dominio.pagamento.Transacao;
 import io.quarkus.hibernate.reactive.panache.common.runtime.ReactiveTransactional;
 import io.smallrye.mutiny.Multi;
@@ -23,7 +23,7 @@ public class TransacaoWeb {
     @ReactiveTransactional
     @Consumes(MediaType.APPLICATION_JSON)
     public Uni<Void> criaPagamento(CriaTransacao umComando) {
-        return transacaoApplicationService.criaPagamento(umComando);
+        return transacaoApplicationService.criaTransacao(umComando);
     }
 
     @POST
@@ -37,7 +37,7 @@ public class TransacaoWeb {
     @GET
     @Path("/listaTodos")
     @Produces(MediaType.APPLICATION_JSON)
-    public Multi<EventoDominio> listaTodos(){
+    public Multi<EventoDeDominio> listaTodos(){
         return transacaoApplicationService.listaTodos();
     }
 

@@ -1,6 +1,6 @@
 package br.com.pine.gerenciador.portas.adaptadores;
 
-import br.com.pine.gerenciador.modelo.dominio.EventoDominio;
+import br.com.pine.gerenciador.modelo.dominio.EventoDeDominio;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
@@ -33,15 +33,15 @@ public class EventoArmazenado {
         return idEntidade;
     }
 
-    public EventoDominio getEventoDominio() {
+    public EventoDeDominio getEventoDominio() {
         try {
-            return json.readValue(this.dadosEvento, EventoDominio.class);
+            return json.readValue(this.dadosEvento, EventoDeDominio.class);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public void setDadosEvento(EventoDominio dadosEvento) {
+    public void setDadosEvento(EventoDeDominio dadosEvento) {
         try {
             this.dadosEvento = json.writeValueAsString(dadosEvento);
         } catch (JsonProcessingException e) {
