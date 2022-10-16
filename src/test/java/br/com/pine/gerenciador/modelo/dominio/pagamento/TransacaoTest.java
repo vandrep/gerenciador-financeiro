@@ -21,17 +21,14 @@ class TransacaoTest {
 
     String umIdEntidade;
     CriaTransacao comandoCriaTransacao;
-    ConsultaTransacao comandoConsultaTransacao;
     AdicionaItemPago comandoAdicionaItemPago;
     RemoveItemPago comandoRemoveItemPago;
     AlteraItemPago comandoAlteraItemPago;
-    ConsultaItemPago comandoConsultaItemPago;
     AdicionaPagamento comandoAdicionaPagamento;
     ConfirmaPagamentoParcela comandoConfirmaPagamentoParcela;
     AgendaPagamentoParcela comandoAgendaPagamentoParcela;
     AjustaValorParcela comandoAjustaValorParcela;
     AjustaContaParcela comandoAjustaContaParcela;
-    ConsultaPagamento comandoConsultaPagamento;
 
     @BeforeEach
     void setUp() {
@@ -173,15 +170,7 @@ class TransacaoTest {
     }
 
     @Test
-    void processaConsultaTransacaoComSucesso(){
-
-    }
-    @Test
-    void processaConsultaTransacaoInexistenteComErro(){
-
-    }
-    @Test
-    void processaAlteraItemPagoComSucesso(){
+    void processaAlteraItemPagoComSucesso() {
         var transacao = new Transacao(umIdEntidade);
         transacao.aplica(transacao.processa(comandoCriaTransacao));
         transacao.aplica(transacao.processa(comandoAdicionaItemPago));
@@ -189,19 +178,20 @@ class TransacaoTest {
         var evento = transacao.processa(comandoAlteraItemPago);
 
         assertEquals(comandoAlteraItemPago.idEntidade, (evento.get(0)).getIdEntidade());
-        assertEquals(comandoAlteraItemPago.descricaoAnterior, ((ItemPagoRemovido)evento.get(0)).descricao);
-        assertEquals(comandoAlteraItemPago.quantidadeAnterior, ((ItemPagoRemovido)evento.get(0)).quantidade);
-        assertEquals(comandoAlteraItemPago.unidadeMedidaAnterior, ((ItemPagoRemovido)evento.get(0)).unidadeMedida.name());
-        assertEquals(comandoAlteraItemPago.valorUnidadeAnterior, ((ItemPagoRemovido)evento.get(0)).valorUnidade);
+        assertEquals(comandoAlteraItemPago.descricaoAnterior, ((ItemPagoRemovido) evento.get(0)).descricao);
+        assertEquals(comandoAlteraItemPago.quantidadeAnterior, ((ItemPagoRemovido) evento.get(0)).quantidade);
+        assertEquals(comandoAlteraItemPago.unidadeMedidaAnterior, ((ItemPagoRemovido) evento.get(0)).unidadeMedida.name());
+        assertEquals(comandoAlteraItemPago.valorUnidadeAnterior, ((ItemPagoRemovido) evento.get(0)).valorUnidade);
 
         assertEquals(comandoAlteraItemPago.idEntidade, (evento.get(1)).getIdEntidade());
-        assertEquals(comandoAlteraItemPago.descricaoNova, ((ItemPagoAdicionado)evento.get(1)).descricao);
-        assertEquals(comandoAlteraItemPago.quantidadeNova, ((ItemPagoAdicionado)evento.get(1)).quantidade);
-        assertEquals(comandoAlteraItemPago.unidadeMedidaNova, ((ItemPagoAdicionado)evento.get(1)).unidadeMedida.name());
-        assertEquals(comandoAlteraItemPago.valorUnidadeNova, ((ItemPagoAdicionado)evento.get(1)).valorUnidade);
+        assertEquals(comandoAlteraItemPago.descricaoNova, ((ItemPagoAdicionado) evento.get(1)).descricao);
+        assertEquals(comandoAlteraItemPago.quantidadeNova, ((ItemPagoAdicionado) evento.get(1)).quantidade);
+        assertEquals(comandoAlteraItemPago.unidadeMedidaNova, ((ItemPagoAdicionado) evento.get(1)).unidadeMedida.name());
+        assertEquals(comandoAlteraItemPago.valorUnidadeNova, ((ItemPagoAdicionado) evento.get(1)).valorUnidade);
     }
+
     @Test
-    void processaAlteraItemPagoInexistenteComErro(){
+    void processaAlteraItemPagoInexistenteComErro() {
         var transacao = new Transacao(umIdEntidade);
         transacao.aplica(transacao.processa(comandoCriaTransacao));
 
@@ -212,7 +202,7 @@ class TransacaoTest {
     }
 
     @Test
-    void processaAlteraItemPagoNovoItemInvalidoComErro(){
+    void processaAlteraItemPagoNovoItemInvalidoComErro() {
         var transacao = new Transacao(umIdEntidade);
         transacao.aplica(transacao.processa(comandoCriaTransacao));
         transacao.aplica(transacao.processa(comandoAdicionaItemPago));
@@ -223,61 +213,54 @@ class TransacaoTest {
 
         assertEquals(ITEM_PAGO_NOME_NULO.mensagem, erro.getMessage());
     }
-    @Test
-    void processaConsultaItemPagoComSucesso(){
 
-    }
     @Test
-    void processaConsultaItemPagoInexistenteComErro(){
-
-    }
-    @Test
-    void processaAdicionaPagamentoComSucesso(){
-
-    }
-    @Test
-    void processaAdicionaPagamentoTransacaoInvalidaComErro(){
-
-    }
-    @Test
-    void processaConfirmaPagamentoParcelaComSucesso(){
-
-    }
-    @Test
-    void processaConfirmaPagamentoParcelaInexistenteComErro(){
-
-    }
-    @Test
-    void processaAgendaPagamentoParcelaComSucesso(){
-
-    }
-    @Test
-    void processaAgendaPagamentoParcelaInexistenteComErro(){
-
-    }
-    @Test
-    void processaAjustaValorParcelaComSucesso(){
-
-    }
-    @Test
-    void processaAjustaValorParcelaInexistenteComErro(){
-
-    }
-    @Test
-    void processaAjustaContaParcelaComSucesso(){
-
-    }
-    @Test
-    void processaAjustaContaParcelaInexistenteComErro(){
-
-    }
-    @Test
-    void processaConsultaPagamentoComSucesso(){
-
-    }
-    @Test
-    void processaConsultaPagamentoInexistenteComErro(){
+    void processaAdicionaPagamentoComSucesso() {
 
     }
 
+    @Test
+    void processaAdicionaPagamentoTransacaoInvalidaComErro() {
+
+    }
+
+    @Test
+    void processaConfirmaPagamentoParcelaComSucesso() {
+
+    }
+
+    @Test
+    void processaConfirmaPagamentoParcelaInexistenteComErro() {
+
+    }
+
+    @Test
+    void processaAgendaPagamentoParcelaComSucesso() {
+
+    }
+
+    @Test
+    void processaAgendaPagamentoParcelaInexistenteComErro() {
+
+    }
+
+    @Test
+    void processaAjustaValorParcelaComSucesso() {
+
+    }
+
+    @Test
+    void processaAjustaValorParcelaInexistenteComErro() {
+
+    }
+
+    @Test
+    void processaAjustaContaParcelaComSucesso() {
+
+    }
+
+    @Test
+    void processaAjustaContaParcelaInexistenteComErro() {
+
+    }
 }
