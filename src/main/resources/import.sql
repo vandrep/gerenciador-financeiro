@@ -16,10 +16,10 @@ VALUES (4, 'PagamentoEmRealCriado', 'Pagamento', '1778d5e0-447b-4559-ac35-715fe1
 
 INSERT INTO EventoArmazenado (id, tipoEvento, tipoEntidade, idEntidade, dadosEvento)
 VALUES (5, 'ItemPagoAdicionado', 'Pagamento', '1778d5e0-447b-4559-ac35-715fe195d64e',
-'{"idEntidade":"1778d5e0-447b-4559-ac35-715fe195d64e","ocorridoEm":"2022-10-14T17:30:31.9186442","nome":"Descrição","valor":399.0,"quantidade":3}');
+'{"idEntidade":"1778d5e0-447b-4559-ac35-715fe195d64e","ocorridoEm":"2022-10-14T17:30:31.9186442","descricao":"Descrição","quantidade":3,"unidadeMedida":"UNIDADE","valorUnidade":399.0}');
 
 INSERT INTO EventoArmazenado (id, tipoEvento, tipoEntidade, idEntidade, dadosEvento)
 VALUES (6, 'ItemPagoAdicionado', 'Pagamento', '1778d5e0-447b-4559-ac35-715fe195d64e',
-'{"idEntidade":"1778d5e0-447b-4559-ac35-715fe195d64e","ocorridoEm":"2022-10-14T17:30:31.9186442","nome":"Carpacio","valor":599.0,"quantidade":10}');
+'{"idEntidade":"1778d5e0-447b-4559-ac35-715fe195d64e","ocorridoEm":"2022-10-14T17:30:31.9186442","descricao":"Carpacio","quantidade":10,"unidadeMedida":"UNIDADE","valorUnidade":599.0}');
 
 UPDATE hibernate_sequence SET next_val=15;

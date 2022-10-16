@@ -1,7 +1,8 @@
-package br.com.pine.gerenciador.modelo.dominio.pagamento;
+package br.com.pine.gerenciador.modelo.dominio.pagamento.eventos;
 
-import br.com.pine.gerenciador.aplicacao.transacao.AdicionaItemPago;
+import br.com.pine.gerenciador.aplicacao.transacao.comandos.transacao.AdicionaItemPago;
 import br.com.pine.gerenciador.modelo.dominio.EventoDominio;
+import br.com.pine.gerenciador.modelo.dominio.pagamento.UnidadeMedida;
 
 public class ItemPagoAdicionado extends EventoDominio {
     public String descricao;

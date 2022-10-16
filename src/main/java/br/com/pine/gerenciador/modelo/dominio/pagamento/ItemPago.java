@@ -1,7 +1,6 @@
 package br.com.pine.gerenciador.modelo.dominio.pagamento;
 
 import br.com.pine.gerenciador.modelo.dominio.ObjetoDeValor;
-import io.smallrye.mutiny.Uni;
 
 import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.*;
 
@@ -9,16 +8,16 @@ public class ItemPago extends ObjetoDeValor {
     private String descricao;
     private int quantidade;
     private UnidadeMedida unidadeMedida;
-    private float valorUnitario;
+    private float valorUnidade;
 
     protected ItemPago(String umaDescricao,
                        int umaQuantidade,
                        UnidadeMedida umaUnidadeMedida,
-                       float umValorUnitario) {
+                       float umValorUnidade) {
         this.setDescricao(umaDescricao);
         this.setQuantidade(umaQuantidade);
         this.setUnidadeMedida(umaUnidadeMedida);
-        this.setValorUnitario(umValorUnitario);
+        this.setValorUnidade(umValorUnidade);
     }
 
     private void setUnidadeMedida(UnidadeMedida umaUnidadeMedida) {
@@ -27,7 +26,7 @@ public class ItemPago extends ObjetoDeValor {
     }
 
     public float valorDoItem(){
-        return quantidade * valorUnitario;
+        return quantidade * valorUnidade;
     }
 
     public UnidadeMedida getUnidadeMedida() {
@@ -38,8 +37,8 @@ public class ItemPago extends ObjetoDeValor {
         return descricao;
     }
 
-    public float getValorUnitario() {
-        return valorUnitario;
+    public float getValorUnidade() {
+        return valorUnidade;
     }
 
     public int getQuantidade() {
@@ -52,9 +51,9 @@ public class ItemPago extends ObjetoDeValor {
         this.descricao = umNome;
     }
 
-    private void setValorUnitario(float umValor) {
+    private void setValorUnidade(float umValor) {
         validaArgumentoMaiorOuIgualA(umValor, 0.0f, ITEM_PAGO_VALOR_NEGATIVO.mensagem);
-        this.valorUnitario = umValor;
+        this.valorUnidade = umValor;
     }
 
     private void setQuantidade(int umaQuantidade) {
@@ -70,7 +69,7 @@ public class ItemPago extends ObjetoDeValor {
         ItemPago itemPago = (ItemPago) o;
 
         if (getQuantidade() != itemPago.getQuantidade()) return false;
-        if (Float.compare(itemPago.getValorUnitario(), getValorUnitario()) != 0) return false;
+        if (Float.compare(itemPago.getValorUnidade(), getValorUnidade()) != 0) return false;
         if (!getDescricao().equals(itemPago.getDescricao())) return false;
         return getUnidadeMedida() == itemPago.getUnidadeMedida();
     }
@@ -80,7 +79,7 @@ public class ItemPago extends ObjetoDeValor {
         int result = getDescricao().hashCode();
         result = 31 * result + getQuantidade();
         result = 31 * result + getUnidadeMedida().hashCode();
-        result = 31 * result + (getValorUnitario() != +0.0f ? Float.floatToIntBits(getValorUnitario()) : 0);
+        result = 31 * result + (getValorUnidade() != +0.0f ? Float.floatToIntBits(getValorUnidade()) : 0);
         return result;
     }
 }

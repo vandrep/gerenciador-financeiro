@@ -2,6 +2,8 @@ package br.com.pine.gerenciador.modelo.dominio.pagamento;
 
 import br.com.pine.Fixtures;
 import br.com.pine.gerenciador.modelo.dominio.EventoDominio;
+import br.com.pine.gerenciador.modelo.dominio.pagamento.eventos.ItemPagoAdicionado;
+import br.com.pine.gerenciador.modelo.dominio.pagamento.eventos.TransacaoCriada;
 import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,7 +31,7 @@ class TransacaoServiceTest {
 
     @Test
     void criaTransacaoComEventos() {
-        var pagamentoEmRealCriado = new PagamentoEmRealCriado();
+        var pagamentoEmRealCriado = new TransacaoCriada();
         pagamentoEmRealCriado.setIdEntidade(umIdEntidade);
         pagamentoEmRealCriado.data = Date.from(Instant.now());
         pagamentoEmRealCriado.valor = 50.0f;

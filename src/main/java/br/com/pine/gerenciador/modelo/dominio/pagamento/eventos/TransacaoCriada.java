@@ -1,20 +1,20 @@
-package br.com.pine.gerenciador.modelo.dominio.pagamento;
+package br.com.pine.gerenciador.modelo.dominio.pagamento.eventos;
 
-import br.com.pine.gerenciador.aplicacao.transacao.CriaTransacao;
+import br.com.pine.gerenciador.aplicacao.transacao.comandos.transacao.CriaTransacao;
 import br.com.pine.gerenciador.modelo.dominio.EventoDominio;
 
 import java.util.Date;
 
-public class PagamentoEmRealCriado extends EventoDominio {
+public class TransacaoCriada extends EventoDominio {
     public Date data;
     public float valor;
     public String nomeFornecedor;
     public String nomeBeneficiario;
 
-    public PagamentoEmRealCriado() {
+    public TransacaoCriada() {
     }
 
-    public PagamentoEmRealCriado(CriaTransacao umComando) {
+    public TransacaoCriada(CriaTransacao umComando) {
         super(umComando.idEntidade);
         this.data = umComando.data;
         this.valor = umComando.valor;

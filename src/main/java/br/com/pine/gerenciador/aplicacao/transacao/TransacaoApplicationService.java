@@ -1,5 +1,7 @@
 package br.com.pine.gerenciador.aplicacao.transacao;
 
+import br.com.pine.gerenciador.aplicacao.transacao.comandos.transacao.AdicionaItemPago;
+import br.com.pine.gerenciador.aplicacao.transacao.comandos.transacao.CriaTransacao;
 import br.com.pine.gerenciador.modelo.dominio.EventoDominio;
 import br.com.pine.gerenciador.modelo.dominio.pagamento.Transacao;
 import br.com.pine.gerenciador.modelo.dominio.pagamento.TransacaoService;

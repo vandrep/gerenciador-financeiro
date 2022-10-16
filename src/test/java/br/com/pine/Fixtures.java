@@ -1,8 +1,6 @@
 package br.com.pine;
 
-import br.com.pine.gerenciador.aplicacao.transacao.AdicionaItemPago;
-import br.com.pine.gerenciador.aplicacao.transacao.CriaTransacao;
-import br.com.pine.gerenciador.aplicacao.transacao.RemoveItemPago;
+import br.com.pine.gerenciador.aplicacao.transacao.comandos.transacao.*;
 import br.com.pine.gerenciador.modelo.dominio.pagamento.UnidadeMedida;
 import br.com.pine.gerenciador.modelo.dominio.pagamento.ValorMonetario;
 
@@ -93,5 +91,19 @@ public class Fixtures {
         umComandoRemove.unidadeMedida = umComandoAdiciona.unidadeMedida;
         umComandoRemove.valorUnidade = umComandoAdiciona.valorUnidade;
         return umComandoRemove;
+    }
+
+    public AlteraItemPago criaComandoAlteraItemPagoIdentico(AdicionaItemPago umComandoAdiciona) {
+        var umComandoAltera = new AlteraItemPago();
+        umComandoAltera.idEntidade = umComandoAdiciona.idEntidade;
+        umComandoAltera.descricaoAnterior = umComandoAdiciona.descricao;
+        umComandoAltera.quantidadeAnterior = umComandoAdiciona.quantidade;
+        umComandoAltera.unidadeMedidaAnterior = umComandoAdiciona.unidadeMedida;
+        umComandoAltera.valorUnidadeAnterior = umComandoAdiciona.valorUnidade;
+        umComandoAltera.descricaoNova = umaStringAleatoria();
+        umComandoAltera.quantidadeNova = umInteiroAleatorio();
+        umComandoAltera.unidadeMedidaNova = UnidadeMedida.UNIDADE.name();
+        umComandoAltera.valorUnidadeNova = valorPositivo();
+        return umComandoAltera;
     }
 }

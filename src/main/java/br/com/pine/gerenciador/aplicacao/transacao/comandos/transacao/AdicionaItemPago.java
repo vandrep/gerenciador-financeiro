@@ -1,4 +1,4 @@
-package br.com.pine.gerenciador.aplicacao.transacao;
+package br.com.pine.gerenciador.aplicacao.transacao.comandos.transacao;
 
 import br.com.pine.gerenciador.modelo.dominio.Comando;
 

@@ -1,9 +1,9 @@
 package br.com.pine.gerenciador.modelo.dominio.pagamento;
 
 import br.com.pine.Fixtures;
-import br.com.pine.gerenciador.aplicacao.transacao.AdicionaItemPago;
-import br.com.pine.gerenciador.aplicacao.transacao.CriaTransacao;
-import br.com.pine.gerenciador.aplicacao.transacao.RemoveItemPago;
+import br.com.pine.gerenciador.aplicacao.transacao.comandos.transacao.*;
+import br.com.pine.gerenciador.modelo.dominio.pagamento.eventos.ItemPagoAdicionado;
+import br.com.pine.gerenciador.modelo.dominio.pagamento.eventos.ItemPagoRemovido;
 import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,15 +21,26 @@ class TransacaoTest {
 
     String umIdEntidade;
     CriaTransacao comandoCriaTransacao;
+    ConsultaTransacao comandoConsultaTransacao;
     AdicionaItemPago comandoAdicionaItemPago;
     RemoveItemPago comandoRemoveItemPago;
+    AlteraItemPago comandoAlteraItemPago;
+    ConsultaItemPago comandoConsultaItemPago;
+    AdicionaPagamento comandoAdicionaPagamento;
+    ConfirmaPagamentoParcela comandoConfirmaPagamentoParcela;
+    AgendaPagamentoParcela comandoAgendaPagamentoParcela;
+    AjustaValorParcela comandoAjustaValorParcela;
+    AjustaContaParcela comandoAjustaContaParcela;
+    ConsultaPagamento comandoConsultaPagamento;
 
     @BeforeEach
     void setUp() {
         umIdEntidade = fixtures.umaStringAleatoria();
         comandoCriaTransacao = fixtures.criaComandoCriaTransacao();
+
         comandoAdicionaItemPago = fixtures.criaComandoAdicionaItemPago(umIdEntidade);
         comandoRemoveItemPago = fixtures.criaComandoRemoveItemPagoIdentico(comandoAdicionaItemPago);
+        comandoAlteraItemPago = fixtures.criaComandoAlteraItemPagoIdentico(comandoAdicionaItemPago);
     }
 
     @Test
@@ -146,7 +157,7 @@ class TransacaoTest {
         assertEquals(comandoRemoveItemPago.idEntidade, evento.getIdEntidade());
         assertEquals(comandoRemoveItemPago.descricao, evento.descricao);
         assertEquals(comandoRemoveItemPago.quantidade, evento.quantidade);
-        assertEquals(comandoRemoveItemPago.unidadeMedida, evento.unidadeMedida);
+        assertEquals(comandoRemoveItemPago.unidadeMedida, evento.unidadeMedida.name());
         assertEquals(comandoRemoveItemPago.valorUnidade, evento.valorUnidade);
     }
 
@@ -160,4 +171,113 @@ class TransacaoTest {
 
         assertEquals(ITEM_PAGO_NAO_EXISTE_NA_TRANSACAO.mensagem, erro.getMessage());
     }
+
+    @Test
+    void processaConsultaTransacaoComSucesso(){
+
+    }
+    @Test
+    void processaConsultaTransacaoInexistenteComErro(){
+
+    }
+    @Test
+    void processaAlteraItemPagoComSucesso(){
+        var transacao = new Transacao(umIdEntidade);
+        transacao.aplica(transacao.processa(comandoCriaTransacao));
+        transacao.aplica(transacao.processa(comandoAdicionaItemPago));
+
+        var evento = transacao.processa(comandoAlteraItemPago);
+
+        assertEquals(comandoAlteraItemPago.idEntidade, (evento.get(0)).getIdEntidade());
+        assertEquals(comandoAlteraItemPago.descricaoAnterior, ((ItemPagoRemovido)evento.get(0)).descricao);
+        assertEquals(comandoAlteraItemPago.quantidadeAnterior, ((ItemPagoRemovido)evento.get(0)).quantidade);
+        assertEquals(comandoAlteraItemPago.unidadeMedidaAnterior, ((ItemPagoRemovido)evento.get(0)).unidadeMedida.name());
+        assertEquals(comandoAlteraItemPago.valorUnidadeAnterior, ((ItemPagoRemovido)evento.get(0)).valorUnidade);
+
+        assertEquals(comandoAlteraItemPago.idEntidade, (evento.get(1)).getIdEntidade());
+        assertEquals(comandoAlteraItemPago.descricaoNova, ((ItemPagoAdicionado)evento.get(1)).descricao);
+        assertEquals(comandoAlteraItemPago.quantidadeNova, ((ItemPagoAdicionado)evento.get(1)).quantidade);
+        assertEquals(comandoAlteraItemPago.unidadeMedidaNova, ((ItemPagoAdicionado)evento.get(1)).unidadeMedida.name());
+        assertEquals(comandoAlteraItemPago.valorUnidadeNova, ((ItemPagoAdicionado)evento.get(1)).valorUnidade);
+    }
+    @Test
+    void processaAlteraItemPagoInexistenteComErro(){
+        var transacao = new Transacao(umIdEntidade);
+        transacao.aplica(transacao.processa(comandoCriaTransacao));
+
+        var erro = assertThrows(IllegalStateException.class,
+                () -> transacao.processa(comandoAlteraItemPago));
+
+        assertEquals(ITEM_PAGO_NAO_EXISTE_NA_TRANSACAO.mensagem, erro.getMessage());
+    }
+
+    @Test
+    void processaAlteraItemPagoNovoItemInvalidoComErro(){
+        var transacao = new Transacao(umIdEntidade);
+        transacao.aplica(transacao.processa(comandoCriaTransacao));
+        transacao.aplica(transacao.processa(comandoAdicionaItemPago));
+        comandoAlteraItemPago.descricaoNova = null;
+
+        var erro = assertThrows(IllegalArgumentException.class,
+                () -> transacao.processa(comandoAlteraItemPago));
+
+        assertEquals(ITEM_PAGO_NOME_NULO.mensagem, erro.getMessage());
+    }
+    @Test
+    void processaConsultaItemPagoComSucesso(){
+
+    }
+    @Test
+    void processaConsultaItemPagoInexistenteComErro(){
+
+    }
+    @Test
+    void processaAdicionaPagamentoComSucesso(){
+
+    }
+    @Test
+    void processaAdicionaPagamentoTransacaoInvalidaComErro(){
+
+    }
+    @Test
+    void processaConfirmaPagamentoParcelaComSucesso(){
+
+    }
+    @Test
+    void processaConfirmaPagamentoParcelaInexistenteComErro(){
+
+    }
+    @Test
+    void processaAgendaPagamentoParcelaComSucesso(){
+
+    }
+    @Test
+    void processaAgendaPagamentoParcelaInexistenteComErro(){
+
+    }
+    @Test
+    void processaAjustaValorParcelaComSucesso(){
+
+    }
+    @Test
+    void processaAjustaValorParcelaInexistenteComErro(){
+
+    }
+    @Test
+    void processaAjustaContaParcelaComSucesso(){
+
+    }
+    @Test
+    void processaAjustaContaParcelaInexistenteComErro(){
+
+    }
+    @Test
+    void processaConsultaPagamentoComSucesso(){
+
+    }
+    @Test
+    void processaConsultaPagamentoInexistenteComErro(){
+
+    }
+
 }
