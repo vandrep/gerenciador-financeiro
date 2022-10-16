@@ -11,6 +11,6 @@ public class IdPagamento extends IdEntidade {
 
     @Override
     public String id() {
-        return null;
+        return id;
     }
 }

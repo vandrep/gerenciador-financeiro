@@ -11,7 +11,6 @@ public class RaizAgregado extends Entidade{
                 var metodoProcessa = getClass().getDeclaredMethod("processa", umComando.getClass());
                 metodoProcessa.setAccessible(true);
                 return (List<EventoDeDominio>) metodoProcessa.invoke(this, umComando);
-//                return (List<EventoDominio>) getClass().getMethod("processa", umComando.getClass()).invoke(this, umComando);
             } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);
             } catch (InvocationTargetException e) {
@@ -33,7 +32,6 @@ public class RaizAgregado extends Entidade{
             var metodoAplica = getClass().getDeclaredMethod("aplica", eventoDeDominio.getClass());
             metodoAplica.setAccessible(true);
             metodoAplica.invoke(this, eventoDeDominio);
-//            getClass().getMethod("aplica", eventoDominio.getClass()).invoke(this, eventoDominio);
         } catch (IllegalAccessException | NoSuchMethodException e) {
             throw new RuntimeException(e);
         } catch (InvocationTargetException e) {

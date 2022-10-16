@@ -1,30 +1,27 @@
 package br.com.pine.gerenciador.modelo.dominio.pagamento.eventos;
 
-import br.com.pine.gerenciador.aplicacao.transacao.comandos.transacao.RemoveItemPago;
+import br.com.pine.gerenciador.aplicacao.transacao.comandos.transacao.AdicionaItemPago;
 import br.com.pine.gerenciador.modelo.dominio.EventoDeDominio;
+import br.com.pine.gerenciador.modelo.dominio.pagamento.AtualizaCategoria;
+import br.com.pine.gerenciador.modelo.dominio.pagamento.Categoria;
 import br.com.pine.gerenciador.modelo.dominio.pagamento.IdTransacao;
 import br.com.pine.gerenciador.modelo.dominio.pagamento.UnidadeMedida;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
-public class ItemPagoRemovido extends EventoDeDominio {
+public class CategoriaAtualizada extends EventoDeDominio {
     public IdTransacao idTransacao;
     public LocalDateTime ocorridoEm;
-    public String descricao;
-    public int quantidade;
-    public UnidadeMedida unidadeMedida;
-    public float valorUnidade;
+    public Set<Categoria> conjuntoCategoria;
 
-    public ItemPagoRemovido() {
+    public CategoriaAtualizada(){
     }
 
-    public ItemPagoRemovido(RemoveItemPago umComando) {
+    public CategoriaAtualizada(AtualizaCategoria umComando) {
         this.idTransacao = new IdTransacao(umComando.idTransacao);
         this.ocorridoEm = LocalDateTime.now();
-        this.descricao = umComando.descricao;
-        this.unidadeMedida = UnidadeMedida.valueOf(umComando.unidadeMedida);
-        this.valorUnidade = umComando.valorUnidade;
-        this.quantidade = umComando.quantidade;
+        this.conjuntoCategoria = umComando.conjuntoCategoria;
     }
 
     @Override

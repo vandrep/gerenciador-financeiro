@@ -1,19 +1,11 @@
 package br.com.pine.gerenciador.modelo.dominio.pagamento;
 
-import br.com.pine.gerenciador.aplicacao.transacao.comandos.transacao.AdicionaItemPago;
-import br.com.pine.gerenciador.aplicacao.transacao.comandos.transacao.AlteraItemPago;
-import br.com.pine.gerenciador.aplicacao.transacao.comandos.transacao.CriaTransacao;
-import br.com.pine.gerenciador.aplicacao.transacao.comandos.transacao.RemoveItemPago;
+import br.com.pine.gerenciador.aplicacao.transacao.comandos.transacao.*;
 import br.com.pine.gerenciador.modelo.dominio.EventoDeDominio;
 import br.com.pine.gerenciador.modelo.dominio.RaizAgregado;
-import br.com.pine.gerenciador.modelo.dominio.pagamento.eventos.ItemPagoAdicionado;
-import br.com.pine.gerenciador.modelo.dominio.pagamento.eventos.ItemPagoRemovido;
-import br.com.pine.gerenciador.modelo.dominio.pagamento.eventos.TransacaoCriada;
+import br.com.pine.gerenciador.modelo.dominio.pagamento.eventos.*;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.*;
 
@@ -56,6 +48,14 @@ public class Transacao extends RaizAgregado {
         return listaItemPago;
     }
 
+    public IdPagamento getIdPagamento(){
+        return idPagamento;
+    }
+
+    public Set<Categoria> getConjuntoCategoria(){
+        return conjuntoCategoria;
+    }
+
 
     protected Transacao(String umIdEntidade) {
         this.setIdTransacao(umIdEntidade);
@@ -72,9 +72,8 @@ public class Transacao extends RaizAgregado {
     }
 
     private List<EventoDeDominio> processa(AdicionaItemPago umComando) {
-        if (!this.getIdTransacao().equals(umComando.idEntidade)) {
-            throw new IllegalStateException(TRANSACAO_INVALIDA.mensagem);
-        }
+        validaIdEntidade(this.getIdTransacao(), umComando.idTransacao, ID_ENTIDADE_INVALIDA.mensagem);
+
         new ItemPago(
                 umComando.descricao,
                 umComando.quantidade,
@@ -85,9 +84,7 @@ public class Transacao extends RaizAgregado {
     }
 
     private List<EventoDeDominio> processa(RemoveItemPago umComando) {
-        if (!this.getIdTransacao().equals(umComando.idEntidade)) {
-            throw new IllegalStateException(TRANSACAO_INVALIDA.mensagem);
-        }
+        validaIdEntidade(this.getIdTransacao(), umComando.idTransacao, ID_ENTIDADE_INVALIDA.mensagem);
 
         var itemARemover = new ItemPago(
                 umComando.descricao,
@@ -102,8 +99,10 @@ public class Transacao extends RaizAgregado {
     }
 
     private List<EventoDeDominio> processa(AlteraItemPago umComando) {
+        validaIdEntidade(this.getIdTransacao(), umComando.idTransacao, ID_ENTIDADE_INVALIDA.mensagem);
+
         var removeItemPago = new RemoveItemPago();
-        removeItemPago.idEntidade = umComando.idEntidade;
+        removeItemPago.idTransacao = umComando.idTransacao;
         removeItemPago.descricao = umComando.descricaoAnterior;
         removeItemPago.quantidade = umComando.quantidadeAnterior;
         removeItemPago.unidadeMedida = umComando.unidadeMedidaAnterior;
@@ -111,7 +110,7 @@ public class Transacao extends RaizAgregado {
         var listaEventos = new ArrayList<>(processaComando(removeItemPago));
 
         var adicionaItemPago = new AdicionaItemPago();
-        adicionaItemPago.idEntidade = umComando.idEntidade;
+        adicionaItemPago.idTransacao = umComando.idTransacao;
         adicionaItemPago.descricao = umComando.descricaoNova;
         adicionaItemPago.quantidade = umComando.quantidadeNova;
         adicionaItemPago.unidadeMedida = umComando.unidadeMedidaNova;
@@ -119,6 +118,18 @@ public class Transacao extends RaizAgregado {
         listaEventos.addAll(processaComando(adicionaItemPago));
 
         return listaEventos;
+    }
+
+    private List<EventoDeDominio> processa(AdicionaPagamento umComando) {
+        validaIdEntidade(this.getIdTransacao(), umComando.idTransacao, ID_ENTIDADE_INVALIDA.mensagem);
+
+        return List.of(new PagamentoAdicionado(umComando));
+    }
+
+    private List<EventoDeDominio> processa(AtualizaCategoria umComando) {
+        validaIdEntidade(this.getIdTransacao(), umComando.idTransacao, ID_ENTIDADE_INVALIDA.mensagem);
+
+        return List.of(new CategoriaAtualizada(umComando));
     }
 
     private void aplica(TransacaoCriada umEvento) {
@@ -143,6 +154,14 @@ public class Transacao extends RaizAgregado {
                 umEvento.quantidade,
                 umEvento.unidadeMedida,
                 umEvento.valorUnidade));
+    }
+
+    private void aplica(PagamentoAdicionado umEvento) {
+        this.setIdPagamento(umEvento.idPagamento);
+    }
+
+    private void aplica(CategoriaAtualizada umEvento) {
+        this.setConjuntoCategoria(umEvento.conjuntoCategoria);
     }
 
     private void adicionaItemPago(ItemPago umItemPago) {
@@ -200,5 +219,14 @@ public class Transacao extends RaizAgregado {
 
     private void setConjuntoItemPago() {
         this.listaItemPago = new ArrayList<>(0);
+    }
+
+//    TODO voltar aqui depois que o modelo estiver mais maduro
+    private void setIdPagamento(IdPagamento umIdPagamento){
+        this.idPagamento = umIdPagamento;
+    }
+
+    private void setConjuntoCategoria(Set<Categoria> umConjuntoCategoria){
+        this.conjuntoCategoria = umConjuntoCategoria;
     }
 }

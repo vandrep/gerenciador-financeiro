@@ -26,7 +26,7 @@ public class TransacaoApplicationService {
     }
 
     public Uni<Void> adicionaItemPago(AdicionaItemPago umComando) {
-        return repositorioEvento.eventosDominioDoId(umComando.idEntidade)
+        return repositorioEvento.eventosDominioDoId(umComando.idTransacao)
                 .onItem().transform(listaEventos -> transacaoService.instanciaTransacao(listaEventos))
                 .onItem().transform(pagamento -> pagamento.processaComando(umComando))
                 .onItem().transformToUni(itemPagoAdicionado -> repositorioEvento.armazena(itemPagoAdicionado, PAGAMENTO));

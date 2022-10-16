@@ -19,7 +19,7 @@ public class ItemPagoAdicionado extends EventoDeDominio {
     }
 
     public ItemPagoAdicionado(AdicionaItemPago umComando) {
-        this.idTransacao = new IdTransacao(umComando.idEntidade);
+        this.idTransacao = new IdTransacao(umComando.idTransacao);
         this.ocorridoEm = LocalDateTime.now();
         this.descricao = umComando.descricao;
         this.unidadeMedida = UnidadeMedida.valueOf(umComando.unidadeMedida);

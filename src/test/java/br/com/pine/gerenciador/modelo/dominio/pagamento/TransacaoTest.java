@@ -8,6 +8,8 @@ import org.junit.jupiter.api.Test;
 
 import javax.inject.Inject;
 
+import java.util.Set;
+
 import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -15,33 +17,32 @@ import static org.junit.jupiter.api.Assertions.*;
 class TransacaoTest {
     @Inject
     Fixtures fixtures;
-
+    Transacao transacao;
     String umIdEntidade;
     CriaTransacao comandoCriaTransacao;
     AdicionaItemPago comandoAdicionaItemPago;
     RemoveItemPago comandoRemoveItemPago;
     AlteraItemPago comandoAlteraItemPago;
     AdicionaPagamento comandoAdicionaPagamento;
-    ConfirmaPagamentoParcela comandoConfirmaPagamentoParcela;
-    AgendaPagamentoParcela comandoAgendaPagamentoParcela;
-    AjustaValorParcela comandoAjustaValorParcela;
-    AjustaContaParcela comandoAjustaContaParcela;
+    AtualizaCategoria comandoAtualizaCategoria;
 
     @BeforeEach
     void setUp() {
         umIdEntidade = fixtures.umaStringAleatoria();
         comandoCriaTransacao = fixtures.criaComandoCriaTransacao();
 
+        transacao = new Transacao(umIdEntidade);
+        transacao.processaComando(comandoCriaTransacao).forEach(transacao::aplicaEvento);
+
         comandoAdicionaItemPago = fixtures.criaComandoAdicionaItemPago(umIdEntidade);
         comandoRemoveItemPago = fixtures.criaComandoRemoveItemPagoIdentico(comandoAdicionaItemPago);
         comandoAlteraItemPago = fixtures.criaComandoAlteraItemPagoIdentico(comandoAdicionaItemPago);
+        comandoAdicionaPagamento = fixtures.criaComandoAdicionaPagamento(umIdEntidade);
+        comandoAtualizaCategoria = fixtures.criaComandoAtualizaCategoria(umIdEntidade);
     }
 
     @Test
-    void processaCriaTransacaoComSucesso() {
-        var transacao = new Transacao(umIdEntidade);
-        transacao.processaComando(comandoCriaTransacao).forEach(transacao::aplicaEvento);
-
+    void criaTransacaoComSucesso() {
         assertEquals(comandoCriaTransacao.data, transacao.getDataDeInclusao());
         assertEquals(comandoCriaTransacao.valor, transacao.getValor());
         assertEquals(comandoCriaTransacao.nomeDoPagador, transacao.getNomeDoPagador());
@@ -49,79 +50,76 @@ class TransacaoTest {
     }
 
     @Test
-    void processaCriaTransacaoDataNulaComErro() {
+    void criaTransacaoDataNulaComErro() {
         comandoCriaTransacao.data = null;
 
-        var transacao = new Transacao(umIdEntidade);
+        var transacaoComErro = new Transacao(umIdEntidade);
         var erro = assertThrows(IllegalArgumentException.class,
-                () -> transacao.processaComando(comandoCriaTransacao));
+                () -> transacaoComErro.processaComando(comandoCriaTransacao));
 
         assertEquals(TRANSACAO_DATA_NULA.mensagem, erro.getMessage());
     }
 
     @Test
-    void processaCriaTransacaoValorNegativoComErro() {
+    void criaTransacaoValorNegativoComErro() {
         comandoCriaTransacao.valor = fixtures.valorNegativo();
 
-        var transacao = new Transacao(umIdEntidade);
+        var transacaoComErro = new Transacao(umIdEntidade);
         var erro = assertThrows(IllegalArgumentException.class,
-                () -> transacao.processaComando(comandoCriaTransacao));
+                () -> transacaoComErro.processaComando(comandoCriaTransacao));
 
         assertEquals(TRANSACAO_VALOR_NEGATIVO.mensagem, erro.getMessage());
     }
 
     @Test
-    void processaCriaTransacaoNomeFornecedorNuloComErro() {
+    void criaTransacaoNomeFornecedorNuloComErro() {
         comandoCriaTransacao.nomeDoPagador = null;
 
-        var transacao = new Transacao(umIdEntidade);
+        var transacaoComErro = new Transacao(umIdEntidade);
         var erro = assertThrows(IllegalArgumentException.class,
-                () -> transacao.processaComando(comandoCriaTransacao));
+                () -> transacaoComErro.processaComando(comandoCriaTransacao));
 
         assertEquals(TRANSACAO_NOME_FORNECEDOR_NULO.mensagem, erro.getMessage());
     }
 
     @Test
-    void processaCriaTransacaoNomeFornecedorVazioComErro() {
+    void criaTransacaoNomeFornecedorVazioComErro() {
         comandoCriaTransacao.nomeDoPagador = "";
 
-        var transacao = new Transacao(umIdEntidade);
+        var transacaoComErro = new Transacao(umIdEntidade);
         var erro = assertThrows(IllegalArgumentException.class,
-                () -> transacao.processaComando(comandoCriaTransacao));
+                () -> transacaoComErro.processaComando(comandoCriaTransacao));
 
         assertEquals(TRANSACAO_NOME_FORNECEDOR_VAZIO.mensagem, erro.getMessage());
     }
 
     @Test
-    void processaCriaTransacaoNomeBeneficiarioNuloComErro() {
+    void criaTransacaoNomeBeneficiarioNuloComErro() {
         comandoCriaTransacao.nomeDoRecebedor = null;
 
-        var transacao = new Transacao(umIdEntidade);
+        var transacaoComErro = new Transacao(umIdEntidade);
         var erro = assertThrows(IllegalArgumentException.class,
-                () -> transacao.processaComando(comandoCriaTransacao));
+                () -> transacaoComErro.processaComando(comandoCriaTransacao));
 
         assertEquals(TRANSACAO_NOME_BENEFICIARIO_NULO.mensagem, erro.getMessage());
     }
 
     @Test
-    void processaCriaTransacaoNomBeneficiarioVazioComErro() {
+    void criaTransacaoNomBeneficiarioVazioComErro() {
         comandoCriaTransacao.nomeDoRecebedor = "";
 
-        var transacao = new Transacao(umIdEntidade);
+        var transacaoComErro = new Transacao(umIdEntidade);
         var erro = assertThrows(IllegalArgumentException.class,
-                () -> transacao.processaComando(comandoCriaTransacao));
+                () -> transacaoComErro.processaComando(comandoCriaTransacao));
 
         assertEquals(TRANSACAO_NOME_BENEFICIARIO_VAZIO.mensagem, erro.getMessage());
     }
 
     @Test
-    void processaAdicionaItemPagoComSucesso() {
-        var transacao = new Transacao(umIdEntidade);
-        transacao.processaComando(comandoCriaTransacao).forEach(transacao::aplicaEvento);
-
+    void adicionaItemPagoComSucesso() {
         transacao.processaComando(comandoAdicionaItemPago).forEach(transacao::aplicaEvento);
 
-        assertEquals(comandoAdicionaItemPago.idEntidade, transacao.getIdTransacao());
+        assertEquals(comandoAdicionaItemPago.idTransacao, transacao.getIdTransacao());
         assertEquals(comandoAdicionaItemPago.descricao, transacao.getListaItemPago().get(0).getDescricao());
         assertEquals(comandoAdicionaItemPago.quantidade, transacao.getListaItemPago().get(0).getQuantidade());
         assertEquals(comandoAdicionaItemPago.unidadeMedida, transacao.getListaItemPago().get(0).getUnidadeMedida().name());
@@ -129,34 +127,28 @@ class TransacaoTest {
     }
 
     @Test
-    void processaAdicionaItemPagoTransacaoInvalidaComErro() {
-        var transacao = new Transacao(umIdEntidade);
-        comandoAdicionaItemPago.idEntidade = fixtures.umaStringAleatoria();
+    void adicionaItemPagoTransacaoInvalidaComErro() {
+        comandoAdicionaItemPago.idTransacao = fixtures.umaStringAleatoria();
 
-        var erro = assertThrows(IllegalStateException.class,
+        var erro = assertThrows(IllegalArgumentException.class,
                 () -> transacao.processaComando(comandoAdicionaItemPago));
 
-        assertEquals(TRANSACAO_INVALIDA.mensagem, erro.getMessage());
+        assertEquals(ID_ENTIDADE_INVALIDA.mensagem, erro.getMessage());
     }
 
     @Test
-    void processaRemoveItemPagoComSucesso() {
-        var transacao = new Transacao(umIdEntidade);
-        transacao.processaComando(comandoCriaTransacao).forEach(transacao::aplicaEvento);
+    void removeItemPagoComSucesso() {
         transacao.processaComando(comandoAdicionaItemPago).forEach(transacao::aplicaEvento);
         assertFalse(transacao.getListaItemPago().isEmpty());
 
         transacao.processaComando(comandoRemoveItemPago).forEach(transacao::aplicaEvento);
 
-        assertEquals(comandoRemoveItemPago.idEntidade, transacao.getIdTransacao());
+        assertEquals(comandoRemoveItemPago.idTransacao, transacao.getIdTransacao());
         assertTrue(transacao.getListaItemPago().isEmpty());
     }
 
     @Test
-    void processaRemoveItemPagoNaoExistenteComErro() {
-        var transacao = new Transacao(umIdEntidade);
-        transacao.processaComando(comandoCriaTransacao).forEach(transacao::aplicaEvento);
-
+    void removeItemPagoNaoExistenteComErro() {
         var erro = assertThrows(IllegalStateException.class,
                 () -> transacao.processaComando(comandoRemoveItemPago));
 
@@ -164,14 +156,12 @@ class TransacaoTest {
     }
 
     @Test
-    void processaAlteraItemPagoComSucesso() {
-        var transacao = new Transacao(umIdEntidade);
-        transacao.processaComando(comandoCriaTransacao).forEach(transacao::aplicaEvento);
+    void alteraItemPagoComSucesso() {
         transacao.processaComando(comandoAdicionaItemPago).forEach(transacao::aplicaEvento);
 
         transacao.processaComando(comandoAlteraItemPago).forEach(transacao::aplicaEvento);
 
-        assertEquals(comandoAlteraItemPago.idEntidade, transacao.getIdTransacao());
+        assertEquals(comandoAlteraItemPago.idTransacao, transacao.getIdTransacao());
         assertEquals(1, transacao.getListaItemPago().size());
         assertEquals(comandoAlteraItemPago.descricaoNova, transacao.getListaItemPago().get(0).getDescricao());
         assertEquals(comandoAlteraItemPago.quantidadeNova, transacao.getListaItemPago().get(0).getQuantidade());
@@ -180,10 +170,7 @@ class TransacaoTest {
     }
 
     @Test
-    void processaAlteraItemPagoInexistenteComErro() {
-        var transacao = new Transacao(umIdEntidade);
-        transacao.processaComando(comandoCriaTransacao).forEach(transacao::aplicaEvento);
-
+    void alteraItemPagoInexistenteComErro() {
         var erro = assertThrows(IllegalStateException.class,
                 () -> transacao.processaComando(comandoAlteraItemPago));
 
@@ -191,9 +178,7 @@ class TransacaoTest {
     }
 
     @Test
-    void processaAlteraItemPagoNovoItemInvalidoComErro() {
-        var transacao = new Transacao(umIdEntidade);
-        transacao.processaComando(comandoCriaTransacao).forEach(transacao::aplicaEvento);
+    void alteraItemPagoNovoItemInvalidoComErro() {
         transacao.processaComando(comandoAdicionaItemPago).forEach(transacao::aplicaEvento);
         comandoAlteraItemPago.descricaoNova = null;
 
@@ -204,52 +189,16 @@ class TransacaoTest {
     }
 
     @Test
-    void processaAdicionaPagamentoComSucesso() {
+    void adicionaPagamentoComSucesso() {
+        transacao.processaComando(comandoAdicionaPagamento).forEach(transacao::aplicaEvento);
 
+        assertEquals(comandoAdicionaPagamento.idPagamento, transacao.getIdPagamento().id());
     }
 
     @Test
-    void processaAdicionaPagamentoTransacaoInvalidaComErro() {
+    void atualizaCategoriaComSucesso() {
+        transacao.processaComando(comandoAtualizaCategoria).forEach(transacao::aplicaEvento);
 
-    }
-
-    @Test
-    void processaConfirmaPagamentoParcelaComSucesso() {
-
-    }
-
-    @Test
-    void processaConfirmaPagamentoParcelaInexistenteComErro() {
-
-    }
-
-    @Test
-    void processaAgendaPagamentoParcelaComSucesso() {
-
-    }
-
-    @Test
-    void processaAgendaPagamentoParcelaInexistenteComErro() {
-
-    }
-
-    @Test
-    void processaAjustaValorParcelaComSucesso() {
-
-    }
-
-    @Test
-    void processaAjustaValorParcelaInexistenteComErro() {
-
-    }
-
-    @Test
-    void processaAjustaContaParcelaComSucesso() {
-
-    }
-
-    @Test
-    void processaAjustaContaParcelaInexistenteComErro() {
-
+        assertEquals(comandoAtualizaCategoria.conjuntoCategoria, transacao.getConjuntoCategoria());
     }
 }

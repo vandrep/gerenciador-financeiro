@@ -18,7 +18,7 @@ public enum MensagensErro {
     TRANSACAO_NOME_FORNECEDOR_VAZIO("Nome do Fornecedor da Transação deve estar preenchido."),
     TRANSACAO_NOME_BENEFICIARIO_NULO("Nome do Beneficiário da Transação deve ser informado."),
     TRANSACAO_NOME_BENEFICIARIO_VAZIO("Nome do Beneficiário da Transação deve estar preenchido."),
-    TRANSACAO_INVALIDA("Transação não corresponde ao Comando."),
+    ID_ENTIDADE_INVALIDA("Transação não corresponde ao Comando."),
     DUMMY("DUMMY");
     public String mensagem;
     MensagensErro(String umaMensagem){

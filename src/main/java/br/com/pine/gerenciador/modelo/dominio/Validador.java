@@ -111,4 +111,10 @@ public class Validador {
             throw new IllegalStateException(umaMensagem);
         }
     }
+
+    protected void validaIdEntidade(String idEntidade, String idComando, String umaMensagem){
+        if (!idEntidade.equals(idComando)) {
+            throw new IllegalArgumentException(umaMensagem);
+        }
+    }
 }
