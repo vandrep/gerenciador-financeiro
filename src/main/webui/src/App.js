@@ -1,6 +1,6 @@
 import './App.css';
 import {Link, Outlet, useLoaderData,} from "react-router-dom";
-import {IncluiPagamento, ListaPagamentos} from "./components/Pagamento";
+import {IncluiTransacao, ListaPagamentos} from "./components/Transacao";
 
 export async function loader() {
     const pagamentos = await ListaPagamentos();
@@ -16,7 +16,7 @@ export default function App() {
     return (
         <>
             <div id="cabecalho">
-                <IncluiPagamento />
+                <IncluiTransacao />
             </div>
             <div id="sidebar">
                 <h1>Gerenciador Financeiro</h1>

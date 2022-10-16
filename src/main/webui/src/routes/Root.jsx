@@ -1,8 +1,7 @@
 import {
-    IncluiPagamento,
-    // ListaPagamentos,
-    ListaTodosPagamentos, pagamento
-} from "../components/Pagamento";
+    IncluiTransacao,
+    ListaTodasTransacoes, ListaTransacoes, transacao
+} from "../components/Transacao";
 import {
     Outlet,
     Link,
@@ -10,16 +9,16 @@ import {
 } from "react-router-dom";
 
 export async function loader() {
-    const pagamentos = await ListaTodosPagamentos();
-    return { pagamentos };
+    const transacoes = await ListaTodasTransacoes();
+    return { transacoes };
 }
 
 export default function Root() {
-    const {pagamentos} = useLoaderData();
+    const {transacoes} = useLoaderData();
     return (
         <>
             <div id="cabecalho">
-                <IncluiPagamento />
+                <IncluiTransacao />
             </div>
             <div id="sidebar">
                 <h1>Gerenciador Financeiro</h1>
@@ -47,39 +46,7 @@ export default function Root() {
                         <button type="submit">New</button>
                     </form>
                 </div>
-                <nav>
-                    {pagamentos.length ? (
-                        <ul>
-                            {pagamentos.map((pagamento) => (
-                                <li key={pagamento.idEntidade}>
-                                    <Link to={`pagamentos/${pagamento.idEntidade}`}>
-                                        {pagamento.idEntidade}
-                                    </Link>
-
-                                    {pagamento.data}
-                                </li>
-                            ))}
-                    {/*        {pagamentos.map((contact) => (*/}
-                    {/*            <li key={contact.id}>*/}
-                    {/*                <Link to={`contacts/${contact.id}`}>*/}
-                    {/*                    {contact.first || contact.last ? (*/}
-                    {/*                        <>*/}
-                    {/*                            {contact.first} {contact.last}*/}
-                    {/*                        </>*/}
-                    {/*                    ) : (*/}
-                    {/*                        <i>No Name</i>*/}
-                    {/*                    )}{" "}*/}
-                    {/*                    {contact.favorite && <span>★</span>}*/}
-                    {/*                </Link>*/}
-                    {/*            </li>*/}
-                    {/*        ))}*/}
-                        </ul>
-                    ) : (
-                        <p>
-                            <i>Sem pagamentos</i>
-                        </p>
-                    )}
-                </nav>
+                <ListaTransacoes transacoes={transacoes}/>
             </div>
             <div id="detail">
                 <Outlet/>
