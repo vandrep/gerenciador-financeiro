@@ -1,67 +1,35 @@
-import React, {useEffect, useState} from "react";
 import axios from "axios";
-import {Link} from "react-router-dom";
+import {
+    Form,
+    NavLink,
+    redirect,
+    useLoaderData,
+    useNavigate,
+} from "react-router-dom";
+import '../styles/Transacao.css';
 
-export const transacao = {
-    idTransacao: "",
-    valor: 0,
-    nomeDoPagador: "",
-    nomeDoRecebedor: "",
-    listaItemPago: [],
-    idPagamento: "",
-    conjuntoCategoria: []
+export async function acaoAdicionaItem({request, params}){
+    const dadosFormulario = await request.formData();
+    const item = Object.fromEntries(dadosFormulario);
+    item.idTransacao = params.idTransacao;
+    await adicionaItemPago(item);
 }
 
-export function IncluiTransacao() {
-    const [sucesso, setSucesso] = useState(false);
-    const [falha, setFalha] = useState(false);
-    const [dadosFormulario, setDadosFormulario] = useState(transacao);
-    const {valor, nomeDoPagador, nomeDoRecebedor, listaItemPago} = dadosFormulario;
+export async function acaoCriaTransacao({request}) {
+    const dadosFormulario = await request.formData();
+    const transacao = Object.fromEntries(dadosFormulario);
+    await criaTransacao(transacao);
+}
 
-    const onChange = (evento) => {
-        setDadosFormulario(prevState => ({
-            ...prevState,
-            [evento.target.id]: evento.target.value,
-        }));
-    }
+export async function acaoAtualizaTransacao({request, params}) {
+    const dadosFormulario = await request.formData();
+    const atualizacoes = Object.fromEntries(dadosFormulario);
+    await atualizaTransacao(params.idTransacao, atualizacoes);
+    return redirect(`/transacao/${params.idTransacao}`);
+}
 
-    const onSubmit = async (evento) => {
-        evento.preventDefault();
-
-        try {
-            await axios.post("http://localhost:8080/transacao/cria",
-                dadosFormulario);
-            setSucesso(true)
-        } catch (error) {
-            setFalha(true);
-        }
-
-        // setDadosFormulario(dadosFormularioPadrao);
-    }
-
-    return (
-        <>
-            <h1>Novo Pagamento</h1>
-            <p>Crie um novo pagamento</p>
-
-            <form onSubmit={onSubmit}>
-
-                <label htmlFor="valor">Valor</label>
-                <input type="number" id="valor" value={valor} onChange={onChange}/>
-
-                <label htmlFor="nomeDoPagador">fornecedor</label>
-                <input type="text" id="nomeDoPagador" value={nomeDoPagador} onChange={onChange}/>
-
-                <label htmlFor="nomeDoRecebedor">beneficiario</label>
-                <input type="text" id="nomeDoRecebedor" value={nomeDoRecebedor} onChange={onChange}/>
-
-                <button type="submit">Enviar pagamento</button>
-            </form>
-
-            {falha && <p>Opa, não foi possível inserir...</p>}
-            {sucesso && <p>Pagamento inserido!</p>}
-        </>
-    )
+export async function transacaoLoader({params}) {
+    return getTransacao(params.idTransacao);
 }
 
 export function ListaTransacoes({transacoes}) {
@@ -69,6 +37,7 @@ export function ListaTransacoes({transacoes}) {
         <>
             {transacoes.length ? (
                 <table>
+                    <thead>
                     <tr>
                         <th>Id da Transação</th>
                         <th>Valor</th>
@@ -79,12 +48,20 @@ export function ListaTransacoes({transacoes}) {
                         <th>Categorias</th>
                         <th>Adiciona Item</th>
                     </tr>
+                    </thead>
+                    <tbody>
                     {transacoes.map((transacao) => (
-                        <tr>
+                        <tr key={transacao.idTransacao}>
                             <td>
-                                <Link to={`transacao/consulta/${transacao.idTransacao}`}>
+                                <NavLink
+                                    to={`transacao/${transacao.idTransacao}`}
+                                    className={({isActive, isPending}) =>
+                                        isActive ? "ativo" :
+                                            isPending ? "pendente" : ""
+                                    }
+                                >
                                     {transacao.idTransacao}
-                                </Link>
+                                </NavLink>
                             </td>
                             <td>{transacao.valor}</td>
                             <td>{transacao.nomeDoPagador}</td>
@@ -95,6 +72,7 @@ export function ListaTransacoes({transacoes}) {
                             <td><BotaoAdicionaItem idTransacao={transacao.idTransacao}/></td>
                         </tr>
                     ))}
+                    </tbody>
                 </table>
             ) : (
                 <p>
@@ -106,71 +84,222 @@ export function ListaTransacoes({transacoes}) {
 }
 
 function BotaoAdicionaItem({idTransacao}) {
-    const payload = {
-        idTransacao: idTransacao,
-        descricao: "Uma descrição qualquer.",
-        quantidade: 5,
-        unidadeMedida: "UNIDADE",
-        valorUnidade: 30.0
-    }
-    const handleClick = async (evento) => {
-        evento.preventDefault();
-
-        await axios.post("http://localhost:8080/transacao/adicionaItemPago",
-            payload);
-    }
     return (
         <>
-            <button onClick={handleClick}>+</button>
+            <Form
+                action={`transacao/${idTransacao}/criaItem`}>
+                <button type="submit">+</button>
+            </Form>
         </>
     )
 }
 
-// export function ListaPagamentos() {
-//     const [data, setData] = useState(null);
-//     const [carregando, setCarregando] = useState(false);
-//     const [erro, setErro] = useState(false);
-//
-//     useEffect(() => {
-//         const buscaEventos = async () => {
-//             try {
-//                 setCarregando(true);
-//
-//                 const response = await axios.get(
-//                     "http://localhost:8080/pagamento/listaTodos"
-//                 );
-//
-//                 setData(response.data);
-//                 setCarregando(false);
-//                 setErro(false);
-//             } catch (erro) {
-//                 setErro(true);
-//                 setCarregando(false);
-//             }
-//         };
-//
-//         buscaEventos();
-//     }, []);
-//
-//     return (
-//         <>
-//             {carregando && 'Carregando...'}
-//
-//             {erro && 'Erro ao buscar eventos...'}
-//
-//             {data && data.map((post) => {
-//                 const {ocorridoEm} = post;
-//
-//                 return (
-//                     <article key={ocorridoEm}>
-//                         <p>{ocorridoEm}</p>
-//                     </article>
-//                 );
-//             })}
-//         </>
-//     );
-// }
+export function Transacao() {
+    const transacao = useLoaderData();
+    return (
+        <div id="transacao">
+            <div className="cabecalho">
+                {transacao.idTransacao}
+                {transacao.valor}
+                {transacao.nomeDoPagador}
+                {transacao.nomeDoRecebedor}
+                <div>
+                    <Form action="edita">
+                        <button type="submit">Editar</button>
+                    </Form>
+                </div>
+            </div>
+        </div>
+    );
+}
 
-export async function ListaTodasTransacoes() {
+export function CriaTransacao() {
+
+    return (
+        <FormularioTransacao/>
+    )
+}
+
+export function EditaTransacao() {
+    const transacao = useLoaderData();
+
+    return (
+        <FormularioTransacao transacao={transacao}/>
+    );
+}
+
+export function CriaItem(){
+    const transacao = useLoaderData();
+
+    return (
+        <FormularioItem transacao={transacao}/>
+    )
+}
+
+function FormularioTransacao({transacao}) {
+    const transacaoNaoPreenchida = transacao == null;
+    const navega = useNavigate();
+
+    const handleReset = () => {
+        Array.from(document.querySelectorAll("input")).forEach(
+            input => (input.value = input.defaultValue)
+        );
+    }
+
+    return (
+        <Form method="post" id="transacao-form">
+            <p>
+                <label>
+                    <span>Pagador</span>
+                    <input
+                        placeholder="Pagador"
+                        aria-label="Pagador"
+                        type="text"
+                        name="nomeDoPagador"
+                        defaultValue={transacaoNaoPreenchida ? "Pagador" : transacao.nomeDoPagador}
+                    />
+                </label>
+                <label>
+                    <span>Recebedor</span>
+                    <input
+                        placeholder="Recebedor"
+                        aria-label="Recebedor"
+                        type="text"
+                        name="nomeDoRecebedor"
+                        defaultValue={transacaoNaoPreenchida ? "Recebedor" : transacao.nomeDoRecebedor}
+                    />
+                </label>
+                <label>
+                    <span>Valor</span>
+                    <input
+                        placeholder="Valor"
+                        aria-label="Valor"
+                        type="number"
+                        name="valor"
+                        defaultValue={transacaoNaoPreenchida ? "0" : transacao.valor}
+                    />
+                </label>
+            </p>
+            <p>
+                <button type="submit">Salvar</button>
+                {
+                    transacaoNaoPreenchida ?
+                        <button
+                            type="button"
+                            onClick={handleReset}
+                        >
+                            Limpar
+                        </button> :
+                        <button
+                            type="button"
+                            onClick={() => {
+                                navega(-1);
+                            }}
+                        >
+                            Cancelar
+                        </button>
+                }
+            </p>
+        </Form>
+    );
+}
+
+function FormularioItem({item}) {
+    const itemNaoPreenchido = item == null;
+    const navega = useNavigate();
+
+    const handleReset = () => {
+        Array.from(document.querySelectorAll("input")).forEach(
+            input => (input.value = input.defaultValue)
+        );
+    }
+
+    return (
+        <Form method="post" id="item-form">
+            <p>
+                <label>
+                    <span>Descrição</span>
+                    <input
+                        placeholder="Descrição"
+                        aria-label="Descrição"
+                        type="text"
+                        name="descricao"
+                        defaultValue={itemNaoPreenchido ? "Descrição" : item.descricao}
+                    />
+                </label>
+                <label>
+                    <span>Quantidade</span>
+                    <input
+                        placeholder="Quantidade"
+                        aria-label="Quantidade"
+                        type="number"
+                        name="quantidade"
+                        defaultValue={itemNaoPreenchido ? "0" : item.quantidade}
+                    />
+                </label>
+                <label>
+                    <span>Unidade de Medida</span>
+                    <input
+                        placeholder="Unidade de Medida"
+                        aria-label="Unidade de Medida"
+                        type="text"
+                        name="unidadeMedida"
+                        defaultValue={itemNaoPreenchido ? "UNIDADE" : item.unidadeMedida}
+                    />
+                </label>
+                <label>
+                    <span>Valor</span>
+                    <input
+                        placeholder="Valor"
+                        aria-label="Valor"
+                        type="number"
+                        name="valorUnidade"
+                        defaultValue={itemNaoPreenchido ? "0" : item.valorUnidade}
+                    />
+                </label>
+            </p>
+            <p>
+                <button type="submit">Salvar</button>
+                {
+                    itemNaoPreenchido ?
+                        <button
+                            type="button"
+                            onClick={handleReset}
+                        >
+                            Limpar
+                        </button> :
+                        <button
+                            type="button"
+                            onClick={() => {
+                                navega(-1);
+                            }}
+                        >
+                            Cancelar
+                        </button>
+                }
+            </p>
+        </Form>
+    );
+}
+
+export async function listaTodasTransacoes() {
     return (await axios.get("http://localhost:8080/transacao/lista")).data;
+}
+
+export async function getTransacao(id) {
+    return (await axios.get(`http://localhost:8080/transacao/consulta/${id}`)).data;
+}
+
+export async function criaTransacao(transacao) {
+    return await axios.post("http://localhost:8080/transacao/cria",
+        transacao);
+}
+
+export async function atualizaTransacao(id, atualizacoes) {
+    return await axios.post()
+}
+
+async function adicionaItemPago(item){
+    return await axios.post("http://localhost:8080/transacao/adicionaItemPago",
+        item);
 }

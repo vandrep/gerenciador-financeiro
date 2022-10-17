@@ -22,10 +22,10 @@ import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.ID_ENTIDADE_I
 import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.ITEM_PAGO_NAO_EXISTE_NA_TRANSACAO;
 import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.TRANSACAO_ID_NULO;
 import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.TRANSACAO_ID_VAZIO;
-import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.TRANSACAO_NOME_BENEFICIARIO_NULO;
-import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.TRANSACAO_NOME_BENEFICIARIO_VAZIO;
-import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.TRANSACAO_NOME_FORNECEDOR_NULO;
-import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.TRANSACAO_NOME_FORNECEDOR_VAZIO;
+import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.TRANSACAO_NOME_DO_RECEBEDOR_NULO;
+import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.TRANSACAO_NOME_DO_RECEBEDOR_VAZIO;
+import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.TRANSACAO_NOME_DO_PAGADOR_NULO;
+import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.TRANSACAO_NOME_DO_PAGADOR_VAZIO;
 import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.TRANSACAO_VALOR_NEGATIVO;
 
 public class Transacao extends RaizAgregado {
@@ -40,7 +40,6 @@ public class Transacao extends RaizAgregado {
     public String getIdTransacao() {
         return this.idTransacao.id();
     }
-
 
     public float getValor() {
         if (this.listaItemPago.isEmpty()) {
@@ -79,8 +78,8 @@ public class Transacao extends RaizAgregado {
 
     private List<EventoDeDominio> processa(CriaTransacao umComando) {
         validaValor(umComando.valor);
-        validaNomeFornecedor(umComando.nomeDoPagador);
-        validaNomeBeneficiario(umComando.nomeDoRecebedor);
+        validaNomePagador(umComando.nomeDoPagador);
+        validaNomeRecebedor(umComando.nomeDoRecebedor);
 
         return List.of(new TransacaoCriada(umComando, this.getIdTransacao()));
     }
@@ -148,8 +147,8 @@ public class Transacao extends RaizAgregado {
 
     private void aplica(TransacaoCriada umEvento) {
         this.setValor(umEvento.valor);
-        this.setNomeDoPagador(umEvento.nomeFornecedor);
-        this.setNomeDoRecebedor(umEvento.nomeBeneficiario);
+        this.setNomeDoPagador(umEvento.nomeDoPagador);
+        this.setNomeDoRecebedor(umEvento.nomeDoRecebedor);
         this.setConjuntoItemPago();
     }
 
@@ -190,14 +189,14 @@ public class Transacao extends RaizAgregado {
         this.valor = umValor;
     }
 
-    private void validaNomeFornecedor(String umNomeFornecedor) {
-        validaArgumentoNaoNulo(umNomeFornecedor, TRANSACAO_NOME_FORNECEDOR_NULO.mensagem);
-        validaArgumentoNaoVazio(umNomeFornecedor, TRANSACAO_NOME_FORNECEDOR_VAZIO.mensagem);
+    private void validaNomePagador(String umNomePagador) {
+        validaArgumentoNaoNulo(umNomePagador, TRANSACAO_NOME_DO_PAGADOR_NULO.mensagem);
+        validaArgumentoNaoVazio(umNomePagador, TRANSACAO_NOME_DO_PAGADOR_VAZIO.mensagem);
     }
 
-    private void validaNomeBeneficiario(String umNomeBeneficiario) {
-        validaArgumentoNaoNulo(umNomeBeneficiario, TRANSACAO_NOME_BENEFICIARIO_NULO.mensagem);
-        validaArgumentoNaoVazio(umNomeBeneficiario, TRANSACAO_NOME_BENEFICIARIO_VAZIO.mensagem);
+    private void validaNomeRecebedor(String umNomeRecebedor) {
+        validaArgumentoNaoNulo(umNomeRecebedor, TRANSACAO_NOME_DO_RECEBEDOR_NULO.mensagem);
+        validaArgumentoNaoVazio(umNomeRecebedor, TRANSACAO_NOME_DO_RECEBEDOR_VAZIO.mensagem);
     }
 
     private void setIdTransacao(String umIdTransacao) {
@@ -211,14 +210,14 @@ public class Transacao extends RaizAgregado {
         this.valor = umValor;
     }
 
-    private void setNomeDoPagador(String umNomeFornecedor) {
-        validaNomeFornecedor(umNomeFornecedor);
-        this.nomeDoPagador = umNomeFornecedor;
+    private void setNomeDoPagador(String umNomePagador) {
+        validaNomePagador(umNomePagador);
+        this.nomeDoPagador = umNomePagador;
     }
 
-    private void setNomeDoRecebedor(String umNomeBeneficiario) {
-        validaNomeBeneficiario(umNomeBeneficiario);
-        this.nomeDoRecebedor = umNomeBeneficiario;
+    private void setNomeDoRecebedor(String umNomeRecebedor) {
+        validaNomeRecebedor(umNomeRecebedor);
+        this.nomeDoRecebedor = umNomeRecebedor;
     }
 
     private void setConjuntoItemPago() {

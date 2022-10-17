@@ -9,9 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import javax.inject.Inject;
-import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Date;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -34,8 +32,8 @@ class TransacaoServiceTest {
         var pagamentoEmRealCriado = new TransacaoCriada();
         pagamentoEmRealCriado.idEntidade = umIdTransacao;
         pagamentoEmRealCriado.valor = 50.0f;
-        pagamentoEmRealCriado.nomeFornecedor = "Joselito";
-        pagamentoEmRealCriado.nomeBeneficiario = "Augusto";
+        pagamentoEmRealCriado.nomeDoPagador = "Joselito";
+        pagamentoEmRealCriado.nomeDoRecebedor = "Augusto";
 
         var itemPagoAdicionado1 = new ItemPagoAdicionado();
         itemPagoAdicionado1.idEntidade = umIdTransacao;
@@ -61,8 +59,8 @@ class TransacaoServiceTest {
         var valor = itemPagoAdicionado1.valorUnidade + itemPagoAdicionado2.valorUnidade;
 
         assertEquals(valor, pagamento.getValor());
-        assertEquals(pagamentoEmRealCriado.nomeFornecedor, pagamento.getNomeDoPagador());
-        assertEquals(pagamentoEmRealCriado.nomeBeneficiario, pagamento.getNomeDoRecebedor());
+        assertEquals(pagamentoEmRealCriado.nomeDoPagador, pagamento.getNomeDoPagador());
+        assertEquals(pagamentoEmRealCriado.nomeDoRecebedor, pagamento.getNomeDoRecebedor());
         assertEquals(2, pagamento.getListaItemPago().size());
         assertEquals(itemPagoAdicionado2.descricao, pagamento.getListaItemPago().get(0).getDescricao());
     }

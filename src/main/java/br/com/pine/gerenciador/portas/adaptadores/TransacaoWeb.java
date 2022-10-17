@@ -31,6 +31,15 @@ public class TransacaoWeb {
     }
 
     @POST
+    @Path("/{idTransacao}/atualiza")
+    @ReactiveTransactional
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Uni<Void> atualiza(@RestPath String idTransacao,
+                              CriaTransacao umComando) {
+        return transacaoApplicationService.cria(umComando);
+    }
+
+    @POST
     @Path("/adicionaItemPago")
     @ReactiveTransactional
     @Consumes(MediaType.APPLICATION_JSON)

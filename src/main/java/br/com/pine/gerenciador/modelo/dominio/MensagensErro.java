@@ -13,10 +13,10 @@ public enum MensagensErro {
     TRANSACAO_ID_NULO("Id da Transação deve ser informado."),
     TRANSACAO_ID_VAZIO("Id da Transação deve ser preenchido."),
     TRANSACAO_VALOR_NEGATIVO("Valor da Transação deve ser maior ou igual a 0."),
-    TRANSACAO_NOME_FORNECEDOR_NULO("Nome do Fornecedor da Transação deve ser informado."),
-    TRANSACAO_NOME_FORNECEDOR_VAZIO("Nome do Fornecedor da Transação deve estar preenchido."),
-    TRANSACAO_NOME_BENEFICIARIO_NULO("Nome do Beneficiário da Transação deve ser informado."),
-    TRANSACAO_NOME_BENEFICIARIO_VAZIO("Nome do Beneficiário da Transação deve estar preenchido."),
+    TRANSACAO_NOME_DO_PAGADOR_NULO("Nome do Pagador da Transação deve ser informado."),
+    TRANSACAO_NOME_DO_PAGADOR_VAZIO("Nome do Pagador da Transação deve estar preenchido."),
+    TRANSACAO_NOME_DO_RECEBEDOR_NULO("Nome do Pagador da Transação deve ser informado."),
+    TRANSACAO_NOME_DO_RECEBEDOR_VAZIO("Nome do Pagador da Transação deve estar preenchido."),
     ID_ENTIDADE_INVALIDA("Transação não corresponde ao Comando."),
     DUMMY("DUMMY");
     public String mensagem;

@@ -16,10 +16,10 @@ import javax.inject.Inject;
 import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.ID_ENTIDADE_INVALIDA;
 import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.ITEM_PAGO_NAO_EXISTE_NA_TRANSACAO;
 import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.ITEM_PAGO_NOME_NULO;
-import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.TRANSACAO_NOME_BENEFICIARIO_NULO;
-import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.TRANSACAO_NOME_BENEFICIARIO_VAZIO;
-import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.TRANSACAO_NOME_FORNECEDOR_NULO;
-import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.TRANSACAO_NOME_FORNECEDOR_VAZIO;
+import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.TRANSACAO_NOME_DO_RECEBEDOR_NULO;
+import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.TRANSACAO_NOME_DO_RECEBEDOR_VAZIO;
+import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.TRANSACAO_NOME_DO_PAGADOR_NULO;
+import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.TRANSACAO_NOME_DO_PAGADOR_VAZIO;
 import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.TRANSACAO_VALOR_NEGATIVO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -73,47 +73,47 @@ class TransacaoTest {
     }
 
     @Test
-    void criaTransacaoNomeFornecedorNuloComErro() {
+    void criaTransacaoNomePagadorNuloComErro() {
         comandoCriaTransacao.nomeDoPagador = null;
 
         var transacaoComErro = new Transacao(umIdEntidade);
         var erro = assertThrows(IllegalArgumentException.class,
                 () -> transacaoComErro.processaComando(comandoCriaTransacao));
 
-        assertEquals(TRANSACAO_NOME_FORNECEDOR_NULO.mensagem, erro.getMessage());
+        assertEquals(TRANSACAO_NOME_DO_PAGADOR_NULO.mensagem, erro.getMessage());
     }
 
     @Test
-    void criaTransacaoNomeFornecedorVazioComErro() {
+    void criaTransacaoNomePagadorVazioComErro() {
         comandoCriaTransacao.nomeDoPagador = "";
 
         var transacaoComErro = new Transacao(umIdEntidade);
         var erro = assertThrows(IllegalArgumentException.class,
                 () -> transacaoComErro.processaComando(comandoCriaTransacao));
 
-        assertEquals(TRANSACAO_NOME_FORNECEDOR_VAZIO.mensagem, erro.getMessage());
+        assertEquals(TRANSACAO_NOME_DO_PAGADOR_VAZIO.mensagem, erro.getMessage());
     }
 
     @Test
-    void criaTransacaoNomeBeneficiarioNuloComErro() {
+    void criaTransacaoNomeRecebedorNuloComErro() {
         comandoCriaTransacao.nomeDoRecebedor = null;
 
         var transacaoComErro = new Transacao(umIdEntidade);
         var erro = assertThrows(IllegalArgumentException.class,
                 () -> transacaoComErro.processaComando(comandoCriaTransacao));
 
-        assertEquals(TRANSACAO_NOME_BENEFICIARIO_NULO.mensagem, erro.getMessage());
+        assertEquals(TRANSACAO_NOME_DO_RECEBEDOR_NULO.mensagem, erro.getMessage());
     }
 
     @Test
-    void criaTransacaoNomBeneficiarioVazioComErro() {
+    void criaTransacaoNomeRecebedorVazioComErro() {
         comandoCriaTransacao.nomeDoRecebedor = "";
 
         var transacaoComErro = new Transacao(umIdEntidade);
         var erro = assertThrows(IllegalArgumentException.class,
                 () -> transacaoComErro.processaComando(comandoCriaTransacao));
 
-        assertEquals(TRANSACAO_NOME_BENEFICIARIO_VAZIO.mensagem, erro.getMessage());
+        assertEquals(TRANSACAO_NOME_DO_RECEBEDOR_VAZIO.mensagem, erro.getMessage());
     }
 
     @Test
