@@ -89,7 +89,7 @@ public class Fixtures {
         umComando.idTransacao = umIdEntidade;
         umComando.descricao = umaStringAleatoria();
         umComando.quantidade = umInteiroAleatorio();
-        umComando.unidadeMedida = UnidadeMedida.UNIDADE.name();
+        umComando.unidadeMedida = UnidadeMedida.UN.name();
         umComando.valorUnidade = valorPositivo();
         return umComando;
     }
@@ -113,7 +113,7 @@ public class Fixtures {
         umComandoAltera.valorUnidadeAnterior = umComandoAdiciona.valorUnidade;
         umComandoAltera.descricaoNova = umaStringAleatoria();
         umComandoAltera.quantidadeNova = umInteiroAleatorio();
-        umComandoAltera.unidadeMedidaNova = UnidadeMedida.UNIDADE.name();
+        umComandoAltera.unidadeMedidaNova = UnidadeMedida.UN.name();
         umComandoAltera.valorUnidadeNova = valorPositivo();
         return umComandoAltera;
     }

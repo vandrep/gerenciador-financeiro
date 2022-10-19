@@ -1,8 +1,6 @@
 package br.com.pine.gerenciador.modelo.dominio.transacao;
 
 import br.com.pine.Fixtures;
-import br.com.pine.gerenciador.modelo.dominio.transacao.ItemPago;
-import br.com.pine.gerenciador.modelo.dominio.transacao.UnidadeMedida;
 import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,7 +14,6 @@ import static org.junit.jupiter.api.Assertions.*;
 class ItemPagoTest {
     @Inject
     Fixtures fixtures;
-
     String umaDescricao;
     int umaQuantidade;
     UnidadeMedida umaUnidadeMedida;
@@ -26,7 +23,7 @@ class ItemPagoTest {
     void setUp() {
         umaDescricao = fixtures.umaStringAleatoria(10);
         umaQuantidade = fixtures.umInteiroAleatorio(1, 10);
-        umaUnidadeMedida = UnidadeMedida.UNIDADE;
+        umaUnidadeMedida = UnidadeMedida.UN;
         umValor = fixtures.valorPositivo();
     }
 

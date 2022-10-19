@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import java.net.URL;
 
-import static br.com.pine.gerenciador.modelo.dominio.transacao.UnidadeMedida.UNIDADE;
+import static br.com.pine.gerenciador.modelo.dominio.transacao.UnidadeMedida.UN;
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
 
@@ -39,7 +39,7 @@ class AdaptadorHTTPTransacaoTest {
         umComando.idTransacao = "bogus";
         umComando.descricao = "OK";
         umComando.quantidade = 5;
-        umComando.unidadeMedida = UNIDADE.name();
+        umComando.unidadeMedida = UN.name();
         umComando.valorUnidade = 50;
         given().contentType(JSON).body(umComando)
                 .when().post(urlAdiciona)

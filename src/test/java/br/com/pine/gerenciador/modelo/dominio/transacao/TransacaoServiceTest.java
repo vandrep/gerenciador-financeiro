@@ -40,14 +40,14 @@ class TransacaoServiceTest {
         itemPagoAdicionado1.idEntidade = umIdTransacao;
         itemPagoAdicionado1.descricao = "Remédio";
         itemPagoAdicionado1.quantidade = 50;
-        itemPagoAdicionado1.unidadeMedida = UnidadeMedida.UNIDADE;
+        itemPagoAdicionado1.unidadeMedida = UnidadeMedida.UN;
         itemPagoAdicionado1.valorUnidade = 200.0f;
 
         var itemPagoAdicionado2 = new ItemPagoAdicionado();
         itemPagoAdicionado2.idEntidade = umIdTransacao;
         itemPagoAdicionado2.descricao = "Remédio";
         itemPagoAdicionado2.quantidade = 50;
-        itemPagoAdicionado2.unidadeMedida = UnidadeMedida.UNIDADE;
+        itemPagoAdicionado2.unidadeMedida = UnidadeMedida.UN;
         itemPagoAdicionado2.valorUnidade = 150.0f;
 
         var multiEventoDeDominio = Multi.createFrom().items(pagamentoEmRealCriado, itemPagoAdicionado1, itemPagoAdicionado2);

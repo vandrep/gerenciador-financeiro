@@ -11,6 +11,7 @@ import br.com.pine.gerenciador.modelo.dominio.RaizAgregado;
 import br.com.pine.gerenciador.modelo.dominio.pagamento.IdPagamento;
 import br.com.pine.gerenciador.modelo.dominio.transacao.eventos.CategoriaAtualizada;
 import br.com.pine.gerenciador.modelo.dominio.transacao.eventos.ItemPagoAdicionado;
+import br.com.pine.gerenciador.modelo.dominio.transacao.eventos.ItemPagoAlterado;
 import br.com.pine.gerenciador.modelo.dominio.transacao.eventos.ItemPagoRemovido;
 import br.com.pine.gerenciador.modelo.dominio.transacao.eventos.PagamentoAdicionado;
 import br.com.pine.gerenciador.modelo.dominio.transacao.eventos.TransacaoCriada;
@@ -34,7 +35,7 @@ import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.TRANSACAO_NOM
 import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.TRANSACAO_NOME_DO_RECEBEDOR_NULO;
 import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.TRANSACAO_NOME_DO_RECEBEDOR_TAMANHO_INVALIDO;
 import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.TRANSACAO_NOME_DO_RECEBEDOR_VAZIO;
-import static br.com.pine.gerenciador.modelo.dominio.transacao.UnidadeMedida.UNIDADE;
+import static br.com.pine.gerenciador.modelo.dominio.transacao.UnidadeMedida.UN;
 
 public class Transacao extends RaizAgregado {
     private IdTransacao idTransacao;
@@ -88,7 +89,7 @@ public class Transacao extends RaizAgregado {
         new ItemPago(
                 "",
                 1,
-                UNIDADE,
+                UN,
                 umComando.valor);
         validaNomePagador(umComando.nomeDoPagador);
         validaNomeRecebedor(umComando.nomeDoRecebedor);
@@ -130,22 +131,23 @@ public class Transacao extends RaizAgregado {
     private Multi<EventoDeDominio> processa(AlteraItemPago umComando) {
         validaIdEntidade(this.idTransacao().id(), umComando.idTransacao, ID_ENTIDADE_INVALIDA.mensagem);
 
-        var removeItemPago = new RemoveItemPago();
-        removeItemPago.idTransacao = umComando.idTransacao;
-        removeItemPago.descricao = umComando.descricaoAnterior;
-        removeItemPago.quantidade = umComando.quantidadeAnterior;
-        removeItemPago.unidadeMedida = umComando.unidadeMedidaAnterior;
-        removeItemPago.valorUnidade = umComando.valorUnidadeAnterior;
+        var itemAAlterar = new ItemPago(
+                umComando.descricaoAnterior,
+                umComando.quantidadeAnterior,
+                UnidadeMedida.valueOf(umComando.unidadeMedidaAnterior),
+                umComando.valorUnidadeAnterior);
 
-        var adicionaItemPago = new AdicionaItemPago();
-        adicionaItemPago.idTransacao = umComando.idTransacao;
-        adicionaItemPago.descricao = umComando.descricaoNova;
-        adicionaItemPago.quantidade = umComando.quantidadeNova;
-        adicionaItemPago.unidadeMedida = umComando.unidadeMedidaNova;
-        adicionaItemPago.valorUnidade = umComando.valorUnidadeNova;
+        if (!this.listaItemPago.contains(itemAAlterar)) {
+            throw new IllegalStateException(ITEM_PAGO_NAO_EXISTE_NA_TRANSACAO.mensagem);
+        }
 
-        return Multi.createBy().concatenating()
-                .streams(processaComando(removeItemPago), processaComando(adicionaItemPago));
+        var itemNovo = new ItemPago(
+                umComando.descricaoNova,
+                umComando.quantidadeNova,
+                UnidadeMedida.valueOf(umComando.unidadeMedidaNova),
+                umComando.valorUnidadeNova);
+
+        return Multi.createFrom().items(new ItemPagoAlterado(umComando));
     }
 
     private Multi<EventoDeDominio> processa(AdicionaPagamento umComando) {
@@ -167,7 +169,7 @@ public class Transacao extends RaizAgregado {
                 new ItemPago(
                         "",
                         1,
-                        UNIDADE,
+                        UN,
                         umEvento.valor));
         this.setNomeDoPagador(umEvento.nomeDoPagador);
         this.setNomeDoRecebedor(umEvento.nomeDoRecebedor);
@@ -188,6 +190,22 @@ public class Transacao extends RaizAgregado {
                 umEvento.quantidade,
                 umEvento.unidadeMedida,
                 umEvento.valorUnidade));
+    }
+
+    private void aplica(ItemPagoAlterado umEvento) {
+        this.adicionaItemPago(
+                new ItemPago(
+                        umEvento.descricaoNova,
+                        umEvento.quantidadeNova,
+                        UnidadeMedida.valueOf(umEvento.unidadeMedidaNova),
+                        umEvento.valorUnidadeNova));
+
+        this.removeItemPago(
+                new ItemPago(
+                        umEvento.descricaoAnterior,
+                        umEvento.quantidadeAnterior,
+                        UnidadeMedida.valueOf(umEvento.unidadeMedidaAnterior),
+                        umEvento.valorUnidadeAnterior));
     }
 
     private void aplica(PagamentoAdicionado umEvento) {
