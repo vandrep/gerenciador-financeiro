@@ -6,8 +6,10 @@ import br.com.pine.gerenciador.modelo.dominio.EventoDeDominio;
 import java.time.LocalDateTime;
 
 public class TransacaoCriada extends EventoDeDominio {
-    public String idEntidade;
+    public String idTransacao;
     public LocalDateTime ocorridoEm;
+    public String idPagamento;
+    public String descricao;
     public float valor;
     public String nomeDoPagador;
     public String nomeDoRecebedor;
@@ -15,17 +17,20 @@ public class TransacaoCriada extends EventoDeDominio {
     public TransacaoCriada() {
     }
 
-    public TransacaoCriada(CriaTransacao umComando, String umIdTransacao) {
-        this.idEntidade = umIdTransacao;
+    public TransacaoCriada(CriaTransacao umComando,
+                           String umIdTransacao) {
+        this.idTransacao = umIdTransacao;
         this.ocorridoEm = LocalDateTime.now();
+        this.descricao = umComando.descricao;
         this.valor = umComando.valor;
         this.nomeDoPagador = umComando.nomeDoPagador;
         this.nomeDoRecebedor = umComando.nomeDoRecebedor;
+        this.idPagamento = umComando.idPagamento;
     }
 
     @Override
-    public String getIdEntidade() {
-        return idEntidade;
+    public String getIdTransacao() {
+        return idTransacao;
     }
 
     @Override

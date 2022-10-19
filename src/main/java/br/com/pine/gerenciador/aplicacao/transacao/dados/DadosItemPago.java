@@ -4,14 +4,14 @@ import br.com.pine.gerenciador.modelo.dominio.transacao.ItemPago;
 
 public class DadosItemPago {
     public String descricao;
-    public int quantidade;
+    public float quantidade;
     public String unidadeDeMedida;
     public float valorDaUnidade;
 
     public DadosItemPago(ItemPago umItemPago){
-        this.descricao = umItemPago.getDescricao();
-        this.quantidade = umItemPago.getQuantidade();
-        this.unidadeDeMedida = umItemPago.getUnidadeMedida().name();
-        this.valorDaUnidade = umItemPago.getValorUnidade();
+        this.descricao = umItemPago.descricao();
+        this.quantidade = umItemPago.quantidade();
+        this.unidadeDeMedida = umItemPago.unidadeMedida().name();
+        this.valorDaUnidade = umItemPago.valorUnidade();
     }
 }

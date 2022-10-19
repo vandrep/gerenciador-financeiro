@@ -22,7 +22,7 @@ public class CategoriaAtualizada extends EventoDeDominio {
     }
 
     @Override
-    public String getIdEntidade() {
+    public String getIdTransacao() {
         return idEntidade;
     }
 

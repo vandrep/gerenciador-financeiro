@@ -16,7 +16,7 @@ public class DadosTransacao {
     public Set<String> conjuntoDeCategoria;
 
     public DadosTransacao(Transacao umaTransacao) {
-        this.idTransacao = umaTransacao.idTransacao();
+        this.idTransacao = umaTransacao.idTransacao().id();
         this.valor = umaTransacao.valor();
         this.nomeDoPagador = umaTransacao.nomeDoPagador();
         this.nomeDoRecebedor = umaTransacao.nomeDoRecebedor();

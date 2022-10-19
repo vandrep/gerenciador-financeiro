@@ -1,7 +1,6 @@
 package br.com.pine.gerenciador.modelo.dominio.transacao;
 
 import br.com.pine.Fixtures;
-import br.com.pine.gerenciador.modelo.dominio.EventoDeDominio;
 import br.com.pine.gerenciador.modelo.dominio.transacao.eventos.ItemPagoAdicionado;
 import br.com.pine.gerenciador.modelo.dominio.transacao.eventos.TransacaoCriada;
 import io.quarkus.test.junit.QuarkusTest;
@@ -10,7 +9,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -31,10 +29,12 @@ class TransacaoServiceTest {
     @Test
     void criaTransacaoComEventos() {
         var pagamentoEmRealCriado = new TransacaoCriada();
-        pagamentoEmRealCriado.idEntidade = umIdTransacao;
+        pagamentoEmRealCriado.idTransacao = umIdTransacao;
         pagamentoEmRealCriado.valor = 50.0f;
         pagamentoEmRealCriado.nomeDoPagador = "Joselito";
         pagamentoEmRealCriado.nomeDoRecebedor = "Augusto";
+        pagamentoEmRealCriado.descricao = fixtures.umaStringAleatoria();
+        pagamentoEmRealCriado.idPagamento = fixtures.umaStringAleatoria();
 
         var itemPagoAdicionado1 = new ItemPagoAdicionado();
         itemPagoAdicionado1.idEntidade = umIdTransacao;
@@ -54,12 +54,12 @@ class TransacaoServiceTest {
 
         var pagamento = transacaoService.instanciaTransacao(multiEventoDeDominio).await().indefinitely();
 
-        var valor = itemPagoAdicionado1.valorUnidade + itemPagoAdicionado2.valorUnidade;
+        var valor = pagamentoEmRealCriado.valor = 50.0f + itemPagoAdicionado1.valorUnidade + itemPagoAdicionado2.valorUnidade;
 
         assertEquals(valor, pagamento.valor());
         assertEquals(pagamentoEmRealCriado.nomeDoPagador, pagamento.nomeDoPagador());
         assertEquals(pagamentoEmRealCriado.nomeDoRecebedor, pagamento.nomeDoRecebedor());
-        assertEquals(2, pagamento.listaItemPago().size());
-        assertEquals(itemPagoAdicionado2.descricao, pagamento.listaItemPago().get(0).getDescricao());
+        assertEquals(3, pagamento.listaItemPago().size());
+        assertEquals(itemPagoAdicionado2.descricao, pagamento.listaItemPago().get(1).descricao());
     }
 }

@@ -27,7 +27,7 @@ public class ItemPagoAdicionado extends EventoDeDominio {
     }
 
     @Override
-    public String getIdEntidade() {
+    public String getIdTransacao() {
         return idEntidade;
     }
 

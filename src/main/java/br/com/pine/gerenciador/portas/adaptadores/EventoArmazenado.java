@@ -1,7 +1,6 @@
 package br.com.pine.gerenciador.portas.adaptadores;
 
 import br.com.pine.gerenciador.modelo.dominio.EventoDeDominio;
-import br.com.pine.gerenciador.modelo.dominio.transacao.Transacao;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
@@ -32,7 +31,7 @@ public class EventoArmazenado {
     public EventoArmazenado(EventoDeDominio umEventoDeDominio, String umTipoEntidade){
         this.tipoEntidade = umTipoEntidade;
         this.tipoEvento = umEventoDeDominio.getClass().getSimpleName();
-        this.idEntidade = umEventoDeDominio.getIdEntidade();
+        this.idEntidade = umEventoDeDominio.getIdTransacao();
         this.setDadosEvento(umEventoDeDominio);
     }
 

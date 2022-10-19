@@ -11,8 +11,11 @@ import static com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import static com.fasterxml.jackson.annotation.JsonTypeInfo.Id.DEDUCTION;
 
 @JsonTypeInfo(use = DEDUCTION)
-@JsonSubTypes({@Type(ItemPagoAdicionado.class), @Type(TransacaoCriada.class)})
+@JsonSubTypes({
+        @Type(ItemPagoAdicionado.class),
+        @Type(TransacaoCriada.class)
+})
 public abstract class EventoDeDominio {
-    public abstract String getIdEntidade();
+    public abstract String getIdTransacao();
     public abstract LocalDateTime getOcorridoEm();
 }

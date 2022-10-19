@@ -74,15 +74,17 @@ public class Fixtures {
         return new Date(random.nextInt() * 1000L);
     }
 
-    public CriaTransacao criaComandoCriaTransacao() {
+    public CriaTransacao comandoCriaTransacao() {
         var umComando = new CriaTransacao();
+        umComando.descricao = umaStringAleatoria();
         umComando.valor = valorPositivo();
         umComando.nomeDoPagador = umaStringAleatoria();
         umComando.nomeDoRecebedor = umaStringAleatoria();
+        umComando.idPagamento = umaStringAleatoria();
         return umComando;
     }
 
-    public AdicionaItemPago criaComandoAdicionaItemPago(String umIdEntidade) {
+    public AdicionaItemPago comandoAdicionaItemPago(String umIdEntidade) {
         var umComando = new AdicionaItemPago();
         umComando.idTransacao = umIdEntidade;
         umComando.descricao = umaStringAleatoria();
@@ -92,7 +94,7 @@ public class Fixtures {
         return umComando;
     }
 
-    public RemoveItemPago criaComandoRemoveItemPagoIdentico(AdicionaItemPago umComandoAdiciona) {
+    public RemoveItemPago comandoRemoveItemPagoIdentico(AdicionaItemPago umComandoAdiciona) {
         var umComandoRemove = new RemoveItemPago();
         umComandoRemove.idTransacao = umComandoAdiciona.idTransacao;
         umComandoRemove.descricao = umComandoAdiciona.descricao;
@@ -102,7 +104,7 @@ public class Fixtures {
         return umComandoRemove;
     }
 
-    public AlteraItemPago criaComandoAlteraItemPagoIdentico(AdicionaItemPago umComandoAdiciona) {
+    public AlteraItemPago comandoAlteraItemPagoIdentico(AdicionaItemPago umComandoAdiciona) {
         var umComandoAltera = new AlteraItemPago();
         umComandoAltera.idTransacao = umComandoAdiciona.idTransacao;
         umComandoAltera.descricaoAnterior = umComandoAdiciona.descricao;
@@ -116,14 +118,14 @@ public class Fixtures {
         return umComandoAltera;
     }
 
-    public AdicionaPagamento criaComandoAdicionaPagamento(String umIdEntidade) {
+    public AdicionaPagamento comandoAdicionaPagamento(String umIdEntidade) {
         var umComando = new AdicionaPagamento();
         umComando.idTransacao = umIdEntidade;
         umComando.idPagamento = umaStringAleatoria();
         return umComando;
     }
 
-    public AtualizaCategoria criaComandoAtualizaCategoria(String umIdEntidade) {
+    public AtualizaCategoria comandoAtualizaCategoria(String umIdEntidade) {
         var umComando = new AtualizaCategoria();
         umComando.idTransacao = umIdEntidade;
         umComando.conjuntoCategoria = Set.of(SALARIO, ALUGUEL);

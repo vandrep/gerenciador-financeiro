@@ -3,14 +3,13 @@ package br.com.pine.gerenciador.modelo.dominio.transacao;
 import br.com.pine.gerenciador.modelo.dominio.ObjetoDeValor;
 
 import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.ITEM_PAGO_NOME_NULO;
-import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.ITEM_PAGO_NOME_VAZIO;
 import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.ITEM_PAGO_QUANTIDADE_MENOR_QUE_UM;
 import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.ITEM_PAGO_UNIDADE_MEDIDA_NULA;
 import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.ITEM_PAGO_VALOR_NEGATIVO;
 
 public class ItemPago extends ObjetoDeValor {
     private String descricao;
-    private int quantidade;
+    private float quantidade;
     private UnidadeMedida unidadeMedida;
     private float valorUnidade;
 
@@ -24,34 +23,33 @@ public class ItemPago extends ObjetoDeValor {
         this.setValorUnidade(umValorUnidade);
     }
 
+    public float valorTotal() {
+        return quantidade * valorUnidade;
+    }
+
+    public UnidadeMedida unidadeMedida() {
+        return unidadeMedida;
+    }
+
+    public String descricao() {
+        return descricao;
+    }
+
+    public float valorUnidade() {
+        return valorUnidade;
+    }
+
+    public float quantidade() {
+        return quantidade;
+    }
+
     private void setUnidadeMedida(UnidadeMedida umaUnidadeMedida) {
         validaArgumentoNaoNulo(umaUnidadeMedida, ITEM_PAGO_UNIDADE_MEDIDA_NULA.mensagem);
         this.unidadeMedida = umaUnidadeMedida;
     }
 
-    public float valorDoItem() {
-        return quantidade * valorUnidade;
-    }
-
-    public UnidadeMedida getUnidadeMedida() {
-        return unidadeMedida;
-    }
-
-    public String getDescricao() {
-        return descricao;
-    }
-
-    public float getValorUnidade() {
-        return valorUnidade;
-    }
-
-    public int getQuantidade() {
-        return quantidade;
-    }
-
     private void setDescricao(String umNome) {
         validaArgumentoNaoNulo(umNome, ITEM_PAGO_NOME_NULO.mensagem);
-        validaArgumentoNaoVazio(umNome, ITEM_PAGO_NOME_VAZIO.mensagem);
         this.descricao = umNome;
     }
 
@@ -60,7 +58,7 @@ public class ItemPago extends ObjetoDeValor {
         this.valorUnidade = umValor;
     }
 
-    private void setQuantidade(int umaQuantidade) {
+    private void setQuantidade(float umaQuantidade) {
         validaArgumentoMaiorOuIgualA(umaQuantidade, 1, ITEM_PAGO_QUANTIDADE_MENOR_QUE_UM.mensagem);
         this.quantidade = umaQuantidade;
     }
@@ -72,18 +70,18 @@ public class ItemPago extends ObjetoDeValor {
 
         ItemPago itemPago = (ItemPago) o;
 
-        if (getQuantidade() != itemPago.getQuantidade()) return false;
-        if (Float.compare(itemPago.getValorUnidade(), getValorUnidade()) != 0) return false;
-        if (!getDescricao().equals(itemPago.getDescricao())) return false;
-        return getUnidadeMedida() == itemPago.getUnidadeMedida();
+        if (quantidade() != itemPago.quantidade()) return false;
+        if (Float.compare(itemPago.valorUnidade(), valorUnidade()) != 0) return false;
+        if (!descricao().equals(itemPago.descricao())) return false;
+        return unidadeMedida() == itemPago.unidadeMedida();
     }
 
     @Override
     public int hashCode() {
-        int result = getDescricao().hashCode();
-        result = 31 * result + getQuantidade();
-        result = 31 * result + getUnidadeMedida().hashCode();
-        result = 31 * result + (getValorUnidade() != +0.0f ? Float.floatToIntBits(getValorUnidade()) : 0);
+        int result = descricao().hashCode();
+        result = 31 * result + (quantidade() != +0.0f ? Float.floatToIntBits(quantidade()) : 0);
+        result = 31 * result + unidadeMedida().hashCode();
+        result = 31 * result + (valorUnidade() != +0.0f ? Float.floatToIntBits(valorUnidade()) : 0);
         return result;
     }
 }

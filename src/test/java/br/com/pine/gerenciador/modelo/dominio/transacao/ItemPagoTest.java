@@ -46,16 +46,6 @@ class ItemPagoTest {
     }
 
     @Test
-    void criaItemPagoNomeVazioComErro() {
-        umaDescricao = "";
-
-        var erro = assertThrows(IllegalArgumentException.class,
-                () -> new ItemPago(umaDescricao, umaQuantidade, umaUnidadeMedida, umValor));
-
-        assertEquals(ITEM_PAGO_NOME_VAZIO.mensagem, erro.getMessage());
-    }
-
-    @Test
     void criaItemPagoValorNegativoComErro() {
         umValor = fixtures.valorNegativo();
 
