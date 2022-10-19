@@ -1,4 +1,4 @@
-package br.com.pine.gerenciador.modelo.dominio.transacao;
+package br.com.pine.gerenciador.modelo.dominio.pagamento;
 
 import br.com.pine.gerenciador.modelo.dominio.IdEntidade;
 

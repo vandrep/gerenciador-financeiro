@@ -5,6 +5,7 @@ import br.com.pine.gerenciador.modelo.dominio.EventoDeDominio;
 import br.com.pine.gerenciador.modelo.dominio.transacao.eventos.ItemPagoAdicionado;
 import br.com.pine.gerenciador.modelo.dominio.transacao.eventos.TransacaoCriada;
 import io.quarkus.test.junit.QuarkusTest;
+import io.smallrye.mutiny.Multi;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -49,19 +50,16 @@ class TransacaoServiceTest {
         itemPagoAdicionado2.unidadeMedida = UnidadeMedida.UNIDADE;
         itemPagoAdicionado2.valorUnidade = 150.0f;
 
-        var listaEventos = new ArrayList<EventoDeDominio>();
-        listaEventos.add(pagamentoEmRealCriado);
-        listaEventos.add(itemPagoAdicionado1);
-        listaEventos.add(itemPagoAdicionado2);
+        var multiEventoDeDominio = Multi.createFrom().items(pagamentoEmRealCriado, itemPagoAdicionado1, itemPagoAdicionado2);
 
-        var pagamento = transacaoService.instanciaTransacao(listaEventos);
+        var pagamento = transacaoService.instanciaTransacao(multiEventoDeDominio).await().indefinitely();
 
         var valor = itemPagoAdicionado1.valorUnidade + itemPagoAdicionado2.valorUnidade;
 
-        assertEquals(valor, pagamento.getValor());
-        assertEquals(pagamentoEmRealCriado.nomeDoPagador, pagamento.getNomeDoPagador());
-        assertEquals(pagamentoEmRealCriado.nomeDoRecebedor, pagamento.getNomeDoRecebedor());
-        assertEquals(2, pagamento.getListaItemPago().size());
-        assertEquals(itemPagoAdicionado2.descricao, pagamento.getListaItemPago().get(0).getDescricao());
+        assertEquals(valor, pagamento.valor());
+        assertEquals(pagamentoEmRealCriado.nomeDoPagador, pagamento.nomeDoPagador());
+        assertEquals(pagamentoEmRealCriado.nomeDoRecebedor, pagamento.nomeDoRecebedor());
+        assertEquals(2, pagamento.listaItemPago().size());
+        assertEquals(itemPagoAdicionado2.descricao, pagamento.listaItemPago().get(0).getDescricao());
     }
 }

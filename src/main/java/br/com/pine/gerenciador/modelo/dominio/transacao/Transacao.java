@@ -8,15 +8,19 @@ import br.com.pine.gerenciador.aplicacao.transacao.comandos.CriaTransacao;
 import br.com.pine.gerenciador.aplicacao.transacao.comandos.RemoveItemPago;
 import br.com.pine.gerenciador.modelo.dominio.EventoDeDominio;
 import br.com.pine.gerenciador.modelo.dominio.RaizAgregado;
+import br.com.pine.gerenciador.modelo.dominio.pagamento.IdPagamento;
 import br.com.pine.gerenciador.modelo.dominio.transacao.eventos.CategoriaAtualizada;
 import br.com.pine.gerenciador.modelo.dominio.transacao.eventos.ItemPagoAdicionado;
 import br.com.pine.gerenciador.modelo.dominio.transacao.eventos.ItemPagoRemovido;
 import br.com.pine.gerenciador.modelo.dominio.transacao.eventos.PagamentoAdicionado;
 import br.com.pine.gerenciador.modelo.dominio.transacao.eventos.TransacaoCriada;
+import io.smallrye.mutiny.Multi;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.ID_ENTIDADE_INVALIDA;
 import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.ITEM_PAGO_NAO_EXISTE_NA_TRANSACAO;
@@ -37,11 +41,11 @@ public class Transacao extends RaizAgregado {
     private IdPagamento idPagamento;
     private Set<Categoria> conjuntoCategoria;
 
-    public String getIdTransacao() {
+    public String idTransacao() {
         return this.idTransacao.id();
     }
 
-    public float getValor() {
+    public float valor() {
         if (this.listaItemPago.isEmpty()) {
             return valor;
         }
@@ -50,42 +54,41 @@ public class Transacao extends RaizAgregado {
                 .reduce(0.0f, Float::sum);
     }
 
-    public String getNomeDoPagador() {
+    public String nomeDoPagador() {
         return nomeDoPagador;
     }
 
-    public String getNomeDoRecebedor() {
+    public String nomeDoRecebedor() {
         return nomeDoRecebedor;
     }
 
-    public List<ItemPago> getListaItemPago() {
+    public List<ItemPago> listaItemPago() {
         return listaItemPago;
     }
 
-    public IdPagamento getIdPagamento() {
+    public IdPagamento idPagamento() {
         return idPagamento;
     }
 
-    public Set<Categoria> getConjuntoCategoria() {
+    public Set<Categoria> conjuntoCategoria() {
         return conjuntoCategoria;
     }
 
-
-    protected Transacao(String umIdEntidade) {
-        this.setIdTransacao(umIdEntidade);
-        this.setConjuntoItemPago();
+    public Transacao() {
+        this.setListaItemPago(new ArrayList<>(0));
+        this.setConjuntoCategoria(new HashSet<>(0));
     }
 
-    private List<EventoDeDominio> processa(CriaTransacao umComando) {
+    private Multi<EventoDeDominio> processa(CriaTransacao umComando) {
         validaValor(umComando.valor);
         validaNomePagador(umComando.nomeDoPagador);
         validaNomeRecebedor(umComando.nomeDoRecebedor);
 
-        return List.of(new TransacaoCriada(umComando, this.getIdTransacao()));
+        return Multi.createFrom().items(new TransacaoCriada(umComando, UUID.randomUUID().toString()));
     }
 
-    private List<EventoDeDominio> processa(AdicionaItemPago umComando) {
-        validaIdEntidade(this.getIdTransacao(), umComando.idTransacao, ID_ENTIDADE_INVALIDA.mensagem);
+    private Multi<EventoDeDominio> processa(AdicionaItemPago umComando) {
+        validaIdEntidade(this.idTransacao(), umComando.idTransacao, ID_ENTIDADE_INVALIDA.mensagem);
 
         new ItemPago(
                 umComando.descricao,
@@ -93,11 +96,11 @@ public class Transacao extends RaizAgregado {
                 UnidadeMedida.valueOf(umComando.unidadeMedida),
                 umComando.valorUnidade);
 
-        return List.of(new ItemPagoAdicionado(umComando));
+        return Multi.createFrom().items(new ItemPagoAdicionado(umComando));
     }
 
-    private List<EventoDeDominio> processa(RemoveItemPago umComando) {
-        validaIdEntidade(this.getIdTransacao(), umComando.idTransacao, ID_ENTIDADE_INVALIDA.mensagem);
+    private Multi<EventoDeDominio> processa(RemoveItemPago umComando) {
+        validaIdEntidade(this.idTransacao(), umComando.idTransacao, ID_ENTIDADE_INVALIDA.mensagem);
 
         var itemARemover = new ItemPago(
                 umComando.descricao,
@@ -108,11 +111,12 @@ public class Transacao extends RaizAgregado {
         if (!this.listaItemPago.contains(itemARemover)) {
             throw new IllegalStateException(ITEM_PAGO_NAO_EXISTE_NA_TRANSACAO.mensagem);
         }
-        return List.of(new ItemPagoRemovido(umComando));
+
+        return Multi.createFrom().items(new ItemPagoRemovido(umComando));
     }
 
-    private List<EventoDeDominio> processa(AlteraItemPago umComando) {
-        validaIdEntidade(this.getIdTransacao(), umComando.idTransacao, ID_ENTIDADE_INVALIDA.mensagem);
+    private Multi<EventoDeDominio> processa(AlteraItemPago umComando) {
+        validaIdEntidade(this.idTransacao(), umComando.idTransacao, ID_ENTIDADE_INVALIDA.mensagem);
 
         var removeItemPago = new RemoveItemPago();
         removeItemPago.idTransacao = umComando.idTransacao;
@@ -120,7 +124,6 @@ public class Transacao extends RaizAgregado {
         removeItemPago.quantidade = umComando.quantidadeAnterior;
         removeItemPago.unidadeMedida = umComando.unidadeMedidaAnterior;
         removeItemPago.valorUnidade = umComando.valorUnidadeAnterior;
-        var listaEventos = new ArrayList<>(processaComando(removeItemPago));
 
         var adicionaItemPago = new AdicionaItemPago();
         adicionaItemPago.idTransacao = umComando.idTransacao;
@@ -128,28 +131,28 @@ public class Transacao extends RaizAgregado {
         adicionaItemPago.quantidade = umComando.quantidadeNova;
         adicionaItemPago.unidadeMedida = umComando.unidadeMedidaNova;
         adicionaItemPago.valorUnidade = umComando.valorUnidadeNova;
-        listaEventos.addAll(processaComando(adicionaItemPago));
 
-        return listaEventos;
+        return Multi.createBy().concatenating()
+                .streams(processaComando(removeItemPago), processaComando(adicionaItemPago));
     }
 
-    private List<EventoDeDominio> processa(AdicionaPagamento umComando) {
-        validaIdEntidade(this.getIdTransacao(), umComando.idTransacao, ID_ENTIDADE_INVALIDA.mensagem);
+    private Multi<EventoDeDominio> processa(AdicionaPagamento umComando) {
+        validaIdEntidade(this.idTransacao(), umComando.idTransacao, ID_ENTIDADE_INVALIDA.mensagem);
 
-        return List.of(new PagamentoAdicionado(umComando));
+        return Multi.createFrom().items(new PagamentoAdicionado(umComando));
     }
 
-    private List<EventoDeDominio> processa(AtualizaCategoria umComando) {
-        validaIdEntidade(this.getIdTransacao(), umComando.idTransacao, ID_ENTIDADE_INVALIDA.mensagem);
+    private Multi<EventoDeDominio> processa(AtualizaCategoria umComando) {
+        validaIdEntidade(this.idTransacao(), umComando.idTransacao, ID_ENTIDADE_INVALIDA.mensagem);
 
-        return List.of(new CategoriaAtualizada(umComando));
+        return Multi.createFrom().items(new CategoriaAtualizada(umComando));
     }
 
     private void aplica(TransacaoCriada umEvento) {
+        this.setIdTransacao(umEvento.idEntidade);
         this.setValor(umEvento.valor);
         this.setNomeDoPagador(umEvento.nomeDoPagador);
         this.setNomeDoRecebedor(umEvento.nomeDoRecebedor);
-        this.setConjuntoItemPago();
     }
 
     private void aplica(ItemPagoAdicionado umEvento) {
@@ -220,8 +223,8 @@ public class Transacao extends RaizAgregado {
         this.nomeDoRecebedor = umNomeRecebedor;
     }
 
-    private void setConjuntoItemPago() {
-        this.listaItemPago = new ArrayList<>(0);
+    private void setListaItemPago(List<ItemPago> umaListaItemPago) {
+        this.listaItemPago = umaListaItemPago;
     }
 
     //    TODO voltar aqui depois que o modelo estiver mais maduro

@@ -1,16 +1,19 @@
 package br.com.pine.gerenciador.modelo.dominio;
 
+import io.smallrye.mutiny.Multi;
+import io.smallrye.mutiny.Uni;
+
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 public class RaizAgregado extends Entidade{
 
-    public List<EventoDeDominio> processaComando(Comando umComando) {
+    public Multi<EventoDeDominio> processaComando(Comando umComando) {
         try {
             try {
                 var metodoProcessa = getClass().getDeclaredMethod("processa", umComando.getClass());
                 metodoProcessa.setAccessible(true);
-                return (List<EventoDeDominio>) metodoProcessa.invoke(this, umComando);
+                return (Multi<EventoDeDominio>) metodoProcessa.invoke(this, umComando);
             } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);
             } catch (InvocationTargetException e) {

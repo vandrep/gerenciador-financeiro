@@ -7,7 +7,10 @@ import br.com.pine.gerenciador.aplicacao.transacao.comandos.AlteraItemPago;
 import br.com.pine.gerenciador.aplicacao.transacao.comandos.AtualizaCategoria;
 import br.com.pine.gerenciador.aplicacao.transacao.comandos.CriaTransacao;
 import br.com.pine.gerenciador.aplicacao.transacao.comandos.RemoveItemPago;
+import br.com.pine.gerenciador.modelo.dominio.EventoDeDominio;
 import io.quarkus.test.junit.QuarkusTest;
+import io.smallrye.mutiny.Multi;
+import io.smallrye.mutiny.helpers.test.UniAssertSubscriber;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -16,10 +19,10 @@ import javax.inject.Inject;
 import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.ID_ENTIDADE_INVALIDA;
 import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.ITEM_PAGO_NAO_EXISTE_NA_TRANSACAO;
 import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.ITEM_PAGO_NOME_NULO;
-import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.TRANSACAO_NOME_DO_RECEBEDOR_NULO;
-import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.TRANSACAO_NOME_DO_RECEBEDOR_VAZIO;
 import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.TRANSACAO_NOME_DO_PAGADOR_NULO;
 import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.TRANSACAO_NOME_DO_PAGADOR_VAZIO;
+import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.TRANSACAO_NOME_DO_RECEBEDOR_NULO;
+import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.TRANSACAO_NOME_DO_RECEBEDOR_VAZIO;
 import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.TRANSACAO_VALOR_NEGATIVO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -30,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class TransacaoTest {
     @Inject
     Fixtures fixtures;
-    Transacao transacao;
+    Transacao transacao = new Transacao();
     String umIdEntidade;
     CriaTransacao comandoCriaTransacao;
     AdicionaItemPago comandoAdicionaItemPago;
@@ -41,11 +44,12 @@ class TransacaoTest {
 
     @BeforeEach
     void setUp() {
-        umIdEntidade = fixtures.umaStringAleatoria();
         comandoCriaTransacao = fixtures.criaComandoCriaTransacao();
 
-        transacao = new Transacao(umIdEntidade);
-        transacao.processaComando(comandoCriaTransacao).forEach(transacao::aplicaEvento);
+        transacao.processaComando(comandoCriaTransacao)
+                .stage(this::finalizaProcessamento);
+
+        umIdEntidade = transacao.idTransacao();
 
         comandoAdicionaItemPago = fixtures.criaComandoAdicionaItemPago(umIdEntidade);
         comandoRemoveItemPago = fixtures.criaComandoRemoveItemPagoIdentico(comandoAdicionaItemPago);
@@ -56,27 +60,26 @@ class TransacaoTest {
 
     @Test
     void criaTransacaoComSucesso() {
-        assertEquals(comandoCriaTransacao.valor, transacao.getValor());
-        assertEquals(comandoCriaTransacao.nomeDoPagador, transacao.getNomeDoPagador());
-        assertEquals(comandoCriaTransacao.nomeDoRecebedor, transacao.getNomeDoRecebedor());
+        assertEquals(comandoCriaTransacao.valor, transacao.valor());
+        assertEquals(comandoCriaTransacao.nomeDoPagador, transacao.nomeDoPagador());
+        assertEquals(comandoCriaTransacao.nomeDoRecebedor, transacao.nomeDoRecebedor());
     }
 
     @Test
     void criaTransacaoValorNegativoComErro() {
         comandoCriaTransacao.valor = fixtures.valorNegativo();
+        var transacaoComErro = new Transacao();
 
-        var transacaoComErro = new Transacao(umIdEntidade);
         var erro = assertThrows(IllegalArgumentException.class,
                 () -> transacaoComErro.processaComando(comandoCriaTransacao));
-
         assertEquals(TRANSACAO_VALOR_NEGATIVO.mensagem, erro.getMessage());
     }
 
     @Test
     void criaTransacaoNomePagadorNuloComErro() {
         comandoCriaTransacao.nomeDoPagador = null;
+        var transacaoComErro = new Transacao();
 
-        var transacaoComErro = new Transacao(umIdEntidade);
         var erro = assertThrows(IllegalArgumentException.class,
                 () -> transacaoComErro.processaComando(comandoCriaTransacao));
 
@@ -86,8 +89,8 @@ class TransacaoTest {
     @Test
     void criaTransacaoNomePagadorVazioComErro() {
         comandoCriaTransacao.nomeDoPagador = "";
+        var transacaoComErro = new Transacao();
 
-        var transacaoComErro = new Transacao(umIdEntidade);
         var erro = assertThrows(IllegalArgumentException.class,
                 () -> transacaoComErro.processaComando(comandoCriaTransacao));
 
@@ -97,8 +100,8 @@ class TransacaoTest {
     @Test
     void criaTransacaoNomeRecebedorNuloComErro() {
         comandoCriaTransacao.nomeDoRecebedor = null;
+        var transacaoComErro = new Transacao();
 
-        var transacaoComErro = new Transacao(umIdEntidade);
         var erro = assertThrows(IllegalArgumentException.class,
                 () -> transacaoComErro.processaComando(comandoCriaTransacao));
 
@@ -108,8 +111,8 @@ class TransacaoTest {
     @Test
     void criaTransacaoNomeRecebedorVazioComErro() {
         comandoCriaTransacao.nomeDoRecebedor = "";
+        var transacaoComErro = new Transacao();
 
-        var transacaoComErro = new Transacao(umIdEntidade);
         var erro = assertThrows(IllegalArgumentException.class,
                 () -> transacaoComErro.processaComando(comandoCriaTransacao));
 
@@ -118,13 +121,14 @@ class TransacaoTest {
 
     @Test
     void adicionaItemPagoComSucesso() {
-        transacao.processaComando(comandoAdicionaItemPago).forEach(transacao::aplicaEvento);
+        transacao.processaComando(comandoAdicionaItemPago)
+                .stage(this::finalizaProcessamento);
 
-        assertEquals(comandoAdicionaItemPago.idTransacao, transacao.getIdTransacao());
-        assertEquals(comandoAdicionaItemPago.descricao, transacao.getListaItemPago().get(0).getDescricao());
-        assertEquals(comandoAdicionaItemPago.quantidade, transacao.getListaItemPago().get(0).getQuantidade());
-        assertEquals(comandoAdicionaItemPago.unidadeMedida, transacao.getListaItemPago().get(0).getUnidadeMedida().name());
-        assertEquals(comandoAdicionaItemPago.valorUnidade, transacao.getListaItemPago().get(0).getValorUnidade());
+        assertEquals(comandoAdicionaItemPago.idTransacao, transacao.idTransacao());
+        assertEquals(comandoAdicionaItemPago.descricao, transacao.listaItemPago().get(0).getDescricao());
+        assertEquals(comandoAdicionaItemPago.quantidade, transacao.listaItemPago().get(0).getQuantidade());
+        assertEquals(comandoAdicionaItemPago.unidadeMedida, transacao.listaItemPago().get(0).getUnidadeMedida().name());
+        assertEquals(comandoAdicionaItemPago.valorUnidade, transacao.listaItemPago().get(0).getValorUnidade());
     }
 
     @Test
@@ -139,13 +143,15 @@ class TransacaoTest {
 
     @Test
     void removeItemPagoComSucesso() {
-        transacao.processaComando(comandoAdicionaItemPago).forEach(transacao::aplicaEvento);
-        assertFalse(transacao.getListaItemPago().isEmpty());
+        transacao.processaComando(comandoAdicionaItemPago)
+                .stage(this::finalizaProcessamento);
+        assertFalse(transacao.listaItemPago().isEmpty());
 
-        transacao.processaComando(comandoRemoveItemPago).forEach(transacao::aplicaEvento);
+        transacao.processaComando(comandoRemoveItemPago)
+                .stage(this::finalizaProcessamento);
 
-        assertEquals(comandoRemoveItemPago.idTransacao, transacao.getIdTransacao());
-        assertTrue(transacao.getListaItemPago().isEmpty());
+        assertEquals(comandoRemoveItemPago.idTransacao, transacao.idTransacao());
+        assertTrue(transacao.listaItemPago().isEmpty());
     }
 
     @Test
@@ -158,16 +164,18 @@ class TransacaoTest {
 
     @Test
     void alteraItemPagoComSucesso() {
-        transacao.processaComando(comandoAdicionaItemPago).forEach(transacao::aplicaEvento);
+        transacao.processaComando(comandoAdicionaItemPago)
+                .stage(this::finalizaProcessamento);
 
-        transacao.processaComando(comandoAlteraItemPago).forEach(transacao::aplicaEvento);
+        transacao.processaComando(comandoAlteraItemPago)
+                .stage(this::finalizaProcessamento);
 
-        assertEquals(comandoAlteraItemPago.idTransacao, transacao.getIdTransacao());
-        assertEquals(1, transacao.getListaItemPago().size());
-        assertEquals(comandoAlteraItemPago.descricaoNova, transacao.getListaItemPago().get(0).getDescricao());
-        assertEquals(comandoAlteraItemPago.quantidadeNova, transacao.getListaItemPago().get(0).getQuantidade());
-        assertEquals(comandoAlteraItemPago.unidadeMedidaNova, transacao.getListaItemPago().get(0).getUnidadeMedida().name());
-        assertEquals(comandoAlteraItemPago.valorUnidadeNova, transacao.getListaItemPago().get(0).getValorUnidade());
+        assertEquals(comandoAlteraItemPago.idTransacao, transacao.idTransacao());
+        assertEquals(1, transacao.listaItemPago().size());
+        assertEquals(comandoAlteraItemPago.descricaoNova, transacao.listaItemPago().get(0).getDescricao());
+        assertEquals(comandoAlteraItemPago.quantidadeNova, transacao.listaItemPago().get(0).getQuantidade());
+        assertEquals(comandoAlteraItemPago.unidadeMedidaNova, transacao.listaItemPago().get(0).getUnidadeMedida().name());
+        assertEquals(comandoAlteraItemPago.valorUnidadeNova, transacao.listaItemPago().get(0).getValorUnidade());
     }
 
     @Test
@@ -180,7 +188,8 @@ class TransacaoTest {
 
     @Test
     void alteraItemPagoNovoItemInvalidoComErro() {
-        transacao.processaComando(comandoAdicionaItemPago).forEach(transacao::aplicaEvento);
+        transacao.processaComando(comandoAdicionaItemPago)
+                .stage(this::finalizaProcessamento);
         comandoAlteraItemPago.descricaoNova = null;
 
         var erro = assertThrows(IllegalArgumentException.class,
@@ -191,15 +200,26 @@ class TransacaoTest {
 
     @Test
     void adicionaPagamentoComSucesso() {
-        transacao.processaComando(comandoAdicionaPagamento).forEach(transacao::aplicaEvento);
+        transacao.processaComando(comandoAdicionaPagamento)
+                .stage(this::finalizaProcessamento);
 
-        assertEquals(comandoAdicionaPagamento.idPagamento, transacao.getIdPagamento().id());
+        assertEquals(comandoAdicionaPagamento.idPagamento, transacao.idPagamento().id());
     }
 
     @Test
     void atualizaCategoriaComSucesso() {
-        transacao.processaComando(comandoAtualizaCategoria).forEach(transacao::aplicaEvento);
+        transacao.processaComando(comandoAtualizaCategoria)
+                .stage(this::finalizaProcessamento);
 
-        assertEquals(comandoAtualizaCategoria.conjuntoCategoria, transacao.getConjuntoCategoria());
+        assertEquals(comandoAtualizaCategoria.conjuntoCategoria, transacao.conjuntoCategoria());
+    }
+
+    private Transacao finalizaProcessamento(Multi<EventoDeDominio> eventoDeDominioMulti) {
+        // Não consegui encontrar forma melhor para reduzir esse Multi. Se tivesse alguma operação que recebesse
+        // somente o accumulator no collect, ficaria melhor.
+        return (Transacao) eventoDeDominioMulti
+                .onItem().transform(transacao::aplicaEvento)
+                .collect().last()
+                .subscribe().withSubscriber(UniAssertSubscriber.create()).getItem();
     }
 }

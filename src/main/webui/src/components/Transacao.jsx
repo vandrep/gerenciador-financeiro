@@ -66,7 +66,7 @@ export function ListaTransacoes({transacoes}) {
                             <td>{transacao.valor}</td>
                             <td>{transacao.nomeDoPagador}</td>
                             <td>{transacao.nomeDoRecebedor}</td>
-                            <td>{transacao.listaItemPago.length}</td>
+                            <td>{transacao.listaDeItemPago.length}</td>
                             <td>{transacao.idPagamento}</td>
                             <td>{transacao.conjuntoCategoria}</td>
                             <td><BotaoAdicionaItem idTransacao={transacao.idTransacao}/></td>
