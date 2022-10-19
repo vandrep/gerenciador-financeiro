@@ -2,7 +2,7 @@ package br.com.pine.gerenciador.modelo.dominio.transacao.eventos;
 
 import br.com.pine.gerenciador.aplicacao.transacao.comandos.RemoveItemPago;
 import br.com.pine.gerenciador.modelo.dominio.EventoDeDominio;
-import br.com.pine.gerenciador.modelo.dominio.transacao.UnidadeMedida;
+import br.com.pine.gerenciador.modelo.dominio.transacao.TipoUnidadeMedida;
 
 import java.time.LocalDateTime;
 
@@ -11,7 +11,7 @@ public class ItemPagoRemovido extends EventoDeDominio {
     public LocalDateTime ocorridoEm;
     public String descricao;
     public int quantidade;
-    public UnidadeMedida unidadeMedida;
+    public TipoUnidadeMedida tipoUnidadeMedida;
     public float valorUnidade;
 
     public ItemPagoRemovido() {
@@ -21,7 +21,7 @@ public class ItemPagoRemovido extends EventoDeDominio {
         this.idEntidade = umComando.idTransacao;
         this.ocorridoEm = LocalDateTime.now();
         this.descricao = umComando.descricao;
-        this.unidadeMedida = UnidadeMedida.valueOf(umComando.unidadeMedida);
+        this.tipoUnidadeMedida = TipoUnidadeMedida.valueOf(umComando.unidadeMedida);
         this.valorUnidade = umComando.valorUnidade;
         this.quantidade = umComando.quantidade;
     }

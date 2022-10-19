@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import java.net.URL;
 
-import static br.com.pine.gerenciador.modelo.dominio.transacao.UnidadeMedida.UN;
+import static br.com.pine.gerenciador.modelo.dominio.transacao.TipoUnidadeMedida.UN;
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
 

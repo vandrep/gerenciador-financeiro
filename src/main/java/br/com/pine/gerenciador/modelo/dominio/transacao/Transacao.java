@@ -35,12 +35,12 @@ import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.TRANSACAO_NOM
 import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.TRANSACAO_NOME_DO_RECEBEDOR_NULO;
 import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.TRANSACAO_NOME_DO_RECEBEDOR_TAMANHO_INVALIDO;
 import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.TRANSACAO_NOME_DO_RECEBEDOR_VAZIO;
-import static br.com.pine.gerenciador.modelo.dominio.transacao.UnidadeMedida.UN;
+import static br.com.pine.gerenciador.modelo.dominio.transacao.TipoUnidadeMedida.UN;
 
 public class Transacao extends RaizAgregado {
     private IdTransacao idTransacao;
     private String descricao;
-    private float valor;
+    private ValorMonetario valorMonetario;
     private String nomeDoPagador;
     private String nomeDoRecebedor;
     private List<ItemPago> listaItemPago;
@@ -48,7 +48,6 @@ public class Transacao extends RaizAgregado {
     private Set<Categoria> conjuntoCategoria;
 
     public Transacao() {
-        this.setConjuntoCategoria(new HashSet<>());
     }
 
     public IdTransacao idTransacao() {
@@ -59,8 +58,8 @@ public class Transacao extends RaizAgregado {
         return this.descricao;
     }
 
-    public float valor() {
-        return this.valor;
+    public ValorMonetario valorMonetario() {
+        return this.valorMonetario;
     }
 
     public String nomeDoPagador() {
@@ -90,7 +89,7 @@ public class Transacao extends RaizAgregado {
                 "",
                 1,
                 UN,
-                umComando.valor);
+                ValorMonetario.emReal(umComando.valor));
         validaNomePagador(umComando.nomeDoPagador);
         validaNomeRecebedor(umComando.nomeDoRecebedor);
 
@@ -106,8 +105,8 @@ public class Transacao extends RaizAgregado {
         new ItemPago(
                 umComando.descricao,
                 umComando.quantidade,
-                UnidadeMedida.valueOf(umComando.unidadeMedida),
-                umComando.valorUnidade);
+                TipoUnidadeMedida.valueOf(umComando.unidadeMedida),
+                ValorMonetario.emReal(umComando.valorUnidade));
 
         return Multi.createFrom().items(new ItemPagoAdicionado(umComando));
     }
@@ -118,8 +117,8 @@ public class Transacao extends RaizAgregado {
         var itemARemover = new ItemPago(
                 umComando.descricao,
                 umComando.quantidade,
-                UnidadeMedida.valueOf(umComando.unidadeMedida),
-                umComando.valorUnidade);
+                TipoUnidadeMedida.valueOf(umComando.unidadeMedida),
+                ValorMonetario.emReal(umComando.valorUnidade));
 
         if (!this.listaItemPago.contains(itemARemover)) {
             throw new IllegalStateException(ITEM_PAGO_NAO_EXISTE_NA_TRANSACAO.mensagem);
@@ -134,8 +133,8 @@ public class Transacao extends RaizAgregado {
         var itemAAlterar = new ItemPago(
                 umComando.descricaoAnterior,
                 umComando.quantidadeAnterior,
-                UnidadeMedida.valueOf(umComando.unidadeMedidaAnterior),
-                umComando.valorUnidadeAnterior);
+                TipoUnidadeMedida.valueOf(umComando.unidadeMedidaAnterior),
+                ValorMonetario.emReal(umComando.valorUnidadeAnterior));
 
         if (!this.listaItemPago.contains(itemAAlterar)) {
             throw new IllegalStateException(ITEM_PAGO_NAO_EXISTE_NA_TRANSACAO.mensagem);
@@ -144,8 +143,8 @@ public class Transacao extends RaizAgregado {
         var itemNovo = new ItemPago(
                 umComando.descricaoNova,
                 umComando.quantidadeNova,
-                UnidadeMedida.valueOf(umComando.unidadeMedidaNova),
-                umComando.valorUnidadeNova);
+                TipoUnidadeMedida.valueOf(umComando.unidadeMedidaNova),
+                ValorMonetario.emReal(umComando.valorUnidadeNova));
 
         return Multi.createFrom().items(new ItemPagoAlterado(umComando));
     }
@@ -170,7 +169,7 @@ public class Transacao extends RaizAgregado {
                         "",
                         1,
                         UN,
-                        umEvento.valor));
+                        ValorMonetario.emReal(umEvento.valor)));
         this.setNomeDoPagador(umEvento.nomeDoPagador);
         this.setNomeDoRecebedor(umEvento.nomeDoRecebedor);
         this.setIdPagamento(new IdPagamento(umEvento.idPagamento));
@@ -180,16 +179,16 @@ public class Transacao extends RaizAgregado {
         this.adicionaItemPago(new ItemPago(
                 umEvento.descricao,
                 umEvento.quantidade,
-                umEvento.unidadeMedida,
-                umEvento.valorUnidade));
+                umEvento.tipoUnidadeMedida,
+                ValorMonetario.emReal(umEvento.valorUnidade)));
     }
 
     private void aplica(ItemPagoRemovido umEvento) {
         this.removeItemPago(new ItemPago(
                 umEvento.descricao,
                 umEvento.quantidade,
-                umEvento.unidadeMedida,
-                umEvento.valorUnidade));
+                umEvento.tipoUnidadeMedida,
+                ValorMonetario.emReal(umEvento.valorUnidade)));
     }
 
     private void aplica(ItemPagoAlterado umEvento) {
@@ -197,15 +196,15 @@ public class Transacao extends RaizAgregado {
                 new ItemPago(
                         umEvento.descricaoNova,
                         umEvento.quantidadeNova,
-                        UnidadeMedida.valueOf(umEvento.unidadeMedidaNova),
-                        umEvento.valorUnidadeNova));
+                        TipoUnidadeMedida.valueOf(umEvento.unidadeMedidaNova),
+                        ValorMonetario.emReal(umEvento.valorUnidadeNova)));
 
         this.removeItemPago(
                 new ItemPago(
                         umEvento.descricaoAnterior,
                         umEvento.quantidadeAnterior,
-                        UnidadeMedida.valueOf(umEvento.unidadeMedidaAnterior),
-                        umEvento.valorUnidadeAnterior));
+                        TipoUnidadeMedida.valueOf(umEvento.unidadeMedidaAnterior),
+                        ValorMonetario.emReal(umEvento.valorUnidadeAnterior)));
     }
 
     private void aplica(PagamentoAdicionado umEvento) {
@@ -239,7 +238,6 @@ public class Transacao extends RaizAgregado {
             this.conjuntoCategoria = new HashSet<>();
         }
         this.conjuntoCategoria.add(umaCategoria);
-        this.atualizaValor();
     }
 
     private void removeCategoria(Categoria umaCategoria) {
@@ -279,13 +277,10 @@ public class Transacao extends RaizAgregado {
     }
 
     private void atualizaValor() {
-        if (this.listaItemPago == null) {
-            this.valor = 0.0f;
-        } else {
-            this.valor = listaItemPago.stream()
-                    .map(ItemPago::valorUnidade)
-                    .reduce(0.0f, Float::sum);
-        }
+        this.valorMonetario = ValorMonetario.emReal(listaItemPago.stream()
+                .map(ItemPago::valorMonetarioTotal)
+                .map(ValorMonetario::valor)
+                .reduce(0.0f, Float::sum));
     }
 
     private void setNomeDoPagador(String umNomePagador) {

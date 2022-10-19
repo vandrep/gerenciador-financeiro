@@ -6,7 +6,7 @@ import br.com.pine.gerenciador.aplicacao.transacao.comandos.AlteraItemPago;
 import br.com.pine.gerenciador.aplicacao.transacao.comandos.AtualizaCategoria;
 import br.com.pine.gerenciador.aplicacao.transacao.comandos.CriaTransacao;
 import br.com.pine.gerenciador.aplicacao.transacao.comandos.RemoveItemPago;
-import br.com.pine.gerenciador.modelo.dominio.transacao.UnidadeMedida;
+import br.com.pine.gerenciador.modelo.dominio.transacao.TipoUnidadeMedida;
 import br.com.pine.gerenciador.modelo.dominio.transacao.ValorMonetario;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -89,7 +89,7 @@ public class Fixtures {
         umComando.idTransacao = umIdEntidade;
         umComando.descricao = umaStringAleatoria();
         umComando.quantidade = umInteiroAleatorio();
-        umComando.unidadeMedida = UnidadeMedida.UN.name();
+        umComando.unidadeMedida = TipoUnidadeMedida.UN.name();
         umComando.valorUnidade = valorPositivo();
         return umComando;
     }
@@ -113,7 +113,7 @@ public class Fixtures {
         umComandoAltera.valorUnidadeAnterior = umComandoAdiciona.valorUnidade;
         umComandoAltera.descricaoNova = umaStringAleatoria();
         umComandoAltera.quantidadeNova = umInteiroAleatorio();
-        umComandoAltera.unidadeMedidaNova = UnidadeMedida.UN.name();
+        umComandoAltera.unidadeMedidaNova = TipoUnidadeMedida.UN.name();
         umComandoAltera.valorUnidadeNova = valorPositivo();
         return umComandoAltera;
     }

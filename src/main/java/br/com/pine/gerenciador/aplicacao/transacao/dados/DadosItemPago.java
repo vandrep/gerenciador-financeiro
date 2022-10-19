@@ -11,7 +11,7 @@ public class DadosItemPago {
     public DadosItemPago(ItemPago umItemPago){
         this.descricao = umItemPago.descricao();
         this.quantidade = umItemPago.quantidade();
-        this.unidadeDeMedida = umItemPago.unidadeMedida().name();
-        this.valorDaUnidade = umItemPago.valorUnidade();
+        this.unidadeDeMedida = umItemPago.tipoUnidadeMedida().name();
+        this.valorDaUnidade = umItemPago.valorMonetarioTotal().valor();
     }
 }

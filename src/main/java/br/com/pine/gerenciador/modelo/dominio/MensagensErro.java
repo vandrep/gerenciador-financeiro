@@ -14,9 +14,9 @@ public enum MensagensErro {
     ID_PAGAMENTO_TAMANHO_INVALIDO("ID do Pagamento deve ter no máximo 36 caracteres."),
 
     ITEM_PAGO_NOME_NULO("Nome do Item Pago deve ser informado."),
-    ITEM_PAGO_VALOR_NEGATIVO("Valor do Item Pago deve ser maior ou igual a 0."),
     ITEM_PAGO_QUANTIDADE_MENOR_QUE_UM("Quantidade de Item Pago deve ser maior ou igual a 1"),
     ITEM_PAGO_UNIDADE_MEDIDA_NULA("Unidade de Medida do Item Pago deve ser informada."),
+    ITEM_PAGO_VALOR_MONETARIO_NULO("Valor Monetário do Item Pago deve ser informada."),
     ITEM_PAGO_NAO_EXISTE_NA_TRANSACAO("Item Pago não existe na Transação informada."),
 
     TRANSACAO_DESCRICAO_NULO("Descrição da Transação deve ser informado."),

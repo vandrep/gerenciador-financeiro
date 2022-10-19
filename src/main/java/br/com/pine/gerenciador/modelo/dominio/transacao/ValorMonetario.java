@@ -13,7 +13,8 @@ public class ValorMonetario extends ObjetoDeValor {
     private Currency moeda;
     private float valor;
 
-    public ValorMonetario(Currency umaMoeda, float umValor) {
+    public ValorMonetario(Currency umaMoeda,
+                          float umValor) {
         this.setMoeda(umaMoeda);
         this.setValor(umValor);
     }
@@ -22,11 +23,11 @@ public class ValorMonetario extends ObjetoDeValor {
         return new ValorMonetario(Currency.getInstance("BRL"), umValor);
     }
 
-    public Currency getMoeda() {
+    public Currency moeda() {
         return this.moeda;
     }
 
-    public float getValor() {
+    public float valor() {
         return this.valor;
     }
 

@@ -61,7 +61,7 @@ class TransacaoTest {
 
     @Test
     void criaTransacaoComSucesso() {
-        assertEquals(comandoCriaTransacao.valor, transacao.valor());
+        assertEquals(comandoCriaTransacao.valor, transacao.valorMonetario().valor());
         assertEquals(comandoCriaTransacao.nomeDoPagador, transacao.nomeDoPagador());
         assertEquals(comandoCriaTransacao.nomeDoRecebedor, transacao.nomeDoRecebedor());
     }
@@ -118,8 +118,8 @@ class TransacaoTest {
         assertEquals(comandoAdicionaItemPago.idTransacao, transacao.idTransacao().id());
         assertEquals(comandoAdicionaItemPago.descricao, transacao.listaItemPago().get(1).descricao());
         assertEquals(comandoAdicionaItemPago.quantidade, transacao.listaItemPago().get(1).quantidade());
-        assertEquals(comandoAdicionaItemPago.unidadeMedida, transacao.listaItemPago().get(1).unidadeMedida().name());
-        assertEquals(comandoAdicionaItemPago.valorUnidade, transacao.listaItemPago().get(1).valorUnidade());
+        assertEquals(comandoAdicionaItemPago.unidadeMedida, transacao.listaItemPago().get(1).tipoUnidadeMedida().name());
+        assertEquals(comandoAdicionaItemPago.valorUnidade, transacao.listaItemPago().get(1).valorMonetarioUnidade().valor());
     }
 
     @Test
@@ -166,8 +166,8 @@ class TransacaoTest {
         assertEquals(2, transacao.listaItemPago().size());
         assertEquals(comandoAlteraItemPago.descricaoNova, transacao.listaItemPago().get(1).descricao());
         assertEquals(comandoAlteraItemPago.quantidadeNova, transacao.listaItemPago().get(1).quantidade());
-        assertEquals(comandoAlteraItemPago.unidadeMedidaNova, transacao.listaItemPago().get(1).unidadeMedida().name());
-        assertEquals(comandoAlteraItemPago.valorUnidadeNova, transacao.listaItemPago().get(1).valorUnidade());
+        assertEquals(comandoAlteraItemPago.unidadeMedidaNova, transacao.listaItemPago().get(1).tipoUnidadeMedida().name());
+        assertEquals(comandoAlteraItemPago.valorUnidadeNova, transacao.listaItemPago().get(1).valorMonetarioUnidade().valor());
     }
 
     @Test
