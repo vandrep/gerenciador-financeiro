@@ -76,7 +76,7 @@ public class Validador {
         }
     }
 
-    protected void validaIntervaloArgumento(float umValor, float umMinimo, float umMaximo, String umaMensagem) {
+    public static void validaIntervaloArgumento(float umValor, float umMinimo, float umMaximo, String umaMensagem) {
         if (umValor < umMinimo || umValor > umMaximo) {
             throw new IllegalArgumentException(umaMensagem);
         }

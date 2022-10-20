@@ -25,10 +25,7 @@ import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.TRANSACAO_NOM
 import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.TRANSACAO_NOME_DO_RECEBEDOR_NULO;
 import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.TRANSACAO_NOME_DO_RECEBEDOR_VAZIO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @QuarkusTest
 class TransacaoTest {
@@ -61,7 +58,7 @@ class TransacaoTest {
 
     @Test
     void criaTransacaoComSucesso() {
-        assertEquals(comandoCriaTransacao.valor, transacao.valorMonetario().valor());
+        assertEquals(comandoCriaTransacao.valor, transacao.valorMonetario().valor().floatValue());
         assertEquals(comandoCriaTransacao.nomeDoPagador, transacao.nomeDoPagador());
         assertEquals(comandoCriaTransacao.nomeDoRecebedor, transacao.nomeDoRecebedor());
     }
@@ -117,9 +114,8 @@ class TransacaoTest {
 
         assertEquals(comandoAdicionaItemPago.idTransacao, transacao.idTransacao().id());
         assertEquals(comandoAdicionaItemPago.descricao, transacao.listaItemPago().get(1).descricao());
-        assertEquals(comandoAdicionaItemPago.quantidade, transacao.listaItemPago().get(1).quantidade());
-        assertEquals(comandoAdicionaItemPago.unidadeMedida, transacao.listaItemPago().get(1).tipoUnidadeMedida().name());
-        assertEquals(comandoAdicionaItemPago.valorUnidade, transacao.listaItemPago().get(1).valorMonetarioUnidade().valor());
+        assertEquals(comandoAdicionaItemPago.quantidade, transacao.listaItemPago().get(1).multiplicador().intValue());
+        assertEquals(comandoAdicionaItemPago.valorUnidade, transacao.listaItemPago().get(1).valorMonetarioUnidade().valor().floatValue());
     }
 
     @Test
@@ -165,9 +161,8 @@ class TransacaoTest {
         assertEquals(comandoAlteraItemPago.idTransacao, transacao.idTransacao().id());
         assertEquals(2, transacao.listaItemPago().size());
         assertEquals(comandoAlteraItemPago.descricaoNova, transacao.listaItemPago().get(1).descricao());
-        assertEquals(comandoAlteraItemPago.quantidadeNova, transacao.listaItemPago().get(1).quantidade());
-        assertEquals(comandoAlteraItemPago.unidadeMedidaNova, transacao.listaItemPago().get(1).tipoUnidadeMedida().name());
-        assertEquals(comandoAlteraItemPago.valorUnidadeNova, transacao.listaItemPago().get(1).valorMonetarioUnidade().valor());
+        assertEquals(comandoAlteraItemPago.quantidadeNova, transacao.listaItemPago().get(1).multiplicador().intValue());
+        assertEquals(comandoAlteraItemPago.valorUnidadeNova, transacao.listaItemPago().get(1).valorMonetarioUnidade().valor().floatValue());
     }
 
     @Test

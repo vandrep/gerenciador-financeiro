@@ -1,7 +1,6 @@
 package br.com.pine.gerenciador.modelo.dominio.transacao;
 
 import br.com.pine.Fixtures;
-import br.com.pine.gerenciador.modelo.dominio.transacao.ValorMonetario;
 import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -9,8 +8,10 @@ import org.junit.jupiter.api.Test;
 import javax.inject.Inject;
 import java.util.Currency;
 
-import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.VALOR_MONETARIO_VALOR_MENOR_QUE_ZERO;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @QuarkusTest
 class ValorMonetarioTest {
@@ -32,30 +33,14 @@ class ValorMonetarioTest {
 
     @Test
     void criaValorMonetarioValidoComSucesso() {
-        assertDoesNotThrow(() -> new ValorMonetario(umaMoeda, umValorPositivo));
-    }
-
-    @Test
-    void criaValorMonetarioSemMoedaComErro() {
-        var erro = assertThrows(
-                IllegalArgumentException.class,
-                () -> new ValorMonetario(null, umValorPositivo));
-        assertEquals(MOEDA_NULA.mensagem, erro.getMessage());
+        assertDoesNotThrow(() -> ValorMonetario.emReal(umValorPositivo));
     }
 
     @Test
     void criaValorMonetarioComValorNegativoComErro() {
         var erro = assertThrows(
                 IllegalArgumentException.class,
-                () -> new ValorMonetario(umaMoeda, umValorNegativo));
-        assertEquals(MOEDA_MENOR_QUE_ZERO.mensagem, erro.getMessage());
-    }
-
-    @Test
-    void criaValorMonetarioComValorComCasasDecimaisIncorretoComErro() {
-        var erro = assertThrows(
-                IllegalArgumentException.class,
-                () -> new ValorMonetario(umaMoeda, umValorComQuantidadeCasasDecimaisErrado));
-        assertEquals(MOEDA_QUANTIDADE_CASAS_DECIMAIS_INVALIDA.mensagem, erro.getMessage());
+                () -> ValorMonetario.emReal(umValorNegativo));
+        assertEquals(VALOR_MONETARIO_VALOR_MENOR_QUE_ZERO.mensagem, erro.getMessage());
     }
 }

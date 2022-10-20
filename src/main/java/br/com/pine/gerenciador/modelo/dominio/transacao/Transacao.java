@@ -17,6 +17,7 @@ import br.com.pine.gerenciador.modelo.dominio.transacao.eventos.PagamentoAdicion
 import br.com.pine.gerenciador.modelo.dominio.transacao.eventos.TransacaoCriada;
 import io.smallrye.mutiny.Multi;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -35,7 +36,6 @@ import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.TRANSACAO_NOM
 import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.TRANSACAO_NOME_DO_RECEBEDOR_NULO;
 import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.TRANSACAO_NOME_DO_RECEBEDOR_TAMANHO_INVALIDO;
 import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.TRANSACAO_NOME_DO_RECEBEDOR_VAZIO;
-import static br.com.pine.gerenciador.modelo.dominio.transacao.TipoUnidadeMedida.UN;
 
 public class Transacao extends RaizAgregado {
     private IdTransacao idTransacao;
@@ -85,11 +85,7 @@ public class Transacao extends RaizAgregado {
     private Multi<EventoDeDominio> processa(CriaTransacao umComando) {
         var idTransacao = new IdTransacao(UUID.randomUUID().toString());
         validaDescricao(umComando.descricao);
-        new ItemPago(
-                "",
-                1,
-                UN,
-                ValorMonetario.emReal(umComando.valor));
+        ItemPago.unidade("", 1, ValorMonetario.emReal(umComando.valor));
         validaNomePagador(umComando.nomeDoPagador);
         validaNomeRecebedor(umComando.nomeDoRecebedor);
 
@@ -102,10 +98,9 @@ public class Transacao extends RaizAgregado {
     private Multi<EventoDeDominio> processa(AdicionaItemPago umComando) {
         validaIdEntidade(this.idTransacao().id(), umComando.idTransacao, ID_ENTIDADE_INVALIDA.mensagem);
 
-        new ItemPago(
+        ItemPago.unidade(
                 umComando.descricao,
                 umComando.quantidade,
-                TipoUnidadeMedida.valueOf(umComando.unidadeMedida),
                 ValorMonetario.emReal(umComando.valorUnidade));
 
         return Multi.createFrom().items(new ItemPagoAdicionado(umComando));
@@ -114,10 +109,9 @@ public class Transacao extends RaizAgregado {
     private Multi<EventoDeDominio> processa(RemoveItemPago umComando) {
         validaIdEntidade(this.idTransacao().id(), umComando.idTransacao, ID_ENTIDADE_INVALIDA.mensagem);
 
-        var itemARemover = new ItemPago(
+        var itemARemover = ItemPago.unidade(
                 umComando.descricao,
                 umComando.quantidade,
-                TipoUnidadeMedida.valueOf(umComando.unidadeMedida),
                 ValorMonetario.emReal(umComando.valorUnidade));
 
         if (!this.listaItemPago.contains(itemARemover)) {
@@ -130,20 +124,18 @@ public class Transacao extends RaizAgregado {
     private Multi<EventoDeDominio> processa(AlteraItemPago umComando) {
         validaIdEntidade(this.idTransacao().id(), umComando.idTransacao, ID_ENTIDADE_INVALIDA.mensagem);
 
-        var itemAAlterar = new ItemPago(
+        var itemAAlterar = ItemPago.unidade(
                 umComando.descricaoAnterior,
                 umComando.quantidadeAnterior,
-                TipoUnidadeMedida.valueOf(umComando.unidadeMedidaAnterior),
                 ValorMonetario.emReal(umComando.valorUnidadeAnterior));
 
         if (!this.listaItemPago.contains(itemAAlterar)) {
             throw new IllegalStateException(ITEM_PAGO_NAO_EXISTE_NA_TRANSACAO.mensagem);
         }
 
-        var itemNovo = new ItemPago(
+        var itemNovo = ItemPago.unidade(
                 umComando.descricaoNova,
                 umComando.quantidadeNova,
-                TipoUnidadeMedida.valueOf(umComando.unidadeMedidaNova),
                 ValorMonetario.emReal(umComando.valorUnidadeNova));
 
         return Multi.createFrom().items(new ItemPagoAlterado(umComando));
@@ -164,46 +156,37 @@ public class Transacao extends RaizAgregado {
     private void aplica(TransacaoCriada umEvento) {
         this.setIdTransacao(new IdTransacao(umEvento.idTransacao));
         this.setDescricao(umEvento.descricao);
-        this.adicionaItemPago(
-                new ItemPago(
-                        "",
-                        1,
-                        UN,
-                        ValorMonetario.emReal(umEvento.valor)));
+        this.adicionaItemPago(ItemPago.unidade("", 1, ValorMonetario.emReal(umEvento.valor)));
         this.setNomeDoPagador(umEvento.nomeDoPagador);
         this.setNomeDoRecebedor(umEvento.nomeDoRecebedor);
         this.setIdPagamento(new IdPagamento(umEvento.idPagamento));
     }
 
     private void aplica(ItemPagoAdicionado umEvento) {
-        this.adicionaItemPago(new ItemPago(
+        this.adicionaItemPago(ItemPago.unidade(
                 umEvento.descricao,
                 umEvento.quantidade,
-                umEvento.tipoUnidadeMedida,
                 ValorMonetario.emReal(umEvento.valorUnidade)));
     }
 
     private void aplica(ItemPagoRemovido umEvento) {
-        this.removeItemPago(new ItemPago(
+        this.removeItemPago(ItemPago.unidade(
                 umEvento.descricao,
                 umEvento.quantidade,
-                umEvento.tipoUnidadeMedida,
                 ValorMonetario.emReal(umEvento.valorUnidade)));
     }
 
     private void aplica(ItemPagoAlterado umEvento) {
         this.adicionaItemPago(
-                new ItemPago(
+                ItemPago.unidade(
                         umEvento.descricaoNova,
                         umEvento.quantidadeNova,
-                        TipoUnidadeMedida.valueOf(umEvento.unidadeMedidaNova),
                         ValorMonetario.emReal(umEvento.valorUnidadeNova)));
 
         this.removeItemPago(
-                new ItemPago(
+                ItemPago.unidade(
                         umEvento.descricaoAnterior,
                         umEvento.quantidadeAnterior,
-                        TipoUnidadeMedida.valueOf(umEvento.unidadeMedidaAnterior),
                         ValorMonetario.emReal(umEvento.valorUnidadeAnterior)));
     }
 
@@ -280,7 +263,7 @@ public class Transacao extends RaizAgregado {
         this.valorMonetario = ValorMonetario.emReal(listaItemPago.stream()
                 .map(ItemPago::valorMonetarioTotal)
                 .map(ValorMonetario::valor)
-                .reduce(0.0f, Float::sum));
+                .reduce(BigDecimal.ZERO, BigDecimal::add).floatValue());
     }
 
     private void setNomeDoPagador(String umNomePagador) {

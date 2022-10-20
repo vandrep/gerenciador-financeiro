@@ -17,7 +17,7 @@ public class DadosTransacao {
 
     public DadosTransacao(Transacao umaTransacao) {
         this.idTransacao = umaTransacao.idTransacao().id();
-        this.valor = umaTransacao.valorMonetario().valor();
+        this.valor = umaTransacao.valorMonetario().valor().floatValue();
         this.nomeDoPagador = umaTransacao.nomeDoPagador();
         this.nomeDoRecebedor = umaTransacao.nomeDoRecebedor();
         this.listaDeItemPago = umaTransacao.listaItemPago()

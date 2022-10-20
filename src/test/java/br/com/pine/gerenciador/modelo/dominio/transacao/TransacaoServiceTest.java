@@ -61,7 +61,7 @@ class TransacaoServiceTest {
                 + (itemPagoAdicionado1.valorUnidade * itemPagoAdicionado1.quantidade)
                 + (itemPagoAdicionado2.valorUnidade * itemPagoAdicionado2.quantidade);
 
-        assertEquals(valorTotal, pagamento.valorMonetario().valor());
+        assertEquals(valorTotal, pagamento.valorMonetario().valor().floatValue());
         assertEquals(pagamentoEmRealCriado.nomeDoPagador, pagamento.nomeDoPagador());
         assertEquals(pagamentoEmRealCriado.nomeDoRecebedor, pagamento.nomeDoRecebedor());
         assertEquals(3, pagamento.listaItemPago().size());

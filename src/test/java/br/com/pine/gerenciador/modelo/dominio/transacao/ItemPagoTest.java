@@ -7,8 +7,10 @@ import org.junit.jupiter.api.Test;
 
 import javax.inject.Inject;
 
-import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.ITEM_PAGO_NOME_NULO;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @QuarkusTest
 class ItemPagoTest {
@@ -29,7 +31,7 @@ class ItemPagoTest {
 
     @Test
     void criaItemPagoComSucesso() {
-        assertDoesNotThrow(() -> new ItemPago(umaDescricao, umaQuantidade, umaTipoUnidadeMedida, umValorMonetario));
+        assertDoesNotThrow(() -> ItemPago.unidade(umaDescricao, umaQuantidade, umValorMonetario));
     }
 
     @Test
@@ -37,28 +39,8 @@ class ItemPagoTest {
         umaDescricao = null;
 
         var erro = assertThrows(IllegalArgumentException.class,
-                () -> new ItemPago(umaDescricao, umaQuantidade, umaTipoUnidadeMedida, umValorMonetario));
+                () -> ItemPago.unidade(umaDescricao, umaQuantidade, umValorMonetario));
 
         assertEquals(ITEM_PAGO_NOME_NULO.mensagem, erro.getMessage());
-    }
-
-    @Test
-    void criaItemPagoQuantidadeMenorQueUmComErro() {
-        umaQuantidade = 0;
-
-        var erro = assertThrows(IllegalArgumentException.class,
-                () -> new ItemPago(umaDescricao, umaQuantidade, umaTipoUnidadeMedida, umValorMonetario));
-
-        assertEquals(ITEM_PAGO_QUANTIDADE_MENOR_QUE_UM.mensagem, erro.getMessage());
-    }
-
-    @Test
-    void criaItemPagoUnidadeMedidaNulaComErro() {
-        umaTipoUnidadeMedida = null;
-
-        var erro = assertThrows(IllegalArgumentException.class,
-                () -> new ItemPago(umaDescricao, umaQuantidade, umaTipoUnidadeMedida, umValorMonetario));
-
-        assertEquals(ITEM_PAGO_UNIDADE_MEDIDA_NULA.mensagem, erro.getMessage());
     }
 }

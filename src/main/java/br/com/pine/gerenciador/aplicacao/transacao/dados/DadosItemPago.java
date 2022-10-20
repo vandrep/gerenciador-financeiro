@@ -10,8 +10,8 @@ public class DadosItemPago {
 
     public DadosItemPago(ItemPago umItemPago){
         this.descricao = umItemPago.descricao();
-        this.quantidade = umItemPago.quantidade();
+        this.quantidade = umItemPago.multiplicador().floatValue();
         this.unidadeDeMedida = umItemPago.tipoUnidadeMedida().name();
-        this.valorDaUnidade = umItemPago.valorMonetarioTotal().valor();
+        this.valorDaUnidade = umItemPago.valorUnidade();
     }
 }

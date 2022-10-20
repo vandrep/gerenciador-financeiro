@@ -10,6 +10,7 @@ import br.com.pine.gerenciador.modelo.dominio.transacao.TipoUnidadeMedida;
 import br.com.pine.gerenciador.modelo.dominio.transacao.ValorMonetario;
 
 import javax.enterprise.context.ApplicationScoped;
+import java.math.BigDecimal;
 import java.util.Currency;
 import java.util.Date;
 import java.util.Random;
@@ -45,7 +46,7 @@ public class Fixtures {
     }
 
     public ValorMonetario umValorMonetarioRealPositivo() {
-        return new ValorMonetario(moedaReal(), valorPositivo());
+        return ValorMonetario.emReal(valorPositivo());
     }
 
     public String umaStringAleatoria() {
