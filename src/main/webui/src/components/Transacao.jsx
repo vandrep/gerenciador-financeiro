@@ -8,7 +8,7 @@ import {
 } from "react-router-dom";
 import '../styles/Transacao.css';
 
-export async function acaoAdicionaItem({request, params}){
+export async function acaoAdicionaItem({request, params}) {
     const dadosFormulario = await request.formData();
     const item = Object.fromEntries(dadosFormulario);
     item.idTransacao = params.idTransacao;
@@ -18,6 +18,7 @@ export async function acaoAdicionaItem({request, params}){
 export async function acaoCriaTransacao({request}) {
     const dadosFormulario = await request.formData();
     const transacao = Object.fromEntries(dadosFormulario);
+    transacao.idPagamento = "umIdQualquer"
     await criaTransacao(transacao);
 }
 
@@ -128,7 +129,7 @@ export function EditaTransacao() {
     );
 }
 
-export function CriaItem(){
+export function CriaItem() {
     const transacao = useLoaderData();
 
     return (
@@ -149,6 +150,16 @@ function FormularioTransacao({transacao}) {
     return (
         <Form method="post" id="transacao-form">
             <p>
+                <label>
+                    <span>Descrição</span>
+                    <input
+                        placeholder="Descrição"
+                        aria-label="Descrição"
+                        type="text"
+                        name="descricao"
+                        defaultValue={transacaoNaoPreenchida ? "Descrição" : transacao.descricao}
+                    />
+                </label>
                 <label>
                     <span>Pagador</span>
                     <input
@@ -184,20 +195,21 @@ function FormularioTransacao({transacao}) {
                 <button type="submit">Salvar</button>
                 {
                     transacaoNaoPreenchida ?
-                        <button
-                            type="button"
-                            onClick={handleReset}
-                        >
-                            Limpar
-                        </button> :
-                        <button
-                            type="button"
-                            onClick={() => {
-                                navega(-1);
-                            }}
-                        >
-                            Cancelar
-                        </button>
+                    <button
+                        type="button"
+                        onClick={handleReset}
+                    >
+                        Limpar
+                    </button>
+                        :
+                    <button
+                        type="button"
+                        onClick={() => {
+                            navega(-1);
+                        }}
+                    >
+                        Cancelar
+                    </button>
                 }
             </p>
         </Form>
@@ -299,7 +311,7 @@ export async function atualizaTransacao(id, atualizacoes) {
     return await axios.post()
 }
 
-async function adicionaItemPago(item){
+async function adicionaItemPago(item) {
     return await axios.post("http://localhost:8080/transacao/adicionaItemPago",
         item);
 }

@@ -31,7 +31,7 @@ public class EventoArmazenado {
     public EventoArmazenado(EventoDeDominio umEventoDeDominio, String umTipoEntidade){
         this.tipoEntidade = umTipoEntidade;
         this.tipoEvento = umEventoDeDominio.getClass().getSimpleName();
-        this.idEntidade = umEventoDeDominio.getIdTransacao();
+        this.idEntidade = umEventoDeDominio.idEntidade();
         this.setDadosEvento(umEventoDeDominio);
     }
 

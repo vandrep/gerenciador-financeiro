@@ -31,7 +31,7 @@ class ItemPagoTest {
 
     @Test
     void criaItemPagoComSucesso() {
-        assertDoesNotThrow(() -> ItemPago.unidade(umaDescricao, umaQuantidade, umValorMonetario));
+        assertDoesNotThrow(() -> ItemPago.criaItemPago(umaDescricao, umaQuantidade, "UN", umValorMonetario));
     }
 
     @Test
@@ -39,7 +39,7 @@ class ItemPagoTest {
         umaDescricao = null;
 
         var erro = assertThrows(IllegalArgumentException.class,
-                () -> ItemPago.unidade(umaDescricao, umaQuantidade, umValorMonetario));
+                () -> ItemPago.criaItemPago(umaDescricao, umaQuantidade, "UN", umValorMonetario));
 
         assertEquals(ITEM_PAGO_NOME_NULO.mensagem, erro.getMessage());
     }

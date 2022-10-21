@@ -1,38 +1,53 @@
 package br.com.pine.gerenciador.modelo.dominio.transacao.eventos;
 
 import br.com.pine.gerenciador.aplicacao.transacao.comandos.RemoveItemPago;
-import br.com.pine.gerenciador.modelo.dominio.EventoDeDominio;
-import br.com.pine.gerenciador.modelo.dominio.transacao.TipoUnidadeMedida;
 
 import java.time.LocalDateTime;
 
-public class ItemPagoRemovido extends EventoDeDominio {
-    public String idEntidade;
+public class ItemPagoRemovido implements EventoDeDominioTransacao {
     public LocalDateTime ocorridoEm;
-    public String descricao;
-    public int quantidade;
-    public TipoUnidadeMedida tipoUnidadeMedida;
-    public float valorUnidade;
+    private RemoveItemPago comando;
 
     public ItemPagoRemovido() {
     }
 
     public ItemPagoRemovido(RemoveItemPago umComando) {
-        this.idEntidade = umComando.idTransacao;
         this.ocorridoEm = LocalDateTime.now();
-        this.descricao = umComando.descricao;
-        this.tipoUnidadeMedida = TipoUnidadeMedida.valueOf(umComando.unidadeMedida);
-        this.valorUnidade = umComando.valorUnidade;
-        this.quantidade = umComando.quantidade;
+        this.comando = umComando;
+    }
+
+    public String idTransacao() {
+        return comando.idTransacao;
+    }
+
+    public String descricao() {
+        return comando.descricao;
+    }
+
+    public int quantidade() {
+        return comando.quantidade;
+    }
+
+    public String tipoUnidadeMedida() {
+        return comando.tipoUnidadeMedida;
+    }
+
+    public float valorUnidade() {
+        return comando.valorUnidade;
     }
 
     @Override
-    public String getIdTransacao() {
-        return idEntidade;
+    public String idEntidade() {
+        return idTransacao();
     }
 
     @Override
-    public LocalDateTime getOcorridoEm() {
+    public LocalDateTime ocorridoEm() {
         return ocorridoEm;
+    }
+
+    @Override
+    public int versaoDoEvento() {
+        return 1;
     }
 }

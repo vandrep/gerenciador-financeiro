@@ -51,7 +51,7 @@ public class RepositorioDeEventosDeTransacao implements RepositorioTransacao {
     }
 
     private Multi<GroupedMulti<String, EventoDeDominio>> agrupaEventosPorId(Multi<EventoDeDominio> multiEventosDeDominio) {
-        return multiEventosDeDominio.group().by(EventoDeDominio::getIdTransacao);
+        return multiEventosDeDominio.group().by(EventoDeDominio::idEntidade);
     }
 
     private Uni<Transacao> instanciaTransacao(GroupedMulti<String, EventoDeDominio> multiGrupoEventoDeDominio) {

@@ -39,7 +39,7 @@ class AdaptadorHTTPTransacaoTest {
         umComando.idTransacao = "bogus";
         umComando.descricao = "OK";
         umComando.quantidade = 5;
-        umComando.unidadeMedida = UN.name();
+        umComando.tipoUnidadeMedida = UN.name();
         umComando.valorUnidade = 50;
         given().contentType(JSON).body(umComando)
                 .when().post(urlAdiciona)

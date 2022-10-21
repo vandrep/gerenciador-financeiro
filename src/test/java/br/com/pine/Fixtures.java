@@ -1,16 +1,14 @@
 package br.com.pine;
 
 import br.com.pine.gerenciador.aplicacao.transacao.comandos.AdicionaItemPago;
-import br.com.pine.gerenciador.aplicacao.transacao.comandos.AdicionaPagamento;
 import br.com.pine.gerenciador.aplicacao.transacao.comandos.AlteraItemPago;
-import br.com.pine.gerenciador.aplicacao.transacao.comandos.AtualizaCategoria;
+import br.com.pine.gerenciador.aplicacao.transacao.comandos.AtualizaCategorias;
 import br.com.pine.gerenciador.aplicacao.transacao.comandos.CriaTransacao;
 import br.com.pine.gerenciador.aplicacao.transacao.comandos.RemoveItemPago;
 import br.com.pine.gerenciador.modelo.dominio.transacao.TipoUnidadeMedida;
 import br.com.pine.gerenciador.modelo.dominio.transacao.ValorMonetario;
 
 import javax.enterprise.context.ApplicationScoped;
-import java.math.BigDecimal;
 import java.util.Currency;
 import java.util.Date;
 import java.util.Random;
@@ -90,7 +88,7 @@ public class Fixtures {
         umComando.idTransacao = umIdEntidade;
         umComando.descricao = umaStringAleatoria();
         umComando.quantidade = umInteiroAleatorio();
-        umComando.unidadeMedida = TipoUnidadeMedida.UN.name();
+        umComando.tipoUnidadeMedida = TipoUnidadeMedida.UN.name();
         umComando.valorUnidade = valorPositivo();
         return umComando;
     }
@@ -100,7 +98,7 @@ public class Fixtures {
         umComandoRemove.idTransacao = umComandoAdiciona.idTransacao;
         umComandoRemove.descricao = umComandoAdiciona.descricao;
         umComandoRemove.quantidade = umComandoAdiciona.quantidade;
-        umComandoRemove.unidadeMedida = umComandoAdiciona.unidadeMedida;
+        umComandoRemove.tipoUnidadeMedida = umComandoAdiciona.tipoUnidadeMedida;
         umComandoRemove.valorUnidade = umComandoAdiciona.valorUnidade;
         return umComandoRemove;
     }
@@ -110,7 +108,7 @@ public class Fixtures {
         umComandoAltera.idTransacao = umComandoAdiciona.idTransacao;
         umComandoAltera.descricaoAnterior = umComandoAdiciona.descricao;
         umComandoAltera.quantidadeAnterior = umComandoAdiciona.quantidade;
-        umComandoAltera.unidadeMedidaAnterior = umComandoAdiciona.unidadeMedida;
+        umComandoAltera.unidadeMedidaAnterior = umComandoAdiciona.tipoUnidadeMedida;
         umComandoAltera.valorUnidadeAnterior = umComandoAdiciona.valorUnidade;
         umComandoAltera.descricaoNova = umaStringAleatoria();
         umComandoAltera.quantidadeNova = umInteiroAleatorio();
@@ -119,17 +117,10 @@ public class Fixtures {
         return umComandoAltera;
     }
 
-    public AdicionaPagamento comandoAdicionaPagamento(String umIdEntidade) {
-        var umComando = new AdicionaPagamento();
+    public AtualizaCategorias comandoAtualizaCategoria(String umIdEntidade) {
+        var umComando = new AtualizaCategorias();
         umComando.idTransacao = umIdEntidade;
-        umComando.idPagamento = umaStringAleatoria();
-        return umComando;
-    }
-
-    public AtualizaCategoria comandoAtualizaCategoria(String umIdEntidade) {
-        var umComando = new AtualizaCategoria();
-        umComando.idTransacao = umIdEntidade;
-        umComando.conjuntoCategoria = Set.of(SALARIO, ALUGUEL);
+        umComando.categorias = Set.of("SALARIO", "ALUGUEL");
         return umComando;
     }
 }

@@ -14,12 +14,13 @@ public class ItemPago extends ObjetoDeValor {
     private ValorMonetario valorMonetarioUnidade;
     private ValorMonetario valorMonetarioTotal;
 
-    public static ItemPago unidade(String umaDescricao,
-                                   int umaQuantidade,
-                                   ValorMonetario umValorMonetario) {
+    public static ItemPago criaItemPago(String umaDescricao,
+                                        float umaQuantidade,
+                                        String umTipoUnidadeMedida,
+                                        ValorMonetario umValorMonetario) {
         return new ItemPago(
                 umaDescricao,
-                Quantidade.unidade(umaQuantidade),
+                Quantidade.deTipoUnidadeMedida(umTipoUnidadeMedida, umaQuantidade ),
                 umValorMonetario
         );
     }

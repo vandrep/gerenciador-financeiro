@@ -57,5 +57,6 @@ public enum Categoria {
     TRANSPORTE_PUBLICO,
     VENDAS,
     ROUPAS,
+    SEM_CATEGORIA,
     VIAGENS
 }

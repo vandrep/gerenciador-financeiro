@@ -1,19 +1,17 @@
 package br.com.pine.gerenciador.modelo.dominio.transacao;
 
 import br.com.pine.gerenciador.aplicacao.transacao.comandos.AdicionaItemPago;
-import br.com.pine.gerenciador.aplicacao.transacao.comandos.AdicionaPagamento;
 import br.com.pine.gerenciador.aplicacao.transacao.comandos.AlteraItemPago;
-import br.com.pine.gerenciador.aplicacao.transacao.comandos.AtualizaCategoria;
+import br.com.pine.gerenciador.aplicacao.transacao.comandos.AtualizaCategorias;
 import br.com.pine.gerenciador.aplicacao.transacao.comandos.CriaTransacao;
 import br.com.pine.gerenciador.aplicacao.transacao.comandos.RemoveItemPago;
 import br.com.pine.gerenciador.modelo.dominio.EventoDeDominio;
 import br.com.pine.gerenciador.modelo.dominio.RaizAgregado;
 import br.com.pine.gerenciador.modelo.dominio.pagamento.IdPagamento;
-import br.com.pine.gerenciador.modelo.dominio.transacao.eventos.CategoriaAtualizada;
+import br.com.pine.gerenciador.modelo.dominio.transacao.eventos.CategoriasAtualizadas;
 import br.com.pine.gerenciador.modelo.dominio.transacao.eventos.ItemPagoAdicionado;
 import br.com.pine.gerenciador.modelo.dominio.transacao.eventos.ItemPagoAlterado;
 import br.com.pine.gerenciador.modelo.dominio.transacao.eventos.ItemPagoRemovido;
-import br.com.pine.gerenciador.modelo.dominio.transacao.eventos.PagamentoAdicionado;
 import br.com.pine.gerenciador.modelo.dominio.transacao.eventos.TransacaoCriada;
 import io.smallrye.mutiny.Multi;
 
@@ -23,6 +21,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.ID_ENTIDADE_INVALIDA;
 import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.ITEM_PAGO_NAO_EXISTE_NA_TRANSACAO;
@@ -36,6 +35,7 @@ import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.TRANSACAO_NOM
 import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.TRANSACAO_NOME_DO_RECEBEDOR_NULO;
 import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.TRANSACAO_NOME_DO_RECEBEDOR_TAMANHO_INVALIDO;
 import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.TRANSACAO_NOME_DO_RECEBEDOR_VAZIO;
+import static br.com.pine.gerenciador.modelo.dominio.transacao.Categoria.SEM_CATEGORIA;
 
 public class Transacao extends RaizAgregado {
     private IdTransacao idTransacao;
@@ -48,6 +48,37 @@ public class Transacao extends RaizAgregado {
     private Set<Categoria> conjuntoCategoria;
 
     public Transacao() {
+    }
+
+    private void adicionaItemPago(ItemPago umItemPago) {
+        this.listaItemPago.add(umItemPago);
+        this.atualizaValor();
+    }
+
+    private void removeItemPago(ItemPago umItemPago) {
+        if (this.listaItemPago.size() == 1) {
+            throw new IllegalStateException(TRANSACAO_DEVE_TER_PELO_MENOS_UM_ITEM_PAGO.mensagem);
+        }
+
+        this.listaItemPago.remove(umItemPago);
+
+        this.atualizaValor();
+    }
+
+    private void alteraItemPago(ItemPago itemPagoARemover, ItemPago itemPagoAAdicionar) {
+        this.adicionaItemPago(itemPagoAAdicionar);
+        this.removeItemPago(itemPagoARemover);
+    }
+
+    private void atualizaCategorias(Set<String> umasCategorias) {
+        if (umasCategorias.isEmpty()) {
+            conjuntoCategoria.add(SEM_CATEGORIA);
+        } else {
+            conjuntoCategoria = umasCategorias.stream()
+                    .map(Categoria::valueOf)
+                    .filter(categoria -> categoria != SEM_CATEGORIA)
+                    .collect(Collectors.toSet());
+        }
     }
 
     public IdTransacao idTransacao() {
@@ -85,7 +116,7 @@ public class Transacao extends RaizAgregado {
     private Multi<EventoDeDominio> processa(CriaTransacao umComando) {
         var idTransacao = new IdTransacao(UUID.randomUUID().toString());
         validaDescricao(umComando.descricao);
-        ItemPago.unidade("", 1, ValorMonetario.emReal(umComando.valor));
+        ItemPago.criaItemPago("", 1, "UN", ValorMonetario.emReal(umComando.valor));
         validaNomePagador(umComando.nomeDoPagador);
         validaNomeRecebedor(umComando.nomeDoRecebedor);
 
@@ -98,9 +129,10 @@ public class Transacao extends RaizAgregado {
     private Multi<EventoDeDominio> processa(AdicionaItemPago umComando) {
         validaIdEntidade(this.idTransacao().id(), umComando.idTransacao, ID_ENTIDADE_INVALIDA.mensagem);
 
-        ItemPago.unidade(
+        ItemPago.criaItemPago(
                 umComando.descricao,
                 umComando.quantidade,
+                "UN",
                 ValorMonetario.emReal(umComando.valorUnidade));
 
         return Multi.createFrom().items(new ItemPagoAdicionado(umComando));
@@ -109,9 +141,10 @@ public class Transacao extends RaizAgregado {
     private Multi<EventoDeDominio> processa(RemoveItemPago umComando) {
         validaIdEntidade(this.idTransacao().id(), umComando.idTransacao, ID_ENTIDADE_INVALIDA.mensagem);
 
-        var itemARemover = ItemPago.unidade(
+        var itemARemover = ItemPago.criaItemPago(
                 umComando.descricao,
                 umComando.quantidade,
+                "UN",
                 ValorMonetario.emReal(umComando.valorUnidade));
 
         if (!this.listaItemPago.contains(itemARemover)) {
@@ -124,111 +157,79 @@ public class Transacao extends RaizAgregado {
     private Multi<EventoDeDominio> processa(AlteraItemPago umComando) {
         validaIdEntidade(this.idTransacao().id(), umComando.idTransacao, ID_ENTIDADE_INVALIDA.mensagem);
 
-        var itemAAlterar = ItemPago.unidade(
+        var itemAAlterar = ItemPago.criaItemPago(
                 umComando.descricaoAnterior,
                 umComando.quantidadeAnterior,
+                "UN",
                 ValorMonetario.emReal(umComando.valorUnidadeAnterior));
 
         if (!this.listaItemPago.contains(itemAAlterar)) {
             throw new IllegalStateException(ITEM_PAGO_NAO_EXISTE_NA_TRANSACAO.mensagem);
         }
 
-        var itemNovo = ItemPago.unidade(
+        var itemNovo = ItemPago.criaItemPago(
                 umComando.descricaoNova,
                 umComando.quantidadeNova,
+                "UN",
                 ValorMonetario.emReal(umComando.valorUnidadeNova));
 
         return Multi.createFrom().items(new ItemPagoAlterado(umComando));
     }
 
-    private Multi<EventoDeDominio> processa(AdicionaPagamento umComando) {
+    private Multi<EventoDeDominio> processa(AtualizaCategorias umComando) {
         validaIdEntidade(this.idTransacao().id(), umComando.idTransacao, ID_ENTIDADE_INVALIDA.mensagem);
 
-        return Multi.createFrom().items(new PagamentoAdicionado(umComando));
-    }
-
-    private Multi<EventoDeDominio> processa(AtualizaCategoria umComando) {
-        validaIdEntidade(this.idTransacao().id(), umComando.idTransacao, ID_ENTIDADE_INVALIDA.mensagem);
-
-        return Multi.createFrom().items(new CategoriaAtualizada(umComando));
+        return Multi.createFrom().items(new CategoriasAtualizadas(umComando));
     }
 
     private void aplica(TransacaoCriada umEvento) {
-        this.setIdTransacao(new IdTransacao(umEvento.idTransacao));
-        this.setDescricao(umEvento.descricao);
-        this.adicionaItemPago(ItemPago.unidade("", 1, ValorMonetario.emReal(umEvento.valor)));
-        this.setNomeDoPagador(umEvento.nomeDoPagador);
-        this.setNomeDoRecebedor(umEvento.nomeDoRecebedor);
-        this.setIdPagamento(new IdPagamento(umEvento.idPagamento));
+        setIdTransacao(new IdTransacao(umEvento.idTransacao));
+        setDescricao(umEvento.descricao);
+        listaItemPago = new ArrayList<>();
+        adicionaItemPago(ItemPago.criaItemPago(
+                "",
+                1,
+                "UN",
+                ValorMonetario.emReal(umEvento.valor)));
+        setNomeDoPagador(umEvento.nomeDoPagador);
+        setNomeDoRecebedor(umEvento.nomeDoRecebedor);
+        setIdPagamento(new IdPagamento(umEvento.idPagamento));
+        conjuntoCategoria = new HashSet<>();
+        atualizaCategorias(Set.of("SEM_CATEGORIA"));
     }
 
     private void aplica(ItemPagoAdicionado umEvento) {
-        this.adicionaItemPago(ItemPago.unidade(
-                umEvento.descricao,
-                umEvento.quantidade,
-                ValorMonetario.emReal(umEvento.valorUnidade)));
+        adicionaItemPago(ItemPago.criaItemPago(
+                umEvento.descricao(),
+                umEvento.quantidade(),
+                "UN",
+                ValorMonetario.emReal(umEvento.valorUnidade())));
     }
 
     private void aplica(ItemPagoRemovido umEvento) {
-        this.removeItemPago(ItemPago.unidade(
-                umEvento.descricao,
-                umEvento.quantidade,
-                ValorMonetario.emReal(umEvento.valorUnidade)));
+        removeItemPago(ItemPago.criaItemPago(
+                umEvento.descricao(),
+                umEvento.quantidade(),
+                "UN",
+                ValorMonetario.emReal(umEvento.valorUnidade())));
     }
 
     private void aplica(ItemPagoAlterado umEvento) {
-        this.adicionaItemPago(
-                ItemPago.unidade(
-                        umEvento.descricaoNova,
-                        umEvento.quantidadeNova,
-                        ValorMonetario.emReal(umEvento.valorUnidadeNova)));
-
-        this.removeItemPago(
-                ItemPago.unidade(
-                        umEvento.descricaoAnterior,
-                        umEvento.quantidadeAnterior,
-                        ValorMonetario.emReal(umEvento.valorUnidadeAnterior)));
+        alteraItemPago(
+                ItemPago.criaItemPago(
+                        umEvento.descricaoAnterior(),
+                        umEvento.quantidadeAnterior(),
+                        "UN",
+                        ValorMonetario.emReal(umEvento.valorUnidadeAnterior())),
+                ItemPago.criaItemPago(
+                        umEvento.descricaoNova(),
+                        umEvento.quantidadeNova(),
+                        "UN",
+                        ValorMonetario.emReal(umEvento.valorUnidadeNova())));
     }
 
-    private void aplica(PagamentoAdicionado umEvento) {
-        this.setIdPagamento(new IdPagamento(umEvento.idPagamento));
-    }
-
-    private void aplica(CategoriaAtualizada umEvento) {
-        this.setConjuntoCategoria(umEvento.conjuntoCategoria);
-    }
-
-    private void adicionaItemPago(ItemPago umItemPago) {
-        if (this.listaItemPago == null) {
-            this.listaItemPago = new ArrayList<>();
-        }
-        this.listaItemPago.add(umItemPago);
-        this.atualizaValor();
-    }
-
-    private void removeItemPago(ItemPago umItemPago) {
-        if (this.listaItemPago.size() == 1) {
-            throw new IllegalStateException(TRANSACAO_DEVE_TER_PELO_MENOS_UM_ITEM_PAGO.mensagem);
-        }
-
-        this.listaItemPago.remove(umItemPago);
-
-        this.atualizaValor();
-    }
-
-    private void adicionaCategoria(Categoria umaCategoria) {
-        if (this.conjuntoCategoria == null) {
-            this.conjuntoCategoria = new HashSet<>();
-        }
-        this.conjuntoCategoria.add(umaCategoria);
-    }
-
-    private void removeCategoria(Categoria umaCategoria) {
-        this.conjuntoCategoria.remove(umaCategoria);
-
-        if (this.conjuntoCategoria.isEmpty()) {
-            this.conjuntoCategoria = null;
-        }
+    private void aplica(CategoriasAtualizadas umEvento) {
+        atualizaCategorias(umEvento.categorias);
     }
 
     private void validaDescricao(String umaDescricao) {
@@ -276,16 +277,8 @@ public class Transacao extends RaizAgregado {
         this.nomeDoRecebedor = umNomeRecebedor;
     }
 
-    private void setListaItemPago(List<ItemPago> umaListaItemPago) {
-        this.listaItemPago = umaListaItemPago;
-    }
-
     //    TODO voltar aqui depois que o modelo estiver mais maduro
     private void setIdPagamento(IdPagamento umIdPagamento) {
         this.idPagamento = umIdPagamento;
-    }
-
-    private void setConjuntoCategoria(Set<Categoria> umConjuntoCategoria) {
-        this.conjuntoCategoria = umConjuntoCategoria;
     }
 }

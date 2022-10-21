@@ -2,13 +2,11 @@ package br.com.pine.gerenciador.modelo.dominio.transacao;
 
 import br.com.pine.Fixtures;
 import br.com.pine.gerenciador.aplicacao.transacao.comandos.AdicionaItemPago;
-import br.com.pine.gerenciador.aplicacao.transacao.comandos.AdicionaPagamento;
 import br.com.pine.gerenciador.aplicacao.transacao.comandos.AlteraItemPago;
-import br.com.pine.gerenciador.aplicacao.transacao.comandos.AtualizaCategoria;
+import br.com.pine.gerenciador.aplicacao.transacao.comandos.AtualizaCategorias;
 import br.com.pine.gerenciador.aplicacao.transacao.comandos.CriaTransacao;
 import br.com.pine.gerenciador.aplicacao.transacao.comandos.RemoveItemPago;
 import br.com.pine.gerenciador.modelo.dominio.EventoDeDominio;
-import br.com.pine.gerenciador.modelo.dominio.pagamento.IdPagamento;
 import io.quarkus.test.junit.QuarkusTest;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.helpers.test.UniAssertSubscriber;
@@ -16,6 +14,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import javax.inject.Inject;
+import java.util.stream.Collectors;
 
 import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.ID_ENTIDADE_INVALIDA;
 import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.ITEM_PAGO_NAO_EXISTE_NA_TRANSACAO;
@@ -26,6 +25,7 @@ import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.TRANSACAO_NOM
 import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.TRANSACAO_NOME_DO_RECEBEDOR_VAZIO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @QuarkusTest
 class TransacaoTest {
@@ -37,8 +37,7 @@ class TransacaoTest {
     AdicionaItemPago comandoAdicionaItemPago;
     RemoveItemPago comandoRemoveItemPago;
     AlteraItemPago comandoAlteraItemPago;
-    AdicionaPagamento comandoAdicionaPagamento;
-    AtualizaCategoria comandoAtualizaCategoria;
+    AtualizaCategorias comandoAtualizaCategoria;
 
     @BeforeEach
     void setUp() {
@@ -52,7 +51,6 @@ class TransacaoTest {
         comandoAdicionaItemPago = fixtures.comandoAdicionaItemPago(umIdTransacao.id());
         comandoRemoveItemPago = fixtures.comandoRemoveItemPagoIdentico(comandoAdicionaItemPago);
         comandoAlteraItemPago = fixtures.comandoAlteraItemPagoIdentico(comandoAdicionaItemPago);
-        comandoAdicionaPagamento = fixtures.comandoAdicionaPagamento(umIdTransacao.id());
         comandoAtualizaCategoria = fixtures.comandoAtualizaCategoria(umIdTransacao.id());
     }
 
@@ -186,20 +184,14 @@ class TransacaoTest {
     }
 
     @Test
-    void adicionaPagamentoComSucesso() {
-        transacao.processaComando(comandoAdicionaPagamento)
-                .stage(this::finalizaProcessamento);
-
-        assertEquals(new IdPagamento(comandoAdicionaPagamento.idPagamento),
-                transacao.idPagamento());
-    }
-
-    @Test
     void atualizaCategoriaComSucesso() {
         transacao.processaComando(comandoAtualizaCategoria)
                 .stage(this::finalizaProcessamento);
 
-        assertEquals(comandoAtualizaCategoria.conjuntoCategoria, transacao.conjuntoCategoria());
+        assertTrue(comandoAtualizaCategoria.categorias.containsAll(
+                transacao.conjuntoCategoria().stream()
+                        .map(Enum::name)
+                        .collect(Collectors.toSet())));
     }
 
     private Transacao finalizaProcessamento(Multi<EventoDeDominio> eventoDeDominioMulti) {

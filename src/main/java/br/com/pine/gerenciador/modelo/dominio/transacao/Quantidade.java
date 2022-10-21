@@ -11,8 +11,10 @@ public class Quantidade extends ObjetoDeValor {
     private BigDecimal multiplicador;
     private TipoUnidadeMedida tipoUnidadeMedida;
 
-    public static Quantidade unidade(int umMultiplicador) {
-        return new Quantidade(new BigDecimal(umMultiplicador), TipoUnidadeMedida.UN);
+    public static Quantidade deTipoUnidadeMedida(String umTipoUnidadeMedida, float umMultiplicador) {
+        return new Quantidade(
+                new BigDecimal(umMultiplicador),
+                TipoUnidadeMedida.valueOf(umTipoUnidadeMedida));
     }
 
     public BigDecimal multiplicador() {

@@ -3,6 +3,7 @@ package br.com.pine.gerenciador.modelo.dominio.transacao;
 import br.com.pine.gerenciador.aplicacao.transacao.comandos.CriaTransacao;
 import br.com.pine.gerenciador.modelo.dominio.EventoDeDominio;
 import br.com.pine.gerenciador.modelo.dominio.RaizAgregado;
+import br.com.pine.gerenciador.modelo.dominio.transacao.eventos.EventoDeDominioTransacao;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 
@@ -16,7 +17,7 @@ public class TransacaoService {
         return transacao.processaComando(umComando);
     }
 
-    public Uni<Transacao> instanciaTransacao(Multi<EventoDeDominio> multiEventoDeDominio) {
+    public Uni<Transacao> instanciaTransacao(Multi<EventoDeDominioTransacao> multiEventoDeDominio) {
         return multiEventoDeDominio.collect().in(Transacao::new, RaizAgregado::aplicaEvento);
     }
 }

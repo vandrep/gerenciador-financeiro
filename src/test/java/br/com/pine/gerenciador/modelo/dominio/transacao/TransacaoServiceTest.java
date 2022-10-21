@@ -1,6 +1,7 @@
 package br.com.pine.gerenciador.modelo.dominio.transacao;
 
 import br.com.pine.Fixtures;
+import br.com.pine.gerenciador.aplicacao.transacao.comandos.AdicionaItemPago;
 import br.com.pine.gerenciador.modelo.dominio.transacao.eventos.ItemPagoAdicionado;
 import br.com.pine.gerenciador.modelo.dominio.transacao.eventos.TransacaoCriada;
 import io.quarkus.test.junit.QuarkusTest;
@@ -37,19 +38,21 @@ class TransacaoServiceTest {
         pagamentoEmRealCriado.descricao = fixtures.umaStringAleatoria();
         pagamentoEmRealCriado.idPagamento = fixtures.umaStringAleatoria();
 
-        var itemPagoAdicionado1 = new ItemPagoAdicionado();
-        itemPagoAdicionado1.idEntidade = umIdTransacao;
-        itemPagoAdicionado1.descricao = "Remédio";
-        itemPagoAdicionado1.quantidade = 50;
-        itemPagoAdicionado1.tipoUnidadeMedida = TipoUnidadeMedida.UN;
-        itemPagoAdicionado1.valorUnidade = 200.0f;
+        var comandoAdicionaItemPago1 = new AdicionaItemPago();
+        comandoAdicionaItemPago1.idTransacao = umIdTransacao;
+        comandoAdicionaItemPago1.descricao = "Remédio";
+        comandoAdicionaItemPago1.quantidade = 50;
+        comandoAdicionaItemPago1.tipoUnidadeMedida = "UN";
+        comandoAdicionaItemPago1.valorUnidade = 200.0f;
+        var itemPagoAdicionado1 = new ItemPagoAdicionado(comandoAdicionaItemPago1);
 
-        var itemPagoAdicionado2 = new ItemPagoAdicionado();
-        itemPagoAdicionado2.idEntidade = umIdTransacao;
-        itemPagoAdicionado2.descricao = "Remédio";
-        itemPagoAdicionado2.quantidade = 50;
-        itemPagoAdicionado2.tipoUnidadeMedida = TipoUnidadeMedida.UN;
-        itemPagoAdicionado2.valorUnidade = 150.0f;
+        var comandoAdicionaItemPago2 = new AdicionaItemPago();
+        comandoAdicionaItemPago2.idTransacao = umIdTransacao;
+        comandoAdicionaItemPago2.descricao = "Remédio";
+        comandoAdicionaItemPago2.quantidade = 50;
+        comandoAdicionaItemPago2.tipoUnidadeMedida = "UN";
+        comandoAdicionaItemPago2.valorUnidade = 150.0f;
+        var itemPagoAdicionado2 = new ItemPagoAdicionado(comandoAdicionaItemPago2);
 
         var multiEventoDeDominio =
                 Multi.createFrom().items(pagamentoEmRealCriado, itemPagoAdicionado1, itemPagoAdicionado2);
@@ -58,13 +61,13 @@ class TransacaoServiceTest {
                 .subscribe().withSubscriber(UniAssertSubscriber.create()).getItem();
 
         var valorTotal = pagamentoEmRealCriado.valor
-                + (itemPagoAdicionado1.valorUnidade * itemPagoAdicionado1.quantidade)
-                + (itemPagoAdicionado2.valorUnidade * itemPagoAdicionado2.quantidade);
+                + (itemPagoAdicionado1.valorUnidade() * itemPagoAdicionado1.quantidade())
+                + (itemPagoAdicionado2.valorUnidade() * itemPagoAdicionado2.quantidade());
 
         assertEquals(valorTotal, pagamento.valorMonetario().valor().floatValue());
         assertEquals(pagamentoEmRealCriado.nomeDoPagador, pagamento.nomeDoPagador());
         assertEquals(pagamentoEmRealCriado.nomeDoRecebedor, pagamento.nomeDoRecebedor());
         assertEquals(3, pagamento.listaItemPago().size());
-        assertEquals(itemPagoAdicionado2.descricao, pagamento.listaItemPago().get(1).descricao());
+        assertEquals(itemPagoAdicionado2.descricao(), pagamento.listaItemPago().get(1).descricao());
     }
 }

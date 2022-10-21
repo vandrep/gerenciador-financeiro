@@ -1,38 +1,50 @@
 package br.com.pine.gerenciador.modelo.dominio.transacao.eventos;
 
 import br.com.pine.gerenciador.aplicacao.transacao.comandos.AdicionaItemPago;
-import br.com.pine.gerenciador.modelo.dominio.EventoDeDominio;
-import br.com.pine.gerenciador.modelo.dominio.transacao.TipoUnidadeMedida;
 
 import java.time.LocalDateTime;
 
-public class ItemPagoAdicionado extends EventoDeDominio {
-    public String idEntidade;
-    public LocalDateTime ocorridoEm;
-    public String descricao;
-    public int quantidade;
-    public TipoUnidadeMedida tipoUnidadeMedida;
-    public float valorUnidade;
+public class ItemPagoAdicionado implements EventoDeDominioTransacao {
+
+    private LocalDateTime ocorridoEm;
+    private AdicionaItemPago comando;
 
     public ItemPagoAdicionado() {
     }
 
-    public ItemPagoAdicionado(AdicionaItemPago umComando) {
-        this.idEntidade = umComando.idTransacao;
+    public ItemPagoAdicionado(AdicionaItemPago comando) {
         this.ocorridoEm = LocalDateTime.now();
-        this.descricao = umComando.descricao;
-        this.tipoUnidadeMedida = TipoUnidadeMedida.valueOf(umComando.unidadeMedida);
-        this.valorUnidade = umComando.valorUnidade;
-        this.quantidade = umComando.quantidade;
+        this.comando = comando;
+    }
+
+    public String idTransacao(){
+        return comando.idTransacao;
+    }
+    public String descricao(){
+        return comando.descricao;
+    }
+    public int quantidade(){
+        return comando.quantidade;
+    }
+    public String tipoUnidadeMedida(){
+        return comando.tipoUnidadeMedida;
+    }
+    public float valorUnidade(){
+        return comando.valorUnidade;
     }
 
     @Override
-    public String getIdTransacao() {
-        return idEntidade;
+    public String idEntidade() {
+        return idTransacao();
     }
 
     @Override
-    public LocalDateTime getOcorridoEm() {
+    public LocalDateTime ocorridoEm() {
         return ocorridoEm;
+    }
+
+    @Override
+    public int versaoDoEvento() {
+        return 1;
     }
 }

@@ -1,46 +1,69 @@
 package br.com.pine.gerenciador.modelo.dominio.transacao.eventos;
 
 import br.com.pine.gerenciador.aplicacao.transacao.comandos.AlteraItemPago;
-import br.com.pine.gerenciador.aplicacao.transacao.comandos.CriaTransacao;
-import br.com.pine.gerenciador.modelo.dominio.EventoDeDominio;
 
 import java.time.LocalDateTime;
 
-public class ItemPagoAlterado extends EventoDeDominio {
-    public String idTransacao;
+public class ItemPagoAlterado implements EventoDeDominioTransacao {
     public LocalDateTime ocorridoEm;
-    public String descricaoAnterior;
-    public int quantidadeAnterior;
-    public String unidadeMedidaAnterior;
-    public float valorUnidadeAnterior;
-    public String descricaoNova;
-    public int quantidadeNova;
-    public String unidadeMedidaNova;
-    public float valorUnidadeNova;
+    private AlteraItemPago comando;
 
     public ItemPagoAlterado() {
     }
 
     public ItemPagoAlterado(AlteraItemPago umComando) {
-        this.idTransacao = umComando.idTransacao;
         this.ocorridoEm = LocalDateTime.now();
-        this.descricaoAnterior = umComando.descricaoAnterior;
-        this.quantidadeAnterior = umComando.quantidadeAnterior;
-        this.unidadeMedidaAnterior = umComando.unidadeMedidaAnterior;
-        this.valorUnidadeAnterior = umComando.valorUnidadeAnterior;
-        this.descricaoNova = umComando.descricaoNova;
-        this.quantidadeNova = umComando.quantidadeNova;
-        this.unidadeMedidaNova = umComando.unidadeMedidaNova;
-        this.valorUnidadeNova = umComando.valorUnidadeNova;
+        this.comando = umComando;
+    }
+
+    public String idTransacao() {
+        return this.comando.idTransacao;
+    }
+
+    public String descricaoAnterior() {
+        return this.comando.descricaoAnterior;
+    }
+
+    public int quantidadeAnterior() {
+        return this.comando.quantidadeAnterior;
+    }
+
+    public String unidadeMedidaAnterior() {
+        return this.comando.unidadeMedidaAnterior;
+    }
+
+    public float valorUnidadeAnterior() {
+        return this.comando.valorUnidadeAnterior;
+    }
+
+    public String descricaoNova() {
+        return this.comando.descricaoNova;
+    }
+
+    public int quantidadeNova() {
+        return this.comando.quantidadeNova;
+    }
+
+    public String unidadeMedidaNova() {
+        return this.comando.unidadeMedidaNova;
+    }
+
+    public float valorUnidadeNova() {
+        return this.comando.valorUnidadeNova;
     }
 
     @Override
-    public String getIdTransacao() {
-        return idTransacao;
+    public String idEntidade() {
+        return idTransacao();
     }
 
     @Override
-    public LocalDateTime getOcorridoEm() {
+    public LocalDateTime ocorridoEm() {
         return ocorridoEm;
+    }
+
+    @Override
+    public int versaoDoEvento() {
+        return 1;
     }
 }

@@ -25,7 +25,7 @@ class QuantidadeTest {
 
     @Test
     void criaUmaQuantidadeDeUnidadeComSucesso() {
-        quantidade = Quantidade.unidade(multiplicadorInteiro);
+        quantidade = Quantidade.deTipoUnidadeMedida("UN", multiplicadorInteiro);
 
         assertEquals(multiplicadorInteiro, quantidade.multiplicador().intValue());
         assertEquals(TipoUnidadeMedida.UN, quantidade.tipoUnidadeDeMedida());
@@ -35,7 +35,7 @@ class QuantidadeTest {
     void criaUmaQuantidadeDeUnidadeMenorQueUmComErro() {
 
         var erro = assertThrows(IllegalArgumentException.class,
-                () -> quantidade = Quantidade.unidade(0));
+                () -> quantidade = Quantidade.deTipoUnidadeMedida("UN", 0));
 
         assertEquals(TIPO_UNIDADE_DE_MEDIDA_MULTIPLICADOR_FORA_DO_INTERVALO.mensagem, erro.getMessage());
     }
