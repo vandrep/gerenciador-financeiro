@@ -18,6 +18,7 @@ public class TransacaoApplicationService {
     TransacaoService transacaoService;
 
     public Uni<Void> criaTransacaoNova(CriaTransacao umComando) {
+//        return repositorioTransacao.armazenaNovosEventosDaTransacao(transacaoService.criaTransacao(umComando));
         return repositorioTransacao.armazenaNovosEventosDaTransacao(transacaoService.criaTransacao(umComando));
     }
 

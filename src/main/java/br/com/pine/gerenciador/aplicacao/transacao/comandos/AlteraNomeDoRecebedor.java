@@ -4,8 +4,5 @@ import br.com.pine.gerenciador.modelo.dominio.Comando;
 
 public class AlteraNomeDoRecebedor implements Comando {
     public String idTransacao;
-    public String descricao;
-    public int quantidade;
-    public String tipoUnidadeMedida;
-    public float valorUnidade;
+    public String nomeDoRecebedor;
 }

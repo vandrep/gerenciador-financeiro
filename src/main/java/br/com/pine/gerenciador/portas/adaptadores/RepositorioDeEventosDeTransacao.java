@@ -4,20 +4,30 @@ import br.com.pine.gerenciador.modelo.dominio.EventoDeDominio;
 import br.com.pine.gerenciador.modelo.dominio.RaizAgregado;
 import br.com.pine.gerenciador.modelo.dominio.transacao.RepositorioTransacao;
 import br.com.pine.gerenciador.modelo.dominio.transacao.Transacao;
+import br.com.pine.gerenciador.modelo.dominio.transacao.eventos.EventoDeDominioTransacao;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.smallrye.mutiny.GroupedMulti;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.ws.rs.NotFoundException;
+import java.text.SimpleDateFormat;
 
 @ApplicationScoped
 public class RepositorioDeEventosDeTransacao implements RepositorioTransacao {
+    private static final ObjectMapper json = JsonMapper.builder()
+            .addModule(new JavaTimeModule())
+            .defaultDateFormat(new SimpleDateFormat("dd/MM/yyyy"))
+            .build();
 
     public Multi<Transacao> buscaTodasTransacoes() {
         return stream("tipoentidade", Transacao.class.getSimpleName())
                 .stage(this::validaMultiVazia)
-                .stage(this::converteParaEventoDeDominio)
+                .stage(this::converteParaEventoDeDominioTransacao)
                 .stage(this::agrupaEventosPorId)
                 .onItem().transformToUniAndConcatenate(this::instanciaTransacao);
     }
@@ -25,7 +35,7 @@ public class RepositorioDeEventosDeTransacao implements RepositorioTransacao {
     public Uni<Transacao> buscaTransacaoPorId(String umIdEntidade) {
         return stream("identidade = ?1 and tipoentidade = ?2", umIdEntidade, Transacao.class.getSimpleName())
                 .stage(this::validaMultiVazia)
-                .stage(this::converteParaEventoDeDominio)
+                .stage(this::converteParaEventoDeDominioTransacao)
                 .stage(this::instanciaTransacao);
     }
 
@@ -46,19 +56,29 @@ public class RepositorioDeEventosDeTransacao implements RepositorioTransacao {
                 .ifEmpty().failWith(new NotFoundException("Sem eventos"));
     }
 
-    private Multi<EventoDeDominio> converteParaEventoDeDominio(Multi<EventoArmazenado> multiEventosArmazenados) {
-        return multiEventosArmazenados.map(EventoArmazenado::getEventoDominio);
+    private Multi<EventoDeDominioTransacao> converteParaEventoDeDominioTransacao(Multi<EventoArmazenado> multiEventosArmazenados) {
+        return multiEventosArmazenados
+                .map(this::deserializa);
     }
 
-    private Multi<GroupedMulti<String, EventoDeDominio>> agrupaEventosPorId(Multi<EventoDeDominio> multiEventosDeDominio) {
+    private EventoDeDominioTransacao deserializa(EventoArmazenado umEventoArmazenado) {
+        var classeDoEvento = EventoDeDominioTransacao.class.getPackageName() + "." + umEventoArmazenado.tipoEvento;
+        try {
+            return (EventoDeDominioTransacao) json.readValue(umEventoArmazenado.getEventoDominio(), Class.forName(classeDoEvento));
+        } catch (JsonProcessingException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private Multi<GroupedMulti<String, EventoDeDominioTransacao>> agrupaEventosPorId(Multi<EventoDeDominioTransacao> multiEventosDeDominio) {
         return multiEventosDeDominio.group().by(EventoDeDominio::idEntidade);
     }
 
-    private Uni<Transacao> instanciaTransacao(GroupedMulti<String, EventoDeDominio> multiGrupoEventoDeDominio) {
+    private Uni<Transacao> instanciaTransacao(GroupedMulti<String, EventoDeDominioTransacao> multiGrupoEventoDeDominio) {
         return multiGrupoEventoDeDominio.collect().in(Transacao::new, RaizAgregado::aplicaEvento);
     }
 
-    public Uni<Transacao> instanciaTransacao(Multi<EventoDeDominio> multiEventosDeDominio) {
+    private Uni<Transacao> instanciaTransacao(Multi<EventoDeDominioTransacao> multiEventosDeDominio) {
         return multiEventosDeDominio.collect().in(Transacao::new, RaizAgregado::aplicaEvento);
     }
 }

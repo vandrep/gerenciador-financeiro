@@ -23,16 +23,17 @@ public class EventoArmazenado {
     public String tipoEvento;
     public String tipoEntidade;
     public String idEntidade;
+    @Lob
     private String dadosEvento;
 
     public EventoArmazenado() {
     }
 
-    public EventoArmazenado(EventoDeDominio umEventoDeDominio, String umTipoEntidade){
+    public EventoArmazenado(EventoDeDominio umEventoDeDominio, String umTipoEntidade) {
         this.tipoEntidade = umTipoEntidade;
         this.tipoEvento = umEventoDeDominio.getClass().getSimpleName();
-        this.idEntidade = umEventoDeDominio.idEntidade();
         this.setDadosEvento(umEventoDeDominio);
+        this.idEntidade = umEventoDeDominio.idEntidade();
     }
 
     public Long getId() {
@@ -43,12 +44,8 @@ public class EventoArmazenado {
         return idEntidade;
     }
 
-    public EventoDeDominio getEventoDominio() {
-        try {
-            return json.readValue(this.dadosEvento, EventoDeDominio.class);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+    public String getEventoDominio() {
+        return this.dadosEvento;
     }
 
     public void setDadosEvento(EventoDeDominio dadosEvento) {

@@ -132,7 +132,7 @@ public class Transacao extends RaizAgregado {
         ItemPago.criaItemPago(
                 umComando.descricao,
                 umComando.quantidade,
-                "UN",
+                umComando.tipoUnidadeMedida,
                 ValorMonetario.emReal(umComando.valorUnidade));
 
         return Multi.createFrom().items(new ItemPagoAdicionado(umComando));
@@ -183,17 +183,17 @@ public class Transacao extends RaizAgregado {
     }
 
     private void aplica(TransacaoCriada umEvento) {
-        setIdTransacao(new IdTransacao(umEvento.idTransacao));
-        setDescricao(umEvento.descricao);
+        setIdTransacao(new IdTransacao(umEvento.getIdTransacao()));
+        setDescricao(umEvento.descricao());
         listaItemPago = new ArrayList<>();
         adicionaItemPago(ItemPago.criaItemPago(
                 "",
                 1,
                 "UN",
-                ValorMonetario.emReal(umEvento.valor)));
-        setNomeDoPagador(umEvento.nomeDoPagador);
-        setNomeDoRecebedor(umEvento.nomeDoRecebedor);
-        setIdPagamento(new IdPagamento(umEvento.idPagamento));
+                ValorMonetario.emReal(umEvento.valor())));
+        setNomeDoPagador(umEvento.nomeDoPagador());
+        setNomeDoRecebedor(umEvento.nomeDoRecebedor());
+        setIdPagamento(new IdPagamento(umEvento.idPagamento()));
         conjuntoCategoria = new HashSet<>();
         atualizaCategorias(Set.of("SEM_CATEGORIA"));
     }
@@ -202,7 +202,7 @@ public class Transacao extends RaizAgregado {
         adicionaItemPago(ItemPago.criaItemPago(
                 umEvento.descricao(),
                 umEvento.quantidade(),
-                "UN",
+                umEvento.tipoUnidadeMedida(),
                 ValorMonetario.emReal(umEvento.valorUnidade())));
     }
 
@@ -229,7 +229,7 @@ public class Transacao extends RaizAgregado {
     }
 
     private void aplica(CategoriasAtualizadas umEvento) {
-        atualizaCategorias(umEvento.categorias);
+        atualizaCategorias(umEvento.categorias());
     }
 
     private void validaDescricao(String umaDescricao) {

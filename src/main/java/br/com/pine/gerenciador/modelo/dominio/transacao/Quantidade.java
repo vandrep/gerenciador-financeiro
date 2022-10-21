@@ -14,7 +14,7 @@ public class Quantidade extends ObjetoDeValor {
     public static Quantidade deTipoUnidadeMedida(String umTipoUnidadeMedida, float umMultiplicador) {
         return new Quantidade(
                 new BigDecimal(umMultiplicador),
-                TipoUnidadeMedida.valueOf(umTipoUnidadeMedida));
+                umTipoUnidadeMedida);
     }
 
     public BigDecimal multiplicador() {
@@ -44,14 +44,14 @@ public class Quantidade extends ObjetoDeValor {
     }
 
     private Quantidade(BigDecimal multiplicador,
-                       TipoUnidadeMedida tipoUnidadeMedida) {
+                       String tipoUnidadeMedida) {
         this.setTipoUnidadeMedida(tipoUnidadeMedida);
         this.setMultiplicador(multiplicador);
     }
 
-    private void setTipoUnidadeMedida(TipoUnidadeMedida umTipoUnidadeMedida) {
+    private void setTipoUnidadeMedida(String umTipoUnidadeMedida) {
         validaArgumentoNaoNulo(umTipoUnidadeMedida, QUANTIDADE_TIPO_UNIDADE_DE_MEDIDA_NULO.mensagem);
-        this.tipoUnidadeMedida = umTipoUnidadeMedida;
+        this.tipoUnidadeMedida = TipoUnidadeMedida.valueOf(umTipoUnidadeMedida);
     }
 
     private void setMultiplicador(BigDecimal umMultiplicador) {

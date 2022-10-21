@@ -1,30 +1,25 @@
 package br.com.pine.gerenciador.modelo.dominio.transacao.eventos;
 
 import br.com.pine.gerenciador.aplicacao.transacao.comandos.CriaTransacao;
+import br.com.pine.gerenciador.modelo.dominio.Comando;
 
 import java.time.LocalDateTime;
 
 public class TransacaoCriada implements EventoDeDominioTransacao {
-    public LocalDateTime ocorridoEm;
-    public String idTransacao;
-    public String descricao;
-    public float valor;
-    public String nomeDoPagador;
-    public String nomeDoRecebedor;
-    public String idPagamento;
+    private LocalDateTime ocorridoEm;
+    private int versao;
+    private String idTransacao;
+    private CriaTransacao comando;
 
     public TransacaoCriada() {
     }
 
     public TransacaoCriada(CriaTransacao umComando,
                            String umIdTransacao) {
-        this.ocorridoEm = LocalDateTime.now();
-        this.idTransacao = umIdTransacao;
-        this.descricao = umComando.descricao;
-        this.valor = umComando.valor;
-        this.nomeDoPagador = umComando.nomeDoPagador;
-        this.nomeDoRecebedor = umComando.nomeDoRecebedor;
-        this.idPagamento = umComando.idPagamento;
+        ocorridoEm = LocalDateTime.now();
+        versao = 1;
+        idTransacao = umIdTransacao;
+        comando = umComando;
     }
 
     @Override
@@ -33,12 +28,37 @@ public class TransacaoCriada implements EventoDeDominioTransacao {
     }
 
     @Override
-    public LocalDateTime ocorridoEm() {
+    public LocalDateTime getOcorridoEm() {
         return ocorridoEm;
     }
 
     @Override
-    public int versaoDoEvento() {
-        return 1;
+    public int getVersao() {
+        return versao;
+    }
+
+    public String getIdTransacao(){
+        return idEntidade();
+    }
+
+    @Override
+    public Comando getComando() {
+        return comando;
+    }
+
+    public String descricao(){
+        return comando.descricao;
+    }
+    public float valor(){
+        return comando.valor;
+    }
+    public String nomeDoPagador(){
+        return comando.nomeDoPagador;
+    }
+    public String nomeDoRecebedor(){
+        return comando.nomeDoRecebedor;
+    }
+    public String idPagamento(){
+        return comando.idPagamento;
     }
 }

@@ -100,10 +100,32 @@ export function Transacao() {
     return (
         <div id="transacao">
             <div className="cabecalho">
-                {transacao.idTransacao}
-                {transacao.valor}
-                {transacao.nomeDoPagador}
-                {transacao.nomeDoRecebedor}
+                <p>Descrição: {transacao.descricao}</p>
+                <p>Valor: {transacao.valor}</p>
+                <p>Nome do Pagador: {transacao.nomeDoPagador}</p>
+                <p>Nome do Recebedor: {transacao.nomeDoRecebedor}</p>
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Descrição</th>
+                        <th>Quantidade</th>
+                        <th>UN</th>
+                        <th>Valor Unitário</th>
+                        <th>Valor Total</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {transacao.listaDeItemPago.map((itemPago, index) => (
+                        <tr key={index}>
+                            <td>{itemPago.descricao}</td>
+                            <td>{itemPago.quantidade}</td>
+                            <td>{itemPago.unidadeDeMedida}</td>
+                            <td>{itemPago.valorDaUnidade}</td>
+                            <td>{itemPago.valorDaUnidade * itemPago.quantidade}</td>
+                        </tr>
+                    ))}
+                    </tbody>
+                </table>
                 <div>
                     <Form action="edita">
                         <button type="submit">Editar</button>
@@ -195,21 +217,21 @@ function FormularioTransacao({transacao}) {
                 <button type="submit">Salvar</button>
                 {
                     transacaoNaoPreenchida ?
-                    <button
-                        type="button"
-                        onClick={handleReset}
-                    >
-                        Limpar
-                    </button>
+                        <button
+                            type="button"
+                            onClick={handleReset}
+                        >
+                            Limpar
+                        </button>
                         :
-                    <button
-                        type="button"
-                        onClick={() => {
-                            navega(-1);
-                        }}
-                    >
-                        Cancelar
-                    </button>
+                        <button
+                            type="button"
+                            onClick={() => {
+                                navega(-1);
+                            }}
+                        >
+                            Cancelar
+                        </button>
                 }
             </p>
         </Form>
@@ -255,8 +277,8 @@ function FormularioItem({item}) {
                         placeholder="Unidade de Medida"
                         aria-label="Unidade de Medida"
                         type="text"
-                        name="unidadeMedida"
-                        defaultValue={itemNaoPreenchido ? "UNIDADE" : item.unidadeMedida}
+                        name="tipoUnidadeMedida"
+                        defaultValue={itemNaoPreenchido ? "UN" : item.unidadeMedida}
                     />
                 </label>
                 <label>

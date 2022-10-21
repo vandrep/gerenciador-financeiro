@@ -1,6 +1,7 @@
 package br.com.pine.gerenciador.modelo.dominio.transacao.eventos;
 
 import br.com.pine.gerenciador.aplicacao.transacao.comandos.AtualizaCategorias;
+import br.com.pine.gerenciador.modelo.dominio.Comando;
 import br.com.pine.gerenciador.modelo.dominio.EventoDeDominio;
 import br.com.pine.gerenciador.modelo.dominio.transacao.Categoria;
 
@@ -8,31 +9,40 @@ import java.time.LocalDateTime;
 import java.util.Set;
 
 public class CategoriasAtualizadas implements EventoDeDominio {
-    public LocalDateTime ocorridoEm;
-    public String idTransacao;
-    public Set<String> categorias;
+    private LocalDateTime ocorridoEm;
+    private int versao;
+    private AtualizaCategorias comando;
 
     public CategoriasAtualizadas() {
     }
 
     public CategoriasAtualizadas(AtualizaCategorias umComando) {
-        this.ocorridoEm = LocalDateTime.now();
-        this.idTransacao = umComando.idTransacao;
-        this.categorias = umComando.categorias;
+        ocorridoEm = LocalDateTime.now();
+        versao = 1;
+        comando = umComando;
     }
 
     @Override
     public String idEntidade() {
-        return idTransacao;
+        return comando.idTransacao;
     }
 
     @Override
-    public LocalDateTime ocorridoEm() {
+    public LocalDateTime getOcorridoEm() {
         return ocorridoEm;
     }
 
     @Override
-    public int versaoDoEvento() {
-        return 1;
+    public int getVersao() {
+        return versao;
+    }
+
+    @Override
+    public Comando getComando() {
+        return this.comando;
+    }
+
+    public Set<String> categorias(){
+        return comando.categorias;
     }
 }

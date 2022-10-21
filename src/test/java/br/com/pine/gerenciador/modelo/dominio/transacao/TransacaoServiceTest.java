@@ -2,6 +2,7 @@ package br.com.pine.gerenciador.modelo.dominio.transacao;
 
 import br.com.pine.Fixtures;
 import br.com.pine.gerenciador.aplicacao.transacao.comandos.AdicionaItemPago;
+import br.com.pine.gerenciador.aplicacao.transacao.comandos.CriaTransacao;
 import br.com.pine.gerenciador.modelo.dominio.transacao.eventos.ItemPagoAdicionado;
 import br.com.pine.gerenciador.modelo.dominio.transacao.eventos.TransacaoCriada;
 import io.quarkus.test.junit.QuarkusTest;
@@ -30,13 +31,16 @@ class TransacaoServiceTest {
 
     @Test
     void criaTransacaoComEventos() {
-        var pagamentoEmRealCriado = new TransacaoCriada();
-        pagamentoEmRealCriado.idTransacao = umIdTransacao;
-        pagamentoEmRealCriado.valor = 50.0f;
-        pagamentoEmRealCriado.nomeDoPagador = "Joselito";
-        pagamentoEmRealCriado.nomeDoRecebedor = "Augusto";
-        pagamentoEmRealCriado.descricao = fixtures.umaStringAleatoria();
-        pagamentoEmRealCriado.idPagamento = fixtures.umaStringAleatoria();
+        var comandoCriaTransacao = new CriaTransacao();
+        comandoCriaTransacao.valor = 50.0f;
+        comandoCriaTransacao.nomeDoPagador = "Joselito";
+        comandoCriaTransacao.nomeDoRecebedor = "Augusto";
+        comandoCriaTransacao.descricao = fixtures.umaStringAleatoria();
+        comandoCriaTransacao.idPagamento = fixtures.umaStringAleatoria();
+        var pagamentoEmRealCriado = new TransacaoCriada(
+                comandoCriaTransacao,
+                umIdTransacao
+        );
 
         var comandoAdicionaItemPago1 = new AdicionaItemPago();
         comandoAdicionaItemPago1.idTransacao = umIdTransacao;
@@ -60,13 +64,13 @@ class TransacaoServiceTest {
         var pagamento = transacaoService.instanciaTransacao(multiEventoDeDominio)
                 .subscribe().withSubscriber(UniAssertSubscriber.create()).getItem();
 
-        var valorTotal = pagamentoEmRealCriado.valor
+        var valorTotal = pagamentoEmRealCriado.valor()
                 + (itemPagoAdicionado1.valorUnidade() * itemPagoAdicionado1.quantidade())
                 + (itemPagoAdicionado2.valorUnidade() * itemPagoAdicionado2.quantidade());
 
         assertEquals(valorTotal, pagamento.valorMonetario().valor().floatValue());
-        assertEquals(pagamentoEmRealCriado.nomeDoPagador, pagamento.nomeDoPagador());
-        assertEquals(pagamentoEmRealCriado.nomeDoRecebedor, pagamento.nomeDoRecebedor());
+        assertEquals(pagamentoEmRealCriado.nomeDoPagador(), pagamento.nomeDoPagador());
+        assertEquals(pagamentoEmRealCriado.nomeDoRecebedor(), pagamento.nomeDoRecebedor());
         assertEquals(3, pagamento.listaItemPago().size());
         assertEquals(itemPagoAdicionado2.descricao(), pagamento.listaItemPago().get(1).descricao());
     }

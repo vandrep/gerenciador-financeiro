@@ -1,39 +1,46 @@
 package br.com.pine.gerenciador.modelo.dominio.transacao.eventos;
 
+import br.com.pine.gerenciador.aplicacao.transacao.comandos.AdicionaItemPago;
+import br.com.pine.gerenciador.aplicacao.transacao.comandos.AlteraNomeDoRecebedor;
 import br.com.pine.gerenciador.aplicacao.transacao.comandos.CriaTransacao;
+import br.com.pine.gerenciador.modelo.dominio.Comando;
 
 import java.time.LocalDateTime;
 
 public class NomeDoRecebedorAlterado implements EventoDeDominioTransacao {
-    public LocalDateTime ocorridoEm;
-    public String idTransacao;
-    public float valor;
-    public String nomeDoPagador;
-    public String nomeDoRecebedor;
+    private LocalDateTime ocorridoEm;
+    private int versao;
+    private AlteraNomeDoRecebedor comando;
 
     public NomeDoRecebedorAlterado() {
     }
 
-    public NomeDoRecebedorAlterado(CriaTransacao umComando, String umIdTransacao) {
-        this.idTransacao = umIdTransacao;
-        this.ocorridoEm = LocalDateTime.now();
-        this.valor = umComando.valor;
-        this.nomeDoPagador = umComando.nomeDoPagador;
-        this.nomeDoRecebedor = umComando.nomeDoRecebedor;
+    public NomeDoRecebedorAlterado(AlteraNomeDoRecebedor umComando) {
+        ocorridoEm = LocalDateTime.now();
+        versao = 1;
+        comando = umComando;
     }
 
     @Override
     public String idEntidade() {
-        return idTransacao;
+        return comando.idTransacao;
     }
 
     @Override
-    public LocalDateTime ocorridoEm() {
+    public LocalDateTime getOcorridoEm() {
         return ocorridoEm;
     }
 
     @Override
-    public int versaoDoEvento() {
-        return 1;
+    public int getVersao() {
+        return versao;
+    }
+
+    @Override
+    public Comando getComando() {
+        return comando;
+    }
+    public String nomeDoRecebedor(){
+        return comando.nomeDoRecebedor;
     }
 }
