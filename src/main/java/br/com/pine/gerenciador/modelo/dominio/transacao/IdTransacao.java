@@ -2,27 +2,37 @@ package br.com.pine.gerenciador.modelo.dominio.transacao;
 
 import br.com.pine.gerenciador.modelo.dominio.ObjetoDeValor;
 
-import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.ID_TRANSACAO_NULO;
-import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.ID_TRANSACAO_TAMANHO_INVALIDO;
-import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.ID_TRANSACAO_VAZIO;
+import java.util.UUID;
 
-public class IdTransacao extends ObjetoDeValor {
+import static br.com.pine.gerenciador.modelo.dominio.MensagemErro.ID_TRANSACAO_NULO;
+import static br.com.pine.gerenciador.modelo.dominio.MensagemErro.ID_TRANSACAO_TAMANHO_INVALIDO;
+import static br.com.pine.gerenciador.modelo.dominio.MensagemErro.ID_TRANSACAO_VAZIO;
+import static br.com.pine.gerenciador.modelo.dominio.Validador.validaArgumentoNaoNulo;
+import static br.com.pine.gerenciador.modelo.dominio.Validador.validaArgumentoNaoVazio;
+import static br.com.pine.gerenciador.modelo.dominio.Validador.validaComprimentoArgumento;
+
+public class IdTransacao implements ObjetoDeValor {
     private String id;
+
+    public IdTransacao() {
+        this.setId(UUID.randomUUID().toString());
+    }
 
     public IdTransacao(String umIdTransacao) {
         this.setId(umIdTransacao);
     }
 
-    public String id() {
-        return id;
-    }
-
     private void setId(String umId) {
-        validaArgumentoNaoNulo(umId, ID_TRANSACAO_NULO.mensagem);
-        validaArgumentoNaoVazio(umId, ID_TRANSACAO_VAZIO.mensagem);
-        validaComprimentoArgumento(umId, 36, ID_TRANSACAO_TAMANHO_INVALIDO.mensagem);
+        validaArgumentoNaoNulo(umId, ID_TRANSACAO_NULO);
+        validaArgumentoNaoVazio(umId, ID_TRANSACAO_VAZIO);
+        validaComprimentoArgumento(umId, 36, ID_TRANSACAO_TAMANHO_INVALIDO);
 
         this.id = umId;
+    }
+
+    @Override
+    public String toString() {
+        return this.id;
     }
 
     @Override

@@ -1,0 +1,64 @@
+syntax = "proto3";
+
+package transacao.eventos;
+
+option java_multiple_files = true;
+option java_package = "br.com.pine.gerenciador.modelo.dominio.transacao.eventos";
+option java_outer_classname = "EventosTransacao";
+
+message TransacaoCriada {
+  optional string id = 1;
+  optional string pagamento = 2;
+  repeated string categorias = 3;
+}
+
+message ItemAdicionado {
+  optional string descricao = 1;
+  optional ObjetosDeValor.ValorItem valor_item = 2;
+  repeated string categorias = 3;
+}
+
+message ItemAlterado {
+  optional string descricao_original = 1;
+  optional string descricao_nova = 2;
+  optional ObjetosDeValor.ValorItem valor_item_novo = 3;
+  repeated string categorias = 4;
+}
+
+message ItemRemovido {
+  optional string descricao = 1;
+}
+
+message CategoriasAtualizadas {
+  repeated string categorias = 1;
+}
+
+message EventoTransacao {
+  optional string ocorrido_em = 1;
+  optional int32 versao_evento = 2;
+  optional string tipo = 3;
+  oneof tipo_evento {
+    TransacaoCriada transacao_criada = 4;
+    ItemAdicionado item_adicionado = 5;
+    ItemAlterado item_alterado = 6;
+    ItemRemovido item_removido = 7;
+    CategoriasAtualizadas categorias_atualizadas = 8;
+  }
+}
+
+message ObjetosDeValor {
+  message ValorItem {
+    optional Quantidade quantidade = 1;
+    optional ValorMonetario valorUnitario = 2;
+  }
+
+  message Quantidade {
+    optional float multiplicador = 1;
+    optional string tipo_unidade_medida = 2;
+  }
+
+  message ValorMonetario {
+    optional string moeda = 1;
+    optional float valor = 2;
+  }
+}

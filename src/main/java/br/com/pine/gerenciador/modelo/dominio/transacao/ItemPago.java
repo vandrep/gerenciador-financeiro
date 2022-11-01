@@ -3,50 +3,72 @@ package br.com.pine.gerenciador.modelo.dominio.transacao;
 import br.com.pine.gerenciador.modelo.dominio.ObjetoDeValor;
 
 import java.math.BigDecimal;
+import java.util.Collections;
+import java.util.Set;
 
-import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.ITEM_PAGO_NOME_NULO;
-import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.ITEM_PAGO_QUANTIDADE_NULA;
-import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.ITEM_PAGO_VALOR_MONETARIO_UNIDADE_NULO;
+import static br.com.pine.gerenciador.modelo.dominio.MensagemErro.ITEM_PAGO_NOME_NULO;
+import static br.com.pine.gerenciador.modelo.dominio.MensagemErro.ITEM_PAGO_DESCRICAO_NULO;
+import static br.com.pine.gerenciador.modelo.dominio.MensagemErro.ITEM_PAGO_DESCRICAO_TAMANHO_INVALIDO;
+import static br.com.pine.gerenciador.modelo.dominio.MensagemErro.ITEM_PAGO_DESCRICAO_VAZIO;
+import static br.com.pine.gerenciador.modelo.dominio.Validador.validaArgumentoNaoNulo;
+import static br.com.pine.gerenciador.modelo.dominio.Validador.validaArgumentoNaoVazio;
+import static br.com.pine.gerenciador.modelo.dominio.Validador.validaComprimentoArgumento;
 
-public class ItemPago extends ObjetoDeValor {
+public class ItemPago implements ObjetoDeValor {
     private String descricao;
-    private Quantidade quantidade;
-    private ValorMonetario valorMonetarioUnidade;
-    private ValorMonetario valorMonetarioTotal;
+    private ValorItem valorItem;
+    private Set<Categoria> categorias;
 
-    public static ItemPago criaItemPago(String umaDescricao,
-                                        float umaQuantidade,
-                                        String umTipoUnidadeMedida,
-                                        ValorMonetario umValorMonetario) {
-        return new ItemPago(
-                umaDescricao,
-                Quantidade.deTipoUnidadeMedida(umTipoUnidadeMedida, umaQuantidade ),
-                umValorMonetario
-        );
-    }
-
-    public ValorMonetario valorMonetarioTotal() {
-        return valorMonetarioTotal;
-    }
-
-    public BigDecimal multiplicador() {
-        return quantidade.multiplicador();
-    }
-
-    public TipoUnidadeMedida tipoUnidadeMedida() {
-        return quantidade.tipoUnidadeDeMedida();
+    protected ItemPago(String umaDescricao,
+                       ValorItem umValorItem,
+                       Set<Categoria> categorias) {
+        this.setDescricao(umaDescricao);
+        this.setValorItem(umValorItem);
+        this.setCategorias(categorias);
     }
 
     public String descricao() {
-        return descricao;
+        return this.descricao;
     }
 
-    public ValorMonetario valorMonetarioUnidade() {
-        return valorMonetarioUnidade;
+    public ValorItem valorItem() {
+        return this.valorItem;
     }
 
-    public float valorUnidade() {
-        return valorMonetarioUnidade().valor().floatValue();
+    public Set<Categoria> todasCategorias() {
+        return Collections.unmodifiableSet(this.categorias());
+    }
+
+    private Set<Categoria> categorias() {
+        return this.categorias;
+    }
+
+    private void setDescricao(String umaDescricao) {
+        validaArgumentoNaoNulo(umaDescricao, ITEM_PAGO_DESCRICAO_NULO);
+        validaArgumentoNaoVazio(umaDescricao, ITEM_PAGO_DESCRICAO_VAZIO);
+        validaComprimentoArgumento(umaDescricao, 60, ITEM_PAGO_DESCRICAO_TAMANHO_INVALIDO);
+
+        this.descricao = umaDescricao;
+    }
+
+    private void setValorItem(ValorItem umValorItem) {
+        this.valorItem = umValorItem;
+    }
+
+    private void setCategorias(Set<Categoria> categorias) {
+        this.categorias = categorias;
+    }
+
+    public BigDecimal multiplicador() {
+        return this.valorItem().quantidade().multiplicador();
+    }
+
+    public TipoUnidadeMedida tipoUnidadeMedida() {
+        return this.valorItem().quantidade().tipoUnidadeDeMedida();
+    }
+
+    public BigDecimal valorUnidade() {
+        return this.valorItem().valorUnitario().valor();
     }
 
     @Override
@@ -56,46 +78,11 @@ public class ItemPago extends ObjetoDeValor {
 
         ItemPago itemPago = (ItemPago) o;
 
-        if (!descricao.equals(itemPago.descricao)) return false;
-        if (!quantidade.equals(itemPago.quantidade)) return false;
-        if (!valorMonetarioUnidade.equals(itemPago.valorMonetarioUnidade)) return false;
-        return valorMonetarioTotal.equals(itemPago.valorMonetarioTotal);
+        return descricao.equals(itemPago.descricao);
     }
 
     @Override
     public int hashCode() {
-        int result = descricao.hashCode();
-        result = 31 * result + quantidade.hashCode();
-        result = 31 * result + valorMonetarioUnidade.hashCode();
-        result = 31 * result + valorMonetarioTotal.hashCode();
-        return result;
-    }
-
-    private ItemPago(String umaDescricao,
-                     Quantidade umaQuantidade,
-                     ValorMonetario umValorMonetarioUnidade) {
-        this.setDescricao(umaDescricao);
-        this.setQuantidade(umaQuantidade);
-        this.setValorMonetarioUnidade(umValorMonetarioUnidade);
-        this.setValorTotal();
-    }
-
-    private void setDescricao(String umNome) {
-        validaArgumentoNaoNulo(umNome, ITEM_PAGO_NOME_NULO.mensagem);
-        this.descricao = umNome;
-    }
-
-    private void setQuantidade(Quantidade umaQuantidade) {
-        validaArgumentoNaoNulo(umaQuantidade, ITEM_PAGO_QUANTIDADE_NULA.mensagem);
-        this.quantidade = umaQuantidade;
-    }
-
-    private void setValorMonetarioUnidade(ValorMonetario umValorMonetario) {
-        validaArgumentoNaoNulo(umValorMonetario, ITEM_PAGO_VALOR_MONETARIO_UNIDADE_NULO.mensagem);
-        this.valorMonetarioUnidade = umValorMonetario;
-    }
-
-    private void setValorTotal() {
-        this.valorMonetarioTotal = ValorMonetario.emReal(valorMonetarioUnidade.valor().multiply(multiplicador()).floatValue());
+        return descricao.hashCode();
     }
 }

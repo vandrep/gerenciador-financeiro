@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import javax.inject.Inject;
 import java.util.Currency;
 
-import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.VALOR_MONETARIO_VALOR_MENOR_QUE_ZERO;
+import static br.com.pine.gerenciador.modelo.dominio.MensagemErro.VALOR_MONETARIO_VALOR_MENOR_QUE_ZERO;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -26,8 +26,8 @@ class ValorMonetarioTest {
     @BeforeEach
     void setUp() {
         umaMoeda = fixtures.moedaReal();
-        umValorPositivo = fixtures.valorPositivo();
-        umValorNegativo = fixtures.valorNegativo();
+        umValorPositivo = fixtures.floatPositivo();
+        umValorNegativo = fixtures.floatNegativo();
         umValorComQuantidadeCasasDecimaisErrado = fixtures.valorComCasasDecimaisAMais(umaMoeda);
     }
 

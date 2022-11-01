@@ -7,9 +7,10 @@ import java.math.RoundingMode;
 import java.util.Currency;
 import java.util.List;
 
-import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.VALOR_MONETARIO_VALOR_MENOR_QUE_ZERO;
+import static br.com.pine.gerenciador.modelo.dominio.MensagemErro.VALOR_MONETARIO_VALOR_MENOR_QUE_ZERO;
+import static br.com.pine.gerenciador.modelo.dominio.Validador.validaArgumentoMaiorOuIgualA;
 
-public class ValorMonetario extends ObjetoDeValor {
+public class ValorMonetario implements ObjetoDeValor {
     private Currency moeda;
     private BigDecimal valor;
 
@@ -46,7 +47,7 @@ public class ValorMonetario extends ObjetoDeValor {
         return result;
     }
 
-    private ValorMonetario(Currency umaMoeda,
+    public ValorMonetario(Currency umaMoeda,
                            BigDecimal umValor) {
         this.setMoeda(umaMoeda);
         this.setValor(umValor);
@@ -57,7 +58,7 @@ public class ValorMonetario extends ObjetoDeValor {
     }
 
     private void setValor(BigDecimal umValor) {
-        validaArgumentoMaiorOuIgualA(umValor.floatValue(), 0, VALOR_MONETARIO_VALOR_MENOR_QUE_ZERO.mensagem);
+        validaArgumentoMaiorOuIgualA(umValor.floatValue(), 0, VALOR_MONETARIO_VALOR_MENOR_QUE_ZERO);
         this.valor = umValor;
     }
 

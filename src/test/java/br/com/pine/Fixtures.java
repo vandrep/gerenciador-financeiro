@@ -1,32 +1,30 @@
 package br.com.pine;
 
-import br.com.pine.gerenciador.aplicacao.transacao.comandos.AdicionaItemPago;
-import br.com.pine.gerenciador.aplicacao.transacao.comandos.AlteraItemPago;
-import br.com.pine.gerenciador.aplicacao.transacao.comandos.AtualizaCategorias;
+import br.com.pine.gerenciador.aplicacao.transacao.comandos.AdicionaItem;
 import br.com.pine.gerenciador.aplicacao.transacao.comandos.CriaTransacao;
-import br.com.pine.gerenciador.aplicacao.transacao.comandos.RemoveItemPago;
+import br.com.pine.gerenciador.modelo.dominio.pagamento.IdPagamento;
+import br.com.pine.gerenciador.modelo.dominio.transacao.Categoria;
 import br.com.pine.gerenciador.modelo.dominio.transacao.TipoUnidadeMedida;
 import br.com.pine.gerenciador.modelo.dominio.transacao.ValorMonetario;
 
 import javax.enterprise.context.ApplicationScoped;
 import java.util.Currency;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-
-import static br.com.pine.gerenciador.modelo.dominio.transacao.Categoria.ALUGUEL;
-import static br.com.pine.gerenciador.modelo.dominio.transacao.Categoria.SALARIO;
 
 @ApplicationScoped
 public class Fixtures {
     Random random = new Random();
 
-    public float valorNegativo() {
+    public float floatNegativo() {
         return -0.01f;
     }
 
-    public float valorPositivo() {
+    public float floatPositivo() {
         return 0.01f;
     }
 
@@ -44,7 +42,7 @@ public class Fixtures {
     }
 
     public ValorMonetario umValorMonetarioRealPositivo() {
-        return ValorMonetario.emReal(valorPositivo());
+        return ValorMonetario.emReal(floatPositivo());
     }
 
     public String umaStringAleatoria() {
@@ -75,52 +73,77 @@ public class Fixtures {
 
     public CriaTransacao comandoCriaTransacao() {
         var umComando = new CriaTransacao();
-        umComando.descricao = umaStringAleatoria();
-        umComando.valor = valorPositivo();
-        umComando.nomeDoPagador = umaStringAleatoria();
-        umComando.nomeDoRecebedor = umaStringAleatoria();
-        umComando.idPagamento = umaStringAleatoria();
+        umComando.pagamento = umaStringAleatoria();
+        umComando.categorias = this.categoriasString();
         return umComando;
     }
 
-    public AdicionaItemPago comandoAdicionaItemPago(String umIdEntidade) {
-        var umComando = new AdicionaItemPago();
-        umComando.idTransacao = umIdEntidade;
+    public Set<String> categoriasString(){
+        var categorias = new HashSet<String>();
+        categorias.add("REEMBOLSO");
+        categorias.add("BAR");
+        return categorias;
+    }
+
+    public Set<Categoria> categorias(){
+        return this.categoriasString()
+                .stream().map(Categoria::valueOf)
+                .collect(Collectors.toSet());
+    }
+
+    public AdicionaItem comandoAdicionaItemPago(String umIdTransacao) {
+        var umComando = new AdicionaItem();
+        umComando.idTransacao = umIdTransacao;
         umComando.descricao = umaStringAleatoria();
         umComando.quantidade = umInteiroAleatorio();
         umComando.tipoUnidadeMedida = TipoUnidadeMedida.UN.name();
-        umComando.valorUnidade = valorPositivo();
+        umComando.valorUnitario = floatPositivo();
         return umComando;
     }
 
-    public RemoveItemPago comandoRemoveItemPagoIdentico(AdicionaItemPago umComandoAdiciona) {
-        var umComandoRemove = new RemoveItemPago();
-        umComandoRemove.idTransacao = umComandoAdiciona.idTransacao;
-        umComandoRemove.descricao = umComandoAdiciona.descricao;
-        umComandoRemove.quantidade = umComandoAdiciona.quantidade;
-        umComandoRemove.tipoUnidadeMedida = umComandoAdiciona.tipoUnidadeMedida;
-        umComandoRemove.valorUnidade = umComandoAdiciona.valorUnidade;
-        return umComandoRemove;
+    public IdPagamento umIdPagamento() {
+        return new IdPagamento();
     }
 
-    public AlteraItemPago comandoAlteraItemPagoIdentico(AdicionaItemPago umComandoAdiciona) {
-        var umComandoAltera = new AlteraItemPago();
-        umComandoAltera.idTransacao = umComandoAdiciona.idTransacao;
-        umComandoAltera.descricaoAnterior = umComandoAdiciona.descricao;
-        umComandoAltera.quantidadeAnterior = umComandoAdiciona.quantidade;
-        umComandoAltera.unidadeMedidaAnterior = umComandoAdiciona.tipoUnidadeMedida;
-        umComandoAltera.valorUnidadeAnterior = umComandoAdiciona.valorUnidade;
-        umComandoAltera.descricaoNova = umaStringAleatoria();
-        umComandoAltera.quantidadeNova = umInteiroAleatorio();
-        umComandoAltera.unidadeMedidaNova = TipoUnidadeMedida.UN.name();
-        umComandoAltera.valorUnidadeNova = valorPositivo();
-        return umComandoAltera;
-    }
+//    public RemoveItemPago comandoRemoveItemPagoIdentico(AdicionaItemPago umComandoAdiciona) {
+//        var umComandoRemove = new RemoveItemPago();
+//        umComandoRemove.idTransacao = umComandoAdiciona.idTransacao;
+//        umComandoRemove.descricao = umComandoAdiciona.descricao;
+////        umComandoRemove.quantidade = umComandoAdiciona.quantidade;
+//        umComandoRemove.tipoUnidadeMedida = umComandoAdiciona.tipoUnidadeMedida;
+//        umComandoRemove.valorUnidade = umComandoAdiciona.valorUnitario;
+//        return umComandoRemove;
+//    }
 
-    public AtualizaCategorias comandoAtualizaCategoria(String umIdEntidade) {
-        var umComando = new AtualizaCategorias();
-        umComando.idTransacao = umIdEntidade;
-        umComando.categorias = Set.of("SALARIO", "ALUGUEL");
-        return umComando;
-    }
+//    public AlteraItemPago comandoAlteraItemPagoIdentico(AdicionaItemPago umComandoAdiciona) {
+//        var umComandoAltera = new AlteraItemPago();
+//        umComandoAltera.idTransacao = umComandoAdiciona.idTransacao;
+//        umComandoAltera.descricaoAnterior = umComandoAdiciona.descricao;
+////        umComandoAltera.quantidadeAnterior = umComandoAdiciona.quantidade;
+//        umComandoAltera.unidadeMedidaAnterior = umComandoAdiciona.tipoUnidadeMedida;
+//        umComandoAltera.valorUnidadeAnterior = umComandoAdiciona.valorUnitario;
+//        umComandoAltera.descricaoNova = umaStringAleatoria();
+//        umComandoAltera.quantidadeNova = umInteiroAleatorio();
+//        umComandoAltera.unidadeMedidaNova = TipoUnidadeMedida.UN.name();
+//        umComandoAltera.valorUnidadeNova = valorPositivo();
+//        return umComandoAltera;
+//    }
+
+//    public AtualizaCategorias comandoAtualizaCategoria(String umIdEntidade) {
+//        var umComando = new AtualizaCategorias();
+//        umComando.idTransacao = umIdEntidade;
+//        umComando.categorias = Set.of("SALARIO", "ALUGUEL");
+//        return umComando;
+//    }
+
+//    public Quantidade umaQuantidade(){
+//        return new Quantidade();
+//    }
+
+//    public ValorItem umValorItem(){
+//        return new ValorItem(
+//                umaQuantidade(),
+//                umValorMonetarioRealPositivo()
+//        );
+//    }
 }

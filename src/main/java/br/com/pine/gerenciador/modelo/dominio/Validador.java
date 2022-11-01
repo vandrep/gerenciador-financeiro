@@ -2,119 +2,115 @@ package br.com.pine.gerenciador.modelo.dominio;
 
 import java.util.regex.Pattern;
 
-public class Validador {
+public final class Validador {
 
-    protected Validador() {
-        super();
-    }
-
-    protected void validaPadraoIgualIgnoreCase(String umaString, String umPadrao, String umaMensagem){
+    public static void validaPadraoIgualIgnoreCase(String umaString, String umPadrao, MensagemErro umaMensagem){
         if(!Pattern.compile(umPadrao, Pattern.CASE_INSENSITIVE).matcher(umaString).matches()){
-            throw new IllegalArgumentException(umaMensagem);
+            throw new IllegalArgumentException(umaMensagem.mensagem);
         }
     }
 
-    protected void validaArgumentoIgual(Object umObjeto1, Object umObjeto2, String umaMensagem) {
+    public static void validaArgumentoIgual(Object umObjeto1, Object umObjeto2, MensagemErro umaMensagem) {
         if (!umObjeto1.equals(umObjeto2)) {
-            throw new IllegalArgumentException(umaMensagem);
+            throw new IllegalArgumentException(umaMensagem.mensagem);
         }
     }
 
-    protected void validaArgumentoFalso(boolean umBoolean, String umaMensagem) {
+    public static void validaArgumentoFalso(boolean umBoolean, MensagemErro umaMensagem) {
         if (umBoolean) {
-            throw new IllegalArgumentException(umaMensagem);
+            throw new IllegalArgumentException(umaMensagem.mensagem);
         }
     }
 
-    protected void validaComprimentoArgumento(String umaString, int umMaximo, String umaMensagem) {
+    public static void validaComprimentoArgumento(String umaString, int umMaximo, MensagemErro umaMensagem) {
         int comprimento = umaString.trim().length();
         if (comprimento > umMaximo) {
-            throw new IllegalArgumentException(umaMensagem);
+            throw new IllegalArgumentException(umaMensagem.mensagem);
         }
     }
 
-    protected void validaComprimentoArgumento(String umaString, int umMinimo, int umMaximo, String umaMensagem) {
+    public static void validaComprimentoArgumento(String umaString, int umMinimo, int umMaximo, MensagemErro umaMensagem) {
         int comprimento = umaString.trim().length();
         if (comprimento < umMinimo || comprimento > umMaximo) {
-            throw new IllegalArgumentException(umaMensagem);
+            throw new IllegalArgumentException(umaMensagem.mensagem);
         }
     }
 
-    protected void validaArgumentoNaoVazio(String umaString, String umaMensagem) {
+    public static void validaArgumentoNaoVazio(String umaString, MensagemErro umaMensagem) {
         if (umaString == null || umaString.trim().isEmpty()) {
-            throw new IllegalArgumentException(umaMensagem);
+            throw new IllegalArgumentException(umaMensagem.mensagem);
         }
     }
 
-    protected void validaArgumentoNaoIgual(Object umObjeto1, Object umObjeto2, String umaMensagem) {
+    public static void validaArgumentoNaoIgual(Object umObjeto1, Object umObjeto2, MensagemErro umaMensagem) {
         if (umObjeto1.equals(umObjeto2)) {
-            throw new IllegalArgumentException(umaMensagem);
+            throw new IllegalArgumentException(umaMensagem.mensagem);
         }
     }
 
-    protected void validaArgumentoNaoNulo(Object umObjeto, String umaMensagem) {
+    public static void validaArgumentoNaoNulo(Object umObjeto, MensagemErro umaMensagem) {
         if (umObjeto == null) {
-            throw new IllegalArgumentException(umaMensagem);
+            throw new IllegalArgumentException(umaMensagem.mensagem);
         }
     }
 
-    protected void validaArgumentoMaiorOuIgualA(int umValor, int umMinimo, String umaMensagem) {
+    public static void validaArgumentoMaiorOuIgualA(int umValor, int umMinimo, MensagemErro umaMensagem) {
         if (umValor < umMinimo) {
-            throw new IllegalArgumentException(umaMensagem);
+            throw new IllegalArgumentException(umaMensagem.mensagem);
         }
     }
 
-    protected void validaArgumentoMaiorOuIgualA(float umValor, float umMinimo, String umaMensagem) {
+    public static void validaArgumentoMaiorOuIgualA(float umValor, float umMinimo, MensagemErro umaMensagem) {
         if (umValor < umMinimo) {
-            throw new IllegalArgumentException(umaMensagem);
+            throw new IllegalArgumentException(umaMensagem.mensagem);
         }
     }
 
-    protected void validaIntervaloArgumento(double umValor, double umMinimo, double umMaximo, String umaMensagem) {
+    public static void validaIntervaloArgumento(double umValor, double umMinimo, double umMaximo, MensagemErro umaMensagem) {
         if (umValor < umMinimo || umValor > umMaximo) {
-            throw new IllegalArgumentException(umaMensagem);
+            throw new IllegalArgumentException(umaMensagem.mensagem);
         }
     }
 
-    public static void validaIntervaloArgumento(float umValor, float umMinimo, float umMaximo, String umaMensagem) {
+    public static void validaIntervaloArgumento(float umValor, float umMinimo, float umMaximo, MensagemErro umaMensagem) {
         if (umValor < umMinimo || umValor > umMaximo) {
-            throw new IllegalArgumentException(umaMensagem);
+            throw new IllegalArgumentException(umaMensagem.mensagem);
         }
     }
 
-    protected void validaIntervaloArgumento(int umValor, int umMinimo, int umMaximo, String umaMensagem) {
+    public static void validaIntervaloArgumento(int umValor, int umMinimo, int umMaximo, MensagemErro umaMensagem) {
         if (umValor < umMinimo || umValor > umMaximo) {
-            throw new IllegalArgumentException(umaMensagem);
+            throw new IllegalArgumentException(umaMensagem.mensagem);
         }
     }
 
-    protected void validaIntervaloArgumento(long umValor, long umMinimo, long umMaximo, String umaMensagem) {
+    public static void validaIntervaloArgumento(long umValor, long umMinimo, long umMaximo, MensagemErro umaMensagem) {
         if (umValor < umMinimo || umValor > umMaximo) {
-            throw new IllegalArgumentException(umaMensagem);
+            throw new IllegalArgumentException(umaMensagem.mensagem);
         }
     }
 
-    protected void validaArgumentoVerdadeiro(boolean umBoolean, String umaMensagem) {
+    public static void validaArgumentoVerdadeiro(boolean umBoolean, MensagemErro umaMensagem) {
         if (!umBoolean) {
-            throw new IllegalArgumentException(umaMensagem);
+            throw new IllegalArgumentException(umaMensagem.mensagem);
         }
     }
 
-    protected void validaEstadoFalso(boolean umBoolean, String umaMensagem) {
+    public static void validaEstadoFalso(boolean umBoolean, MensagemErro umaMensagem) {
         if (umBoolean) {
-            throw new IllegalStateException(umaMensagem);
+            throw new IllegalStateException(umaMensagem.mensagem);
         }
     }
 
-    protected void validaEstadoVerdadeiro(boolean umBoolean, String umaMensagem) {
+    public static void validaEstadoVerdadeiro(boolean umBoolean, MensagemErro umaMensagem) {
         if (!umBoolean) {
-            throw new IllegalStateException(umaMensagem);
+            throw new IllegalStateException(umaMensagem.mensagem);
         }
     }
 
-    protected void validaIdEntidade(String idEntidade, String idComando, String umaMensagem){
+    public static void validaIdEntidade(String idEntidade, String idComando, MensagemErro umaMensagem){
         if (!idEntidade.equals(idComando)) {
-            throw new IllegalArgumentException(umaMensagem);
+            throw new IllegalArgumentException(umaMensagem.mensagem);
         }
     }
 }

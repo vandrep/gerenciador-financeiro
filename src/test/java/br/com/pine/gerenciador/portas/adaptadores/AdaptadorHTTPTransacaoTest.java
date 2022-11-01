@@ -1,6 +1,6 @@
 package br.com.pine.gerenciador.portas.adaptadores;
 
-import br.com.pine.gerenciador.aplicacao.transacao.comandos.AdicionaItemPago;
+import br.com.pine.gerenciador.aplicacao.transacao.comandos.AdicionaItem;
 import io.quarkus.test.common.http.TestHTTPResource;
 import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,12 +35,12 @@ class AdaptadorHTTPTransacaoTest {
 
     @Test
     void chamaEndPointComComandoReferenciandoTransacaoInexistenteComErro() {
-        var umComando = new AdicionaItemPago();
+        var umComando = new AdicionaItem();
         umComando.idTransacao = "bogus";
         umComando.descricao = "OK";
         umComando.quantidade = 5;
         umComando.tipoUnidadeMedida = UN.name();
-        umComando.valorUnidade = 50;
+        umComando.valorUnitario = 50;
         given().contentType(JSON).body(umComando)
                 .when().post(urlAdiciona)
                 .then()

@@ -1,9 +1,10 @@
 package br.com.pine.gerenciador.aplicacao.transacao;
 
 import br.com.pine.gerenciador.aplicacao.transacao.dados.DadosTransacao;
-import br.com.pine.gerenciador.modelo.dominio.transacao.RepositorioTransacao;
-import br.com.pine.gerenciador.modelo.dominio.transacao.TransacaoService;
-import io.smallrye.mutiny.Multi;
+import br.com.pine.gerenciador.modelo.dominio.EventStore;
+import br.com.pine.gerenciador.modelo.dominio.transacao.Transacao;
+import br.com.pine.gerenciador.modelo.dominio.transacao.eventos.EventoTransacao;
+import br.com.pine.gerenciador.portas.adaptadores.saida.EventStream;
 import io.smallrye.mutiny.Uni;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -11,20 +12,13 @@ import javax.inject.Inject;
 
 @ApplicationScoped
 public class TransacaoQueryApplicationService {
-
     @Inject
-    RepositorioTransacao repositorioTransacao;
-
-    @Inject
-    TransacaoService transacaoService;
-
-    public Multi<DadosTransacao> consultaTodasTransacoes() {
-        return repositorioTransacao.buscaTodasTransacoes()
-                .map(DadosTransacao::new);
-    }
+    EventStore<EventoTransacao> eventStore;
 
     public Uni<DadosTransacao> consultaTransacao(String umIdTransacao) {
-        return repositorioTransacao.buscaTransacaoPorId(umIdTransacao)
+        return eventStore.buscaEventosPorIdStream(umIdTransacao)
+                .collect().asList()
+                .map(Transacao::new)
                 .map(DadosTransacao::new);
     }
 }

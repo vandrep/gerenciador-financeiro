@@ -4,17 +4,18 @@ import br.com.pine.gerenciador.modelo.dominio.ObjetoDeValor;
 
 import java.math.BigDecimal;
 
-import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.QUANTIDADE_MULTIPLICADOR_NULO;
-import static br.com.pine.gerenciador.modelo.dominio.MensagensErro.QUANTIDADE_TIPO_UNIDADE_DE_MEDIDA_NULO;
+import static br.com.pine.gerenciador.modelo.dominio.MensagemErro.QUANTIDADE_MULTIPLICADOR_NULO;
+import static br.com.pine.gerenciador.modelo.dominio.MensagemErro.QUANTIDADE_TIPO_UNIDADE_DE_MEDIDA_NULO;
+import static br.com.pine.gerenciador.modelo.dominio.Validador.validaArgumentoNaoNulo;
 
-public class Quantidade extends ObjetoDeValor {
+public class Quantidade implements ObjetoDeValor {
     private BigDecimal multiplicador;
     private TipoUnidadeMedida tipoUnidadeMedida;
 
-    public static Quantidade deTipoUnidadeMedida(String umTipoUnidadeMedida, float umMultiplicador) {
-        return new Quantidade(
-                new BigDecimal(umMultiplicador),
-                umTipoUnidadeMedida);
+    public Quantidade(BigDecimal umMultiplicador,
+                      TipoUnidadeMedida tipoUnidadeMedida) {
+        this.setTipoUnidadeMedida(tipoUnidadeMedida);
+        this.setMultiplicador(umMultiplicador);
     }
 
     public BigDecimal multiplicador() {
@@ -43,19 +44,13 @@ public class Quantidade extends ObjetoDeValor {
         return result;
     }
 
-    private Quantidade(BigDecimal multiplicador,
-                       String tipoUnidadeMedida) {
-        this.setTipoUnidadeMedida(tipoUnidadeMedida);
-        this.setMultiplicador(multiplicador);
-    }
-
-    private void setTipoUnidadeMedida(String umTipoUnidadeMedida) {
-        validaArgumentoNaoNulo(umTipoUnidadeMedida, QUANTIDADE_TIPO_UNIDADE_DE_MEDIDA_NULO.mensagem);
-        this.tipoUnidadeMedida = TipoUnidadeMedida.valueOf(umTipoUnidadeMedida);
+    private void setTipoUnidadeMedida(TipoUnidadeMedida umTipoUnidadeMedida) {
+        validaArgumentoNaoNulo(umTipoUnidadeMedida, QUANTIDADE_TIPO_UNIDADE_DE_MEDIDA_NULO);
+        this.tipoUnidadeMedida = umTipoUnidadeMedida;
     }
 
     private void setMultiplicador(BigDecimal umMultiplicador) {
-        validaArgumentoNaoNulo(umMultiplicador, QUANTIDADE_MULTIPLICADOR_NULO.mensagem);
+        validaArgumentoNaoNulo(umMultiplicador, QUANTIDADE_MULTIPLICADOR_NULO);
         this.multiplicador = this.tipoUnidadeMedida.multiplicadorDaMedida(umMultiplicador);
     }
 }

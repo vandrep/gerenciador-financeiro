@@ -12,6 +12,6 @@ public class DadosItemPago {
         this.descricao = umItemPago.descricao();
         this.quantidade = umItemPago.multiplicador().floatValue();
         this.unidadeDeMedida = umItemPago.tipoUnidadeMedida().name();
-        this.valorDaUnidade = umItemPago.valorUnidade();
+        this.valorDaUnidade = umItemPago.valorUnidade().floatValue();
     }
 }

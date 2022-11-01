@@ -9,21 +9,15 @@ import java.util.stream.Collectors;
 
 public class DadosTransacao {
     public String idTransacao;
-    public float valor;
-    public String nomeDoPagador;
-    public String nomeDoRecebedor;
-    public List<DadosItemPago> listaDeItemPago;
-    public Set<String> conjuntoDeCategoria;
+    public List<DadosItemPago> itens;
+    public Set<String> categorias;
 
     public DadosTransacao(Transacao umaTransacao) {
-        this.idTransacao = umaTransacao.idTransacao().id();
-        this.valor = umaTransacao.valorMonetario().valor().floatValue();
-        this.nomeDoPagador = umaTransacao.nomeDoPagador();
-        this.nomeDoRecebedor = umaTransacao.nomeDoRecebedor();
-        this.listaDeItemPago = umaTransacao.listaItemPago()
+        this.idTransacao = umaTransacao.id().toString();
+        this.itens = umaTransacao.itens()
                 .stream().map(DadosItemPago::new)
                 .collect(Collectors.toList());
-        this.conjuntoDeCategoria = umaTransacao.conjuntoCategoria()
+        this.categorias = umaTransacao.categorias()
                 .stream().map(Categoria::name)
                 .collect(Collectors.toSet());
     }
