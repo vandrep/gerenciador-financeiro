@@ -1,8 +1,10 @@
 package br.com.pine.gerenciador.portas.adaptadores.saida;
 
 import br.com.pine.gerenciador.modelo.dominio.EventStore;
+import br.com.pine.gerenciador.modelo.dominio.transacao.Transacao;
 import br.com.pine.gerenciador.modelo.dominio.transacao.eventos.EventoTransacao;
 import com.google.protobuf.InvalidProtocolBufferException;
+import io.quarkus.hibernate.reactive.panache.Panache;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 
@@ -11,6 +13,7 @@ import javax.enterprise.context.RequestScoped;
 import javax.ws.rs.NotFoundException;
 import java.util.ConcurrentModificationException;
 import java.util.List;
+import java.util.UUID;
 
 @ApplicationScoped
 public class EventStoreTransacao implements EventStore<EventoTransacao> {
@@ -19,34 +22,37 @@ public class EventStoreTransacao implements EventStore<EventoTransacao> {
 
     @Override
     public Multi<EventoTransacao> buscaEventosPorIdStream(String umIdStream) {
-        return stream("idstream", umIdStream)
+        return stream("identificadorFluxo", umIdStream)
                 .stage(this::validaMultiVazia)
                 .invoke(this::armazenaVersaoEsperada)
-                .map(EventStream::getEventoDominio)
+                .map(EventoFluxo::getDado)
                 .map(this::traduzEvento);
     }
 
     @Override
-    public Uni<Void> armazenaNovosEventos(String umIdStream,
-                                          List<EventoTransacao> alteracoes) {
-        return recuperaVersaoMaisRecente(umIdStream)
-                .onItem().transformToMulti(oq -> Multi.createFrom().iterable(alteracoes)
-                        .onItem().transform(evento -> new EventStream(
-                                umIdStream,
-                                versaoEsperada + 1 + alteracoes.indexOf(evento),
-                                evento.toByteArray()))
-                        .onItem().call(this::persist))
-                .collect().asList().replaceWithVoid();
+    public Uni<List<EventoFluxo>> armazenaNovosEventos(String umIdStream,
+                                                       List<EventoTransacao> alteracoes) {
+        return Panache.withTransaction(() ->
+                recuperaVersaoMaisRecente(umIdStream)
+                        .onItem().transformToMulti(oq -> Multi.createFrom().iterable(alteracoes)
+                                .onItem().transform(evento -> new EventoFluxo(
+                                        UUID.fromString(umIdStream),
+                                        versaoEsperada + 1 + alteracoes.indexOf(evento),
+                                        evento.toByteArray(),
+                                        Transacao.class.getSimpleName(),
+                                        evento.getTipo()))
+                                .onItem().call(this::persist))
+                        .collect().asList());
     }
 
-    private void armazenaVersaoEsperada(EventStream umaStream) {
-        versaoEsperada = (versaoEsperada < umaStream.getVersaoStream() ? umaStream.getVersaoStream() : versaoEsperada);
+    private void armazenaVersaoEsperada(EventoFluxo umaStream) {
+        versaoEsperada = (versaoEsperada < umaStream.getVersaoFluxo() ? umaStream.getVersaoFluxo() : versaoEsperada);
     }
 
     private Uni<Void> recuperaVersaoMaisRecente(String umId) {
-        return this.stream("select max(EventStream.versaoStream) where idStream = ?1", umId)
+        return this.stream("select max(EventStream.versaoStream) from EventStream where idStream = ?1", umId)
                 .onFailure().recoverWithCompletion()
-                .map(EventStream::getVersaoStream)
+                .map(EventoFluxo::getVersaoFluxo)
                 .onItem().invoke(versaoAtual -> {
                     if (versaoAtual > versaoEsperada) {
                         throw new ConcurrentModificationException("Nova versão da Stream");
@@ -63,7 +69,7 @@ public class EventStoreTransacao implements EventStore<EventoTransacao> {
         }
     }
 
-    private Multi<EventStream> validaMultiVazia(Multi<EventStream> multiEventoArmazenado) {
+    private Multi<EventoFluxo> validaMultiVazia(Multi<EventoFluxo> multiEventoArmazenado) {
         return multiEventoArmazenado.onCompletion()
                 .ifEmpty().failWith(new NotFoundException("Sem eventos"));
     }

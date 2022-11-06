@@ -1,20 +1,18 @@
 package br.com.pine.gerenciador.modelo.dominio.transacao;
 
-import br.com.pine.gerenciador.modelo.dominio.Evento;
 import br.com.pine.gerenciador.modelo.dominio.RaizAgregado;
 import br.com.pine.gerenciador.modelo.dominio.pagamento.IdPagamento;
 import br.com.pine.gerenciador.modelo.dominio.transacao.eventos.EventoTransacao;
 import br.com.pine.gerenciador.modelo.dominio.transacao.eventos.ItemAdicionado;
-import br.com.pine.gerenciador.modelo.dominio.transacao.eventos.ObjetosDeValor;
 import br.com.pine.gerenciador.modelo.dominio.transacao.eventos.TransacaoCriada;
-import br.com.pine.gerenciador.portas.adaptadores.saida.EventStoreTransacao;
-import br.com.pine.gerenciador.portas.adaptadores.saida.EventStream;
-import com.google.protobuf.InvalidProtocolBufferException;
-import io.smallrye.mutiny.Multi;
-import io.smallrye.mutiny.Uni;
+import br.com.pine.gerenciador.portas.adaptadores.EventoAvro;
+import org.apache.avro.Schema;
+import org.apache.avro.generic.GenericDatumReader;
+import org.apache.avro.generic.GenericRecord;
 
+import java.io.File;
+import java.io.IOException;
 import java.math.BigDecimal;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Currency;
@@ -36,6 +34,7 @@ public class Transacao implements RaizAgregado {
     private Set<Categoria> categorias = new HashSet<>();
 
     private final List<EventoTransacao> alteracoes = new ArrayList<>();
+//    private final List<EventoAvro> alteracoes = new ArrayList<>();
 
     public Transacao(List<EventoTransacao> eventos) {
         eventos.forEach(this::mutate);
@@ -51,6 +50,16 @@ public class Transacao implements RaizAgregado {
                                 .map(Categoria::name)
                                 .collect(Collectors.toSet())));
     }
+
+//    public Transacao(IdPagamento umPagamento,
+//                     Set<Categoria> categorias) {
+//        this.aplicaNovo(
+//                criaEventoNovo(
+//                        pagamentoValido(umPagamento),
+//                        categorias.stream()
+//                                .map(Categoria::name)
+//                                .collect(Collectors.toSet())));
+//    }
 
     private String pagamentoValido(IdPagamento umPagamento) {
         validaArgumentoNaoNulo(umPagamento, TRANSACAO_PAGAMENTO_NULO);
@@ -110,6 +119,7 @@ public class Transacao implements RaizAgregado {
     }
 
     public List<EventoTransacao> alteracoes() {
+//    public List<EventoAvro> alteracoes() {
         return Collections.unmodifiableList(alteracoes);
     }
 
@@ -133,11 +143,13 @@ public class Transacao implements RaizAgregado {
     }
 
     private void aplicaNovo(EventoTransacao evento) {
+//    private void aplicaNovo(EventoAvro evento) {
         this.incluiAlteracao(evento);
         this.mutate(evento);
     }
 
     private void incluiAlteracao(EventoTransacao umEvento) {
+//    private void incluiAlteracao(EventoAvro umEvento) {
         this.alteracoes.add(umEvento);
     }
 
@@ -146,13 +158,44 @@ public class Transacao implements RaizAgregado {
 
     private void mutate(EventoTransacao evento) {
 //        this.when((T)evento.getTipoEventoCase().deserializa(evento));
+//        this.when(EventoAvro.valueOf(evento.getTipo()).deserializa(evento.));
+//        var serial = EventoAvro.valueOf(evento.getTipo());
         switch (evento.getTipoEventoCase()) {
             case TRANSACAO_CRIADA -> this.when(evento.getTransacaoCriada());
             case ITEM_ADICIONADO -> this.when(evento.getItemAdicionado());
         }
     }
 
-    private void when(TransacaoCriada umEvento) {
+//    private void mutate(EventoAvro evento) {
+//        try {
+//            Schema schema = new Schema.Parser().parse(new File("transacao.avsc"));
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
+//        Class<?> clazz;
+//        try {
+//            clazz = Class.forName("br.com.pine.gerenciador.modelo.dominio.transacao.eventos" + "." + evento.tipoEvento);
+//        } catch (ClassNotFoundException e) {
+//            throw new RuntimeException(e);
+//        }
+//        var alo = evento.tipoEvento;
+//
+//        var userDatumReader = new GenericDatumReader<GenericRecord>(clazz);
+//        DataFileReader<User> dataFileReader = new DataFileReader<User>(file, userDatumReader);
+//        User user = null;
+//        while (dataFileReader.hasNext()) {
+//            // Reuse user object by passing it to next(). This saves us from
+//            // allocating and garbage collecting many objects for files with
+//            // many items.
+//            user = dataFileReader.next(user);
+//            System.out.println(user);
+////        switch (evento.getTipoEventoCase()) {
+////            case TRANSACAO_CRIADA -> this.when(evento.getTransacaoCriada());
+////            case ITEM_ADICIONADO -> this.when(evento.getItemAdicionado());
+//        }
+//    }
+
+    public void when(TransacaoCriada umEvento) {
         this.setId(new IdTransacao(umEvento.getId()));
         this.setPagamento(new IdPagamento(umEvento.getPagamento()));
         this.setCategorias(umEvento.getCategoriasList().stream()

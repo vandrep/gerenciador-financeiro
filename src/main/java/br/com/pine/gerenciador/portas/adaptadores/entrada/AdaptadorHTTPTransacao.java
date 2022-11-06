@@ -33,8 +33,8 @@ public class AdaptadorHTTPTransacao {
     }
 
     @POST
-    @Path("/adicionaItemPago")
     @ReactiveTransactional
+    @Path("/adicionaItemPago")
     @Consumes(MediaType.APPLICATION_JSON)
     public Uni<Void> adicionaItemPago(AdicionaItem umComando) {
         return transacaoApplicationService.processa(umComando);

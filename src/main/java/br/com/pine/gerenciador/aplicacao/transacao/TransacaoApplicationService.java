@@ -8,11 +8,10 @@ import br.com.pine.gerenciador.modelo.dominio.transacao.Categoria;
 import br.com.pine.gerenciador.modelo.dominio.transacao.TipoUnidadeMedida;
 import br.com.pine.gerenciador.modelo.dominio.transacao.Transacao;
 import br.com.pine.gerenciador.modelo.dominio.transacao.eventos.EventoTransacao;
-import br.com.pine.gerenciador.portas.adaptadores.saida.EventStream;
 import io.smallrye.mutiny.Uni;
+import org.eclipse.microprofile.faulttolerance.Bulkhead;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import java.util.Currency;
 import java.util.Set;
@@ -22,16 +21,35 @@ import java.util.stream.Collectors;
 public class TransacaoApplicationService {
     @Inject
     EventStore<EventoTransacao> eventStore;
+//    @Channel("transacao")
+//    KafkaTransactions<byte[]> kafkaTx;
 
+//    @Bulkhead(1)
     public Uni<Void> processa(CriaTransacao umComando) {
         var novaTransacao = new Transacao(
                 new IdPagamento(umComando.pagamento),
                 categoriasNaoNulas(umComando.categorias));
 
-        return eventStore.armazenaNovosEventos(
-                novaTransacao.id().toString(),
-                novaTransacao.alteracoes());
+        return armazenaAlteracoes(novaTransacao);
     }
+    public Uni<Void> processaNovo(CriaTransacao umComando) {
+        var novaTransacao = new Transacao(
+                new IdPagamento(umComando.pagamento),
+                categoriasNaoNulas(umComando.categorias));
+
+        return armazenaAlteracoes(novaTransacao);
+    }
+
+
+//    public Uni<Void> processa(CriaTransacao umComando) {
+//        var novaTransacao = new Transacao(
+//                new IdPagamento(umComando.pagamento),
+//                categoriasNaoNulas(umComando.categorias));
+//
+//        return eventStore.armazenaNovosEventos(
+//                novaTransacao.id().toString(),
+//                novaTransacao.alteracoes());
+//    }
 
     public Uni<Void> processa(AdicionaItem umComando) {
         return instanciaTransacao(umComando.idTransacao)
@@ -51,11 +69,26 @@ public class TransacaoApplicationService {
                 .map(Transacao::new);
     }
 
-    private Uni<Void> armazenaAlteracoes(Uni<Transacao> umaTransacao) {
-        return umaTransacao
-                .chain(transacao -> eventStore.armazenaNovosEventos(
-                        transacao.id().toString(),
-                        transacao.alteracoes()));
+    private Uni<Void> armazenaAlteracoes(Uni<Transacao> umaTransacaoUni) {
+        return umaTransacaoUni.chain(this::armazenaAlteracoes);
+    }
+
+    private Uni<Void> armazenaAlteracoes(Transacao umaTransacao) {
+//        return kafkaTx.withTransaction(emitter -> eventStore.armazenaNovosEventos(
+//                        umaTransacao.id().toString(),
+//                        umaTransacao.alteracoes())
+//                .onItem().invoke(eventStreams -> eventStreams.forEach(evento -> emitter.send(
+//                        Message.of(evento.getEventoDominio())
+//                                .addMetadata(
+//                                        OutgoingKafkaRecordMetadata.<String>builder()
+//                                                .withHeaders(new RecordHeaders()
+//                                                        .add("idStream", evento.getIdStream().getBytes())
+//                                                        .add("versaoStream", String.valueOf(evento.getVersaoStream()).getBytes()))
+//                                                .build()))))).replaceWithVoid();
+        return eventStore.armazenaNovosEventos(
+                        umaTransacao.id().toString(),
+                        umaTransacao.alteracoes())
+                .replaceWithVoid();
     }
 
     private Currency moedaValida(String umaMoeda) {

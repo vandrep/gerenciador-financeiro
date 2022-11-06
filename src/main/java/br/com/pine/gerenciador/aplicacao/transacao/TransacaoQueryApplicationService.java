@@ -4,7 +4,6 @@ import br.com.pine.gerenciador.aplicacao.transacao.dados.DadosTransacao;
 import br.com.pine.gerenciador.modelo.dominio.EventStore;
 import br.com.pine.gerenciador.modelo.dominio.transacao.Transacao;
 import br.com.pine.gerenciador.modelo.dominio.transacao.eventos.EventoTransacao;
-import br.com.pine.gerenciador.portas.adaptadores.saida.EventStream;
 import io.smallrye.mutiny.Uni;
 
 import javax.enterprise.context.ApplicationScoped;

@@ -1,0 +1,18 @@
+{
+  "namespace": "br.com.pine.gerenciador.modelo.dominio.transacao.eventos",
+  "type": "record",
+  "name": "Transacao1",
+  "fields": [
+    {
+      "name": "pagamento",
+      "type": "string"
+    },
+    {
+      "name": "categorias",
+      "type": {
+        "type": "array",
+        "items": "string"
+      }
+    }
+  ]
+}
