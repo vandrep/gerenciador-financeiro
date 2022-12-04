@@ -1,4 +1,4 @@
 package br.com.pine.gerenciador.modelo.dominio;
 
-public interface Evento {
+public interface IdAgregado extends ObjetoDeValor{
 }

@@ -13,7 +13,7 @@ public class DadosTransacao {
     public Set<String> categorias;
 
     public DadosTransacao(Transacao umaTransacao) {
-        this.idTransacao = umaTransacao.id().toString();
+        this.idTransacao = umaTransacao.idTransacao().toString();
         this.itens = umaTransacao.itens()
                 .stream().map(DadosItemPago::new)
                 .collect(Collectors.toList());

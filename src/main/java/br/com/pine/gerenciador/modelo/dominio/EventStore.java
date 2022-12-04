@@ -1,15 +1,16 @@
 package br.com.pine.gerenciador.modelo.dominio;
 
-import br.com.pine.gerenciador.modelo.dominio.transacao.eventos.EventoTransacao;
 import br.com.pine.gerenciador.portas.adaptadores.saida.EventoFluxo;
 import io.quarkus.hibernate.reactive.panache.PanacheRepository;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 
-import java.util.List;
+import java.util.UUID;
+import java.util.stream.Stream;
 
-public interface EventStore<T> extends PanacheRepository<EventoFluxo> {
-    Multi<T> buscaEventosPorIdStream(String umIdStream);
+public interface EventStore extends PanacheRepository<EventoFluxo> {
+    Multi<EventoFluxo> buscaEventosPorIdStream(UUID umIdStream);
 
-    Uni<List<EventoFluxo>> armazenaNovosEventos(String umIdStream, List<EventoTransacao> alteracoes);
+    Uni<Void> armazenaNovosEventos(UUID umIdFluxo,
+                                   Stream<EventoFluxo> alteracoes);
 }

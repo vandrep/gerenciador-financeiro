@@ -1,46 +1,47 @@
 package br.com.pine.gerenciador.modelo.dominio;
 
-public interface RaizAgregado extends Entidade{
+import br.com.pine.gerenciador.modelo.dominio.transacao.FabricaEventoTransacao;
+import br.com.pine.gerenciador.portas.adaptadores.saida.EventoFluxo;
+import br.com.pine.gerenciador.portas.adaptadores.saida.FabricaEventoTransacaoProtobuf;
 
-//    public Multi<Evento> processaComando(Comando umComando) {
-//        try {
-//            try {
-//                var metodoProcessa = getClass().getDeclaredMethod("processa", umComando.getClass());
-//                metodoProcessa.setAccessible(true);
-//                return (Multi<Evento>) metodoProcessa.invoke(this, umComando);
-//            } catch (IllegalAccessException e) {
-//                throw new RuntimeException(e);
-//            } catch (InvocationTargetException e) {
-//                if (e.getCause() instanceof IllegalArgumentException) {
-//                    throw (IllegalArgumentException) e.getCause();
-//                }
-//                if (e.getCause() instanceof IllegalStateException) {
-//                    throw (IllegalStateException) e.getCause();
-//                }
-//                throw new RuntimeException(e);
-//            }
-//        } catch (NoSuchMethodException e) {
-//            throw new RuntimeException(e);
-//        }
-//    }
-//
-//    public <T extends RaizAgregado> T aplicaEvento(Evento eventoDeDominio) {
-//        try {
-//            var metodoAplica = getClass().getDeclaredMethod("aplica", eventoDeDominio.getClass());
-//            metodoAplica.setAccessible(true);
-//            metodoAplica.invoke(this, eventoDeDominio);
-//
-//        } catch (IllegalAccessException | NoSuchMethodException e) {
-//            throw new RuntimeException(e);
-//        } catch (InvocationTargetException e) {
-//            if (e.getCause() instanceof IllegalArgumentException) {
-//                throw (IllegalArgumentException) e.getCause();
-//            }
-//            if (e.getCause() instanceof IllegalStateException) {
-//                throw (IllegalStateException) e.getCause();
-//            }
-//            throw new RuntimeException(e);
-//        }
-//        return (T)this;
-//    }
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Stream;
+
+public abstract class RaizAgregado implements Entidade {
+    protected static FabricaEventoTransacao evento = new FabricaEventoTransacaoProtobuf();
+    private IdAgregado idAgregado;
+    private int versaoAgregado = 0;
+    private final List<EventoFluxo> alteracoes = new ArrayList<>();
+
+    protected IdAgregado idAgregado() {
+        return idAgregado;
+    }
+
+    protected void setIdAgregado(IdAgregado umId) {
+        this.idAgregado = umId;
+    }
+
+    protected int proximaVersaoDoAgregado() {
+        return versaoAgregado + 1;
+    }
+
+    public Stream<EventoFluxo> alteracoes() {
+        return alteracoes.stream();
+    }
+
+    protected void aplica(EventoFluxo umEvento) {
+        this.alteracoes.add(umEvento);
+        this.atualiza(umEvento);
+    }
+
+    protected void atualiza(EventoFluxo evento) {
+        try {
+            this.getClass().getMethod("when", evento.evento().getClass()).invoke(this, evento.evento());
+            this.versaoAgregado++;
+        } catch (InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

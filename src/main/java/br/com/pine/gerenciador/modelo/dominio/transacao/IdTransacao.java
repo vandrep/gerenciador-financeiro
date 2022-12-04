@@ -1,5 +1,6 @@
 package br.com.pine.gerenciador.modelo.dominio.transacao;
 
+import br.com.pine.gerenciador.modelo.dominio.IdAgregado;
 import br.com.pine.gerenciador.modelo.dominio.ObjetoDeValor;
 
 import java.util.UUID;
@@ -11,8 +12,8 @@ import static br.com.pine.gerenciador.modelo.dominio.Validador.validaArgumentoNa
 import static br.com.pine.gerenciador.modelo.dominio.Validador.validaArgumentoNaoVazio;
 import static br.com.pine.gerenciador.modelo.dominio.Validador.validaComprimentoArgumento;
 
-public class IdTransacao implements ObjetoDeValor {
-    private String id;
+public class IdTransacao implements IdAgregado {
+    private UUID id;
 
     public IdTransacao() {
         this.setId(UUID.randomUUID().toString());
@@ -27,12 +28,16 @@ public class IdTransacao implements ObjetoDeValor {
         validaArgumentoNaoVazio(umId, ID_TRANSACAO_VAZIO);
         validaComprimentoArgumento(umId, 36, ID_TRANSACAO_TAMANHO_INVALIDO);
 
-        this.id = umId;
+        this.id = UUID.fromString(umId);
+    }
+
+    public UUID id() {
+        return id;
     }
 
     @Override
     public String toString() {
-        return this.id;
+        return this.id.toString();
     }
 
     @Override

@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.net.URL;
+import java.util.UUID;
 
 import static br.com.pine.gerenciador.modelo.dominio.transacao.TipoUnidadeMedida.UN;
 import static io.restassured.RestAssured.given;
@@ -36,7 +37,7 @@ class AdaptadorHTTPTransacaoTest {
     @Test
     void chamaEndPointComComandoReferenciandoTransacaoInexistenteComErro() {
         var umComando = new AdicionaItem();
-        umComando.idTransacao = "bogus";
+        umComando.idTransacao = UUID.randomUUID().toString();
         umComando.descricao = "OK";
         umComando.quantidade = 5;
         umComando.tipoUnidadeMedida = UN.name();

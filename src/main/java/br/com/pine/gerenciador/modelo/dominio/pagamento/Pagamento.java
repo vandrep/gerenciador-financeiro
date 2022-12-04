@@ -2,12 +2,14 @@
 //
 //import br.com.pine.gerenciador.aplicacao.pagamento.dados.DadosParcela;
 //import br.com.pine.gerenciador.aplicacao.transacao.comandos.CriaTransacao;
+//import br.com.pine.gerenciador.modelo.dominio.Evento;
 //import br.com.pine.gerenciador.modelo.dominio.EventoDeDominio;
 //import br.com.pine.gerenciador.modelo.dominio.RaizAgregado;
 //import br.com.pine.gerenciador.modelo.dominio.conta.IdConta;
 //import br.com.pine.gerenciador.modelo.dominio.transacao.IdTransacao;
 //import br.com.pine.gerenciador.modelo.dominio.transacao.Transacao;
 //import br.com.pine.gerenciador.modelo.dominio.transacao.ValorMonetario;
+//import br.com.pine.gerenciador.modelo.dominio.transacao.eventos.EventoTransacao;
 //import io.smallrye.mutiny.Multi;
 //
 //import java.util.Set;
@@ -65,5 +67,10 @@
 //        idPagamento = umIdPagamento;
 //        idTransacao = umIdTransacao;
 //        idParcelas = unsIdParcelas;
+//    }
+//
+//    @Override
+//    protected void mutate(Evento evento) {
+//
 //    }
 //}

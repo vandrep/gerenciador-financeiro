@@ -1,5 +1,6 @@
 package br.com.pine.gerenciador.portas.adaptadores.saida;
 
+import com.google.protobuf.GeneratedMessageV3;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Type;
 
@@ -12,6 +13,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.UUID;
 
@@ -82,6 +84,12 @@ public class EventoFluxo {
 
     public byte[] getDado() {
         return dado;
+    }
+
+    public GeneratedMessageV3 evento() {
+        return Arrays.stream(EventoFluxoParaEventoDominio.values())
+                .filter(eventoFluxoParaEventoDominio -> eventoFluxoParaEventoDominio.tipoEvento.equals(tipoEvento))
+                .findFirst().orElseThrow().evento(dado);
     }
 
     public byte[] getMetadado() {

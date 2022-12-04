@@ -2,18 +2,12 @@ package br.com.pine.gerenciador.modelo.dominio.transacao;
 
 import br.com.pine.gerenciador.modelo.dominio.RaizAgregado;
 import br.com.pine.gerenciador.modelo.dominio.pagamento.IdPagamento;
-import br.com.pine.gerenciador.modelo.dominio.transacao.eventos.EventoTransacao;
 import br.com.pine.gerenciador.modelo.dominio.transacao.eventos.ItemAdicionado;
+import br.com.pine.gerenciador.modelo.dominio.transacao.eventos.ItemRemovido;
 import br.com.pine.gerenciador.modelo.dominio.transacao.eventos.TransacaoCriada;
-import br.com.pine.gerenciador.portas.adaptadores.EventoAvro;
-import org.apache.avro.Schema;
-import org.apache.avro.generic.GenericDatumReader;
-import org.apache.avro.generic.GenericRecord;
+import br.com.pine.gerenciador.portas.adaptadores.saida.EventoFluxo;
 
-import java.io.File;
-import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Currency;
 import java.util.HashSet;
@@ -25,46 +19,27 @@ import static br.com.pine.gerenciador.modelo.dominio.MensagemErro.TRANSACAO_PAGA
 import static br.com.pine.gerenciador.modelo.dominio.Validador.validaArgumentoNaoNulo;
 import static br.com.pine.gerenciador.modelo.dominio.Validador.validaArgumentoNaoVazio;
 import static br.com.pine.gerenciador.modelo.dominio.transacao.Categoria.SEM_CATEGORIA;
-import static br.com.pine.gerenciador.portas.adaptadores.saida.FabricaEventosTransacao.criaEvento;
 
-public class Transacao implements RaizAgregado {
-    private IdTransacao id;
+public class Transacao extends RaizAgregado {
     private IdPagamento pagamento;
     private final Set<ItemPago> itens = new HashSet<>();
     private Set<Categoria> categorias = new HashSet<>();
 
-    private final List<EventoTransacao> alteracoes = new ArrayList<>();
-//    private final List<EventoAvro> alteracoes = new ArrayList<>();
 
-    public Transacao(List<EventoTransacao> eventos) {
-        eventos.forEach(this::mutate);
+    public static Transacao cria(IdPagamento umPagamento,
+                                 Set<Categoria> categorias) {
+        Transacao transacao = new Transacao();
+        transacao.aplica(evento.transacaoCriada(
+                new IdTransacao(),
+                transacao.pagamentoValido(umPagamento),
+                transacao.categoriasValidas(categorias)));
+        return transacao;
     }
 
-    public Transacao(IdPagamento umPagamento,
-                     Set<Categoria> categorias) {
-        this.aplicaNovo(
-                criaEvento(
-                        new IdTransacao().toString(),
-                        pagamentoValido(umPagamento),
-                        categorias.stream()
-                                .map(Categoria::name)
-                                .collect(Collectors.toSet())));
-    }
-
-//    public Transacao(IdPagamento umPagamento,
-//                     Set<Categoria> categorias) {
-//        this.aplicaNovo(
-//                criaEventoNovo(
-//                        pagamentoValido(umPagamento),
-//                        categorias.stream()
-//                                .map(Categoria::name)
-//                                .collect(Collectors.toSet())));
-//    }
-
-    private String pagamentoValido(IdPagamento umPagamento) {
-        validaArgumentoNaoNulo(umPagamento, TRANSACAO_PAGAMENTO_NULO);
-        validaArgumentoNaoVazio(umPagamento.toString(), TRANSACAO_PAGAMENTO_NULO);
-        return umPagamento.toString();
+    public static Transacao instancia(List<EventoFluxo> eventos) {
+        var transacao = new Transacao();
+        eventos.forEach(transacao::atualiza);
+        return transacao;
     }
 
     public void adicionaItemMoedaPadrao(String umaDescricao,
@@ -72,7 +47,7 @@ public class Transacao implements RaizAgregado {
                                         String umTipoUnidade,
                                         float umValor,
                                         Set<String> categorias) {
-        this.adicionaItemPago(
+        this.adicionaItem(
                 new ItemPago(
                         umaDescricao,
                         new ValorItem(
@@ -87,47 +62,20 @@ public class Transacao implements RaizAgregado {
                                 .collect(Collectors.toSet())));
     }
 
-    public void adicionaItemOutraMoeda(String umaDescricao,
-                                       float umaQuantidade,
-                                       String umTipoUnidade,
-                                       String umaMoeda,
-                                       float umValor,
-                                       Set<String> categorias) {
-        this.adicionaItemPago(
-                new ItemPago(
-                        umaDescricao,
-                        new ValorItem(
-                                new Quantidade(
-                                        BigDecimal.valueOf(umaQuantidade),
-                                        TipoUnidadeMedida.valueOf(umTipoUnidade)),
-                                new ValorMonetario(
-                                        Currency.getInstance(umaMoeda),
-                                        BigDecimal.valueOf(umValor))),
-                        categorias.stream()
-                                .map(Categoria::valueOf)
-                                .collect(Collectors.toSet())));
+    private void adicionaItem(ItemPago umItem) {
+        this.aplica(evento.itemAdicionado(
+                idTransacao(),
+                proximaVersaoDoAgregado(),
+                umItem.descricao(),
+                umItem.valorItem(),
+                umItem.todasCategorias()));
     }
 
-    private void adicionaItemPago(ItemPago umItemPago) {
-        this.aplicaNovo(
-                criaEvento(
-                        umItemPago.descricao(),
-                        umItemPago.valorItem(),
-                        umItemPago.todasCategorias().stream()
-                                .map(Categoria::name)
-                                .collect(Collectors.toSet())));
-    }
-
-    public List<EventoTransacao> alteracoes() {
-//    public List<EventoAvro> alteracoes() {
-        return Collections.unmodifiableList(alteracoes);
-    }
-
-    public void atualizaCategorias(Set<String> umasCategorias) {
-    }
-
-    public IdTransacao id() {
-        return this.id;
+    public void removeItem(String umaDescricao) {
+        this.aplica(evento.itemRemovido(
+                idTransacao(),
+                proximaVersaoDoAgregado(),
+                umaDescricao));
     }
 
     public Set<ItemPago> itens() {
@@ -142,69 +90,16 @@ public class Transacao implements RaizAgregado {
         return Collections.unmodifiableSet(this.categorias);
     }
 
-    private void aplicaNovo(EventoTransacao evento) {
-//    private void aplicaNovo(EventoAvro evento) {
-        this.incluiAlteracao(evento);
-        this.mutate(evento);
-    }
-
-    private void incluiAlteracao(EventoTransacao umEvento) {
-//    private void incluiAlteracao(EventoAvro umEvento) {
-        this.alteracoes.add(umEvento);
-    }
-
-    private Transacao() {
-    }
-
-    private void mutate(EventoTransacao evento) {
-//        this.when((T)evento.getTipoEventoCase().deserializa(evento));
-//        this.when(EventoAvro.valueOf(evento.getTipo()).deserializa(evento.));
-//        var serial = EventoAvro.valueOf(evento.getTipo());
-        switch (evento.getTipoEventoCase()) {
-            case TRANSACAO_CRIADA -> this.when(evento.getTransacaoCriada());
-            case ITEM_ADICIONADO -> this.when(evento.getItemAdicionado());
-        }
-    }
-
-//    private void mutate(EventoAvro evento) {
-//        try {
-//            Schema schema = new Schema.Parser().parse(new File("transacao.avsc"));
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
-//        Class<?> clazz;
-//        try {
-//            clazz = Class.forName("br.com.pine.gerenciador.modelo.dominio.transacao.eventos" + "." + evento.tipoEvento);
-//        } catch (ClassNotFoundException e) {
-//            throw new RuntimeException(e);
-//        }
-//        var alo = evento.tipoEvento;
-//
-//        var userDatumReader = new GenericDatumReader<GenericRecord>(clazz);
-//        DataFileReader<User> dataFileReader = new DataFileReader<User>(file, userDatumReader);
-//        User user = null;
-//        while (dataFileReader.hasNext()) {
-//            // Reuse user object by passing it to next(). This saves us from
-//            // allocating and garbage collecting many objects for files with
-//            // many items.
-//            user = dataFileReader.next(user);
-//            System.out.println(user);
-////        switch (evento.getTipoEventoCase()) {
-////            case TRANSACAO_CRIADA -> this.when(evento.getTransacaoCriada());
-////            case ITEM_ADICIONADO -> this.when(evento.getItemAdicionado());
-//        }
-//    }
-
     public void when(TransacaoCriada umEvento) {
-        this.setId(new IdTransacao(umEvento.getId()));
-        this.setPagamento(new IdPagamento(umEvento.getPagamento()));
-        this.setCategorias(umEvento.getCategoriasList().stream()
+        setId(new IdTransacao(umEvento.getId()));
+        setPagamento(new IdPagamento(umEvento.getPagamento()));
+        setCategorias(umEvento.getCategoriasList().stream()
                 .map(Categoria::valueOf)
                 .collect(Collectors.toSet()));
     }
 
-    private void when(ItemAdicionado umEvento) {
-        this.adicionaItem(
+    public void when(ItemAdicionado umEvento) {
+        itens.add(
                 new ItemPago(
                         umEvento.getDescricao(),
                         new ValorItem(
@@ -219,6 +114,29 @@ public class Transacao implements RaizAgregado {
                                 .collect(Collectors.toSet())));
     }
 
+    public void when(ItemRemovido umEvento) {
+        itens.removeIf(item -> item.descricao().equals(umEvento.getDescricao()));
+    }
+
+    private Transacao() {
+    }
+
+    public IdTransacao idTransacao() {
+        return (IdTransacao) this.idAgregado();
+    }
+
+    private IdPagamento pagamentoValido(IdPagamento umPagamento) {
+        validaArgumentoNaoNulo(umPagamento, TRANSACAO_PAGAMENTO_NULO);
+        validaArgumentoNaoVazio(umPagamento.toString(), TRANSACAO_PAGAMENTO_NULO);
+        return umPagamento;
+    }
+
+    private Set<Categoria> categoriasValidas(Set<Categoria> categorias) {
+        validaArgumentoNaoNulo(categorias, TRANSACAO_PAGAMENTO_NULO);
+        validaArgumentoNaoVazio(categorias.toString(), TRANSACAO_PAGAMENTO_NULO);
+        return categorias;
+    }
+
     private void setCategorias(Set<Categoria> categorias) {
         if (categorias.isEmpty()) {
             categorias.add(SEM_CATEGORIA);
@@ -230,70 +148,10 @@ public class Transacao implements RaizAgregado {
         this.categorias = categorias;
     }
 
-//    public void removeItemPago(ItemPago umItemPago) {
-//        if (this.itens.size() == 1) {
-//            throw new IllegalStateException(TRANSACAO_DEVE_TER_PELO_MENOS_UM_ITEM_PAGO.mensagem);
-//        }
-//
-//        this.itens.remove(umItemPago);
-//
-//        this.atualizaValor();
-//    }
-
-//    public void alteraItemPago(ItemPago itemPagoARemover, ItemPago itemPagoAAdicionar) {
-//        this.adicionaItemPago(itemPagoAAdicionar);
-//        this.removeItemPago(itemPagoARemover);
-//    }
-
-
-    private void adicionaItem(ItemPago umItemPago) {
-        this.itens.add(umItemPago);
-    }
-
-//    private Set<Categoria> getCategorias() {
-//        return this.categorias;
-//    }
-
-
-//    private void aplica(ItemPagoAdicionado umEvento) {
-//        var itemAAdicionar = new ItemPago(
-//                umEvento.descricao(),
-//                umEvento.valor(),
-//                umEvento.categorias());
-//        this.adicionaItemPago(itemAAdicionar);
-//    }
-
-//    private void aplica(ItemPagoRemovido umEvento) {
-//        removeItemPago(ItemPago.criaItemPago(
-//                umEvento.descricao(),
-//                umEvento.quantidade(),
-//                "UN",
-//                ValorMonetario.emReal(umEvento.valorUnidade())));
-//    }
-//
-//    private void aplica(ItemPagoAlterado umEvento) {
-//        alteraItemPago(
-//                ItemPago.criaItemPago(
-//                        umEvento.descricaoAnterior(),
-//                        umEvento.quantidadeAnterior(),
-//                        "UN",
-//                        ValorMonetario.emReal(umEvento.valorUnidadeAnterior())),
-//                ItemPago.criaItemPago(
-//                        umEvento.descricaoNova(),
-//                        umEvento.quantidadeNova(),
-//                        "UN",
-//                        ValorMonetario.emReal(umEvento.valorUnidadeNova())));
-//    }
-
-//    private void aplica(CategoriasAtualizadas umEvento) {
-//        atualizaCategorias(umEvento.categorias());
-//    }
-
     private void setId(IdTransacao umIdTransacao) {
-        this.id = umIdTransacao;
+        this.setIdAgregado(umIdTransacao);
     }
 
-    //    TODO voltar aqui depois que o modelo estiver mais maduro
     private void setPagamento(IdPagamento umIdPagamento) {
         this.pagamento = umIdPagamento;
     }

@@ -3,6 +3,7 @@ package br.com.pine.gerenciador.portas.adaptadores.saida;
 import br.com.pine.Fixtures;
 import br.com.pine.gerenciador.modelo.dominio.transacao.Categoria;
 import br.com.pine.gerenciador.modelo.dominio.transacao.Transacao;
+import br.com.pine.gerenciador.modelo.dominio.transacao.eventos.TransacaoCriada;
 import io.quarkus.test.junit.QuarkusTest;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
@@ -18,9 +19,9 @@ import java.util.stream.Collectors;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @QuarkusTest
-class EventStoreTransacaoTest {
+class EventStoreImplTest {
     @Inject
-    EventStoreTransacao repositorio;
+    EventStoreImpl repositorio;
     @Inject
     Fixtures fixtures;
 
@@ -30,17 +31,25 @@ class EventStoreTransacaoTest {
 
     @Test
     void armazenaPrimeiroEventoDoIdComSucesso() {
-        var umaTransacao = transacao();
+        var transacao = Transacao.cria(
+                fixtures.umIdPagamento(),
+                fixtures.categorias());
 
-        var eventos = repositorio.buscaEventosPorIdStream(umaTransacao.id().toString())
+        repositorio.armazenaNovosEventos(
+                transacao.idTransacao().id(),
+                transacao.alteracoes())
+                .stage(this::finaliza);
+
+        var eventos = repositorio.buscaEventosPorIdStream(
+                transacao.idTransacao().id())
                 .stage(this::finaliza);
 
         assertEquals(1, eventos.size());
 
-        var transacaoCriada = eventos.get(0).getTransacaoCriada();
-        assertEquals(umaTransacao.id().toString(), transacaoCriada.getId());
+        TransacaoCriada transacaoCriada = (TransacaoCriada) eventos.get(0).evento();
+        assertEquals(transacao.idTransacao().toString(), transacaoCriada.getId());
         assertEquals(
-                umaTransacao.categorias(),
+                transacao.categorias(),
                 transacaoCriada.getCategoriasList().stream()
                         .map(Categoria::valueOf)
                         .collect(Collectors.toSet()));
@@ -48,9 +57,18 @@ class EventStoreTransacaoTest {
 
     @Test
     void armazenaSegundoEventoDoIdComSucesso() {
-        var umId = transacao().id().toString();
+        var transacao = Transacao.cria(
+                fixtures.umIdPagamento(),
+                fixtures.categorias());
 
-        var umaTransacaoRecriada = new Transacao(
+        repositorio.armazenaNovosEventos(
+                transacao.idTransacao().id(),
+                transacao.alteracoes())
+                .stage(this::finaliza);
+
+        var umId = transacao.idTransacao().id();
+
+        var transacaoRecriada = Transacao.instancia(
                 repositorio.buscaEventosPorIdStream(umId).stage(this::finaliza));
 
         var umaDescricao = fixtures.umaStringAleatoria();
@@ -59,7 +77,7 @@ class EventStoreTransacaoTest {
         var umValor = fixtures.floatPositivo();
         var categorias = fixtures.categoriasString();
 
-        umaTransacaoRecriada.adicionaItemMoedaPadrao(
+        transacaoRecriada.adicionaItemMoedaPadrao(
                 umaDescricao,
                 umaQuantidade,
                 umTipoUnidade,
@@ -67,8 +85,8 @@ class EventStoreTransacaoTest {
                 categorias);
 
         repositorio.armazenaNovosEventos(
-                umaTransacaoRecriada.id().toString(),
-                umaTransacaoRecriada.alteracoes()).stage(this::finaliza);
+                transacaoRecriada.idTransacao().id(),
+                transacaoRecriada.alteracoes()).stage(this::finaliza);
 
         var eventos = repositorio.buscaEventosPorIdStream(umId)
                 .stage(this::finaliza);
@@ -77,24 +95,13 @@ class EventStoreTransacaoTest {
 //        var transacaoFinalizada = new Transacao(eventos);
 
 //        var transacaoFinalizada = eventos.get(0).getItemAdicionado();
-        assertEquals(1, umaTransacaoRecriada.itens().size());
-        var itemDaLista = umaTransacaoRecriada.itens().stream().toList().get(0);
+        assertEquals(1, transacaoRecriada.itens().size());
+        var itemDaLista = transacaoRecriada.itens().stream().toList().get(0);
         assertEquals(umaDescricao, itemDaLista.descricao());
         assertEquals(umaQuantidade, itemDaLista.multiplicador().floatValue());
         assertEquals(umTipoUnidade, itemDaLista.tipoUnidadeMedida().name());
         assertEquals(umValor, itemDaLista.valorUnidade().floatValue());
         assertEquals(categorias, itemDaLista.todasCategorias().stream().map(Categoria::name).collect(Collectors.toSet()));
-    }
-
-    private Transacao transacao() {
-        var umaTransacao = new Transacao(
-                fixtures.umIdPagamento(),
-                fixtures.categorias());
-
-        repositorio.armazenaNovosEventos(
-                umaTransacao.id().toString(),
-                umaTransacao.alteracoes()).stage(this::finaliza);
-        return umaTransacao;
     }
 
     private <X> X finaliza(Uni<X> umaUni) {

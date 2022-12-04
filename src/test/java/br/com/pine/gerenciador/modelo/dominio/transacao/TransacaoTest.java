@@ -29,10 +29,9 @@ class TransacaoTest {
 
     @BeforeEach
     void setUp() {
-        umPagamento = new IdPagamento();
+        umPagamento = fixtures.umIdPagamento();
         categorias = fixtures.categorias();
-        umaTransacao = new Transacao(umPagamento, categorias);
-
+        umaTransacao = Transacao.cria(umPagamento, categorias);
 //        comandoRemoveItemPago = fixtures.comandoRemoveItemPagoIdentico(comandoAdicionaItemPago);
 //        comandoAlteraItemPago = fixtures.comandoAlteraItemPagoIdentico(comandoAdicionaItemPago);
 //        comandoAtualizaCategoria = fixtures.comandoAtualizaCategoria(umIdTransacao.id());
@@ -40,7 +39,7 @@ class TransacaoTest {
 
     @Test
     void criaTransacaoComSucesso() {
-        assertNotNull(umaTransacao.id());
+        assertNotNull(umaTransacao.idTransacao());
         assertEquals(umPagamento, umaTransacao.pagamento());
         assertEquals(categorias, umaTransacao.categorias());
     }
@@ -49,8 +48,9 @@ class TransacaoTest {
     void criaTransacaoPagamentoNuloComErro() {
         umPagamento = null;
 
+
         var erro = assertThrows(IllegalArgumentException.class,
-                () -> new Transacao(umPagamento, categorias));
+                () -> Transacao.cria(umPagamento, categorias));
 
         assertEquals(TRANSACAO_PAGAMENTO_NULO.mensagem, erro.getMessage());
     }

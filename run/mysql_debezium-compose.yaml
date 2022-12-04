@@ -1,0 +1,60 @@
+version: '2'
+services:
+  mysql:
+    image: mysql:8
+    networks:
+      - broker-kafka
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql:/var/lib/mysql
+      - "./scripts/schema.sql:/docker-entrypoint-initdb.d/1.sql"
+    environment:
+      - MYSQL_ROOT_PASSWORD=ap135111
+      - MYSQL_USER=vandrep
+      - MYSQL_PASSWORD=ap135111
+      - MYSQL_DATABASE=db
+  zookeeper:
+    image: quay.io/debezium/zookeeper:2.0
+    networks:
+      - broker-kafka
+    ports:
+      - "2181:2181"
+      - "2888:2888"
+      - "3888:3888"
+  kafka:
+    image: quay.io/debezium/kafka:2.0
+    depends_on:
+      - zookeeper
+    networks:
+      - broker-kafka
+    ports:
+      - "9092:9092"
+    volumes:
+      - kafka:/kafka/data
+    environment:
+      - ZOOKEEPER_CONNECT=zookeeper:2181
+  connect:
+    image: quay.io/debezium/connect:2.0
+    depends_on:
+      - zookeeper
+      - mysql
+      - kafka
+    networks:
+      - broker-kafka
+    ports:
+      - "8083:8083"
+    environment:
+      - BOOTSTRAP_SERVERS=kafka:9092
+      - GROUP_ID=1
+      - CONFIG_STORAGE_TOPIC=my_connect_configs
+      - OFFSET_STORAGE_TOPIC=my_connect_offsets
+      - STATUS_STORAGE_TOPIC=my_connect_statuses
+volumes:
+  mysql:
+    driver: local
+  kafka:
+    driver: local
+networks:
+  broker-kafka:
+    driver: bridge
